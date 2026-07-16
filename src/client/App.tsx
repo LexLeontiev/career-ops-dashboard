@@ -10,7 +10,7 @@ export default function App() {
 
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
-  const [sortField, setSortField] = useState<keyof Application | "">("num");
+  const [sortField, setSortField] = useState<keyof Application | "">("score");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
 
   const [selectedApp, setSelectedApp] = useState<Application | null>(null);
@@ -39,6 +39,39 @@ export default function App() {
       setSortOrder("desc");
     }
   };
+
+  const counts = {
+    all: 0,
+    active: 0,
+    closed: 0,
+    applied: 0,
+    interview: 0,
+    evaluated: 0,
+    skip: 0,
+    rejected: 0,
+  };
+
+  applications.forEach((app) => {
+    const term = searchQuery.toLowerCase();
+    const matchesSearch =
+      app.company.toLowerCase().includes(term) ||
+      app.role.toLowerCase().includes(term) ||
+      app.notes.toLowerCase().includes(term);
+
+    if (!matchesSearch) return;
+
+    counts.all++;
+    const status = (app.status || "").toUpperCase();
+    
+    if (status === "APPLIED" || status === "INTERVIEW" || status === "RESPONDED") counts.active++;
+    if (status === "SKIP" || status === "REJECTED") counts.closed++;
+    
+    if (status === "APPLIED") counts.applied++;
+    if (status === "INTERVIEW") counts.interview++;
+    if (status === "EVALUATED") counts.evaluated++;
+    if (status === "SKIP") counts.skip++;
+    if (status === "REJECTED") counts.rejected++;
+  });
 
   const filteredApps = applications.filter((app) => {
     // Search query match
@@ -123,6 +156,7 @@ export default function App() {
                 setSearchQuery={setSearchQuery}
                 statusFilter={statusFilter}
                 setStatusFilter={setStatusFilter}
+                counts={counts}
               />
               <DataTable 
                 applications={sortedApps}

@@ -74,14 +74,14 @@ export function DataTable({ applications, onSelect, sortField, sortOrder, onSort
         <table className="w-full border-collapse">
           <thead>
             <tr className="bg-surface-container-high text-left">
+              <th className="px-6 py-4 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider cursor-pointer hover:bg-white/5" onClick={() => onSort("score")}>
+                Score / 5{renderSortIndicator("score")}
+              </th>
               <th className="px-6 py-4 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider cursor-pointer hover:bg-white/5" onClick={() => onSort("company")}>
                 Company{renderSortIndicator("company")}
               </th>
               <th className="px-6 py-4 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider cursor-pointer hover:bg-white/5" onClick={() => onSort("role")}>
                 Role{renderSortIndicator("role")}
-              </th>
-              <th className="px-6 py-4 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider cursor-pointer hover:bg-white/5" onClick={() => onSort("score")}>
-                Score / 5{renderSortIndicator("score")}
               </th>
               <th className="px-6 py-4 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider cursor-pointer hover:bg-white/5" onClick={() => onSort("status")}>
                 Status{renderSortIndicator("status")}
@@ -112,11 +112,11 @@ export function DataTable({ applications, onSelect, sortField, sortOrder, onSort
                     className="hover:bg-surface-hover cursor-pointer transition-colors group" 
                     onClick={(e) => toggleTimeline(e, app.num)}
                   >
-                    <td className="px-6 py-5 font-bold text-white">{app.company}</td>
-                    <td className="px-6 py-5 text-on-surface-variant">{app.role}</td>
                     <td className="px-6 py-5">
                       <span className={`${scoreClass.bg} ${scoreClass.text} px-2.5 py-1 rounded-md text-xs font-bold`}>{app.score.replace(/\s*\/\s*5$/, "")}</span>
                     </td>
+                    <td className="px-6 py-5 font-bold text-white">{app.company}</td>
+                    <td className="px-6 py-5 text-on-surface-variant">{app.role}</td>
                     <td className="px-6 py-5">
                       <span className={`${statusClass.bg} ${statusClass.text} px-2.5 py-1 rounded-md text-xs font-bold`}>{app.status}</span>
                     </td>

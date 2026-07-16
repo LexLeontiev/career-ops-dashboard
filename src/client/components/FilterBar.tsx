@@ -5,9 +5,10 @@ interface FilterBarProps {
   setSearchQuery: (q: string) => void;
   statusFilter: string;
   setStatusFilter: (s: string) => void;
+  counts: Record<string, number>;
 }
 
-export function FilterBar({ searchQuery, setSearchQuery, statusFilter, setStatusFilter }: FilterBarProps) {
+export function FilterBar({ searchQuery, setSearchQuery, statusFilter, setStatusFilter, counts }: FilterBarProps) {
   return (
     <section className="mb-stack-lg space-y-4">
       <div className="relative max-w-md">
@@ -23,54 +24,54 @@ export function FilterBar({ searchQuery, setSearchQuery, statusFilter, setStatus
       <div className="flex items-center gap-2 overflow-x-auto pb-2 no-scrollbar">
         <button 
           onClick={() => setStatusFilter("all")}
-          className={`flex-shrink-0 px-5 py-2 rounded-full font-label-md text-label-md transition-colors ${statusFilter === "all" ? "bg-primary text-on-primary-container" : "border border-border-subtle text-on-surface-variant hover:bg-surface-hover"}`}
+          className={`flex-shrink-0 px-5 py-2 rounded-full font-label-md text-label-md transition-colors flex items-center ${statusFilter === "all" ? "bg-primary text-on-primary-container" : "border border-border-subtle text-on-surface-variant hover:bg-surface-hover"}`}
         >
-          All Statuses
+          All Statuses <span className="opacity-50 text-xs ml-1.5 font-normal">{counts.all}</span>
         </button>
         <button 
           onClick={() => setStatusFilter("active")}
-          className={`flex-shrink-0 px-5 py-2 rounded-full font-label-md text-label-md transition-colors ${statusFilter === "active" ? "bg-primary text-on-primary-container" : "border border-border-subtle text-on-surface-variant hover:bg-surface-hover"}`}
+          className={`flex-shrink-0 px-5 py-2 rounded-full font-label-md text-label-md transition-colors flex items-center ${statusFilter === "active" ? "bg-primary text-on-primary-container" : "border border-border-subtle text-on-surface-variant hover:bg-surface-hover"}`}
         >
-          Active
+          Active <span className="opacity-50 text-xs ml-1.5 font-normal">{counts.active}</span>
         </button>
         <button 
           onClick={() => setStatusFilter("closed")}
-          className={`flex-shrink-0 px-5 py-2 rounded-full font-label-md text-label-md transition-colors ${statusFilter === "closed" ? "bg-primary text-on-primary-container" : "border border-border-subtle text-on-surface-variant hover:bg-surface-hover"}`}
+          className={`flex-shrink-0 px-5 py-2 rounded-full font-label-md text-label-md transition-colors flex items-center ${statusFilter === "closed" ? "bg-primary text-on-primary-container" : "border border-border-subtle text-on-surface-variant hover:bg-surface-hover"}`}
         >
-          Closed
+          Closed <span className="opacity-50 text-xs ml-1.5 font-normal">{counts.closed}</span>
         </button>
 
         <div className="w-px h-8 bg-border-subtle mx-2 flex-shrink-0" />
 
         <button 
           onClick={() => setStatusFilter("applied")}
-          className={`flex-shrink-0 px-5 py-2 rounded-full font-label-md text-label-md transition-colors ${statusFilter === "applied" ? "bg-primary text-on-primary-container" : "border border-border-subtle text-on-surface-variant hover:bg-surface-hover"}`}
+          className={`flex-shrink-0 px-5 py-2 rounded-full font-label-md text-label-md transition-colors flex items-center ${statusFilter === "applied" ? "bg-primary text-on-primary-container" : "border border-border-subtle text-on-surface-variant hover:bg-surface-hover"}`}
         >
-          Applied
+          Applied <span className="opacity-50 text-xs ml-1.5 font-normal">{counts.applied}</span>
         </button>
         <button 
           onClick={() => setStatusFilter("interview")}
-          className={`flex-shrink-0 px-5 py-2 rounded-full font-label-md text-label-md transition-colors ${statusFilter === "interview" ? "bg-primary text-on-primary-container" : "border border-border-subtle text-on-surface-variant hover:bg-surface-hover"}`}
+          className={`flex-shrink-0 px-5 py-2 rounded-full font-label-md text-label-md transition-colors flex items-center ${statusFilter === "interview" ? "bg-primary text-on-primary-container" : "border border-border-subtle text-on-surface-variant hover:bg-surface-hover"}`}
         >
-          Interview
+          Interview <span className="opacity-50 text-xs ml-1.5 font-normal">{counts.interview}</span>
         </button>
         <button 
           onClick={() => setStatusFilter("evaluated")}
-          className={`flex-shrink-0 px-5 py-2 rounded-full font-label-md text-label-md transition-colors ${statusFilter === "evaluated" ? "bg-primary text-on-primary-container" : "border border-border-subtle text-on-surface-variant hover:bg-surface-hover"}`}
+          className={`flex-shrink-0 px-5 py-2 rounded-full font-label-md text-label-md transition-colors flex items-center ${statusFilter === "evaluated" ? "bg-primary text-on-primary-container" : "border border-border-subtle text-on-surface-variant hover:bg-surface-hover"}`}
         >
-          Evaluated
+          Evaluated <span className="opacity-50 text-xs ml-1.5 font-normal">{counts.evaluated}</span>
         </button>
         <button 
           onClick={() => setStatusFilter("skip")}
-          className={`flex-shrink-0 px-5 py-2 rounded-full font-label-md text-label-md transition-colors ${statusFilter === "skip" ? "bg-primary text-on-primary-container" : "border border-border-subtle text-on-surface-variant hover:bg-surface-hover"}`}
+          className={`flex-shrink-0 px-5 py-2 rounded-full font-label-md text-label-md transition-colors flex items-center ${statusFilter === "skip" ? "bg-primary text-on-primary-container" : "border border-border-subtle text-on-surface-variant hover:bg-surface-hover"}`}
         >
-          Skip
+          Skip <span className="opacity-50 text-xs ml-1.5 font-normal">{counts.skip}</span>
         </button>
         <button 
           onClick={() => setStatusFilter("rejected")}
-          className={`flex-shrink-0 px-5 py-2 rounded-full font-label-md text-label-md transition-colors ${statusFilter === "rejected" ? "bg-primary text-on-primary-container" : "border border-border-subtle text-on-surface-variant hover:bg-surface-hover"}`}
+          className={`flex-shrink-0 px-5 py-2 rounded-full font-label-md text-label-md transition-colors flex items-center ${statusFilter === "rejected" ? "bg-primary text-on-primary-container" : "border border-border-subtle text-on-surface-variant hover:bg-surface-hover"}`}
         >
-          Rejected
+          Rejected <span className="opacity-50 text-xs ml-1.5 font-normal">{counts.rejected}</span>
         </button>
       </div>
     </section>
