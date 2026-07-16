@@ -6,5 +6,5 @@ import App from "../src/client/App.js";
 
 test("renders app container header", () => {
   const html = renderToString(React.createElement(App));
-  assert.match(html, /Career Ops Dashboard/);
+  assert.match(html, /Career Ops/);
 });

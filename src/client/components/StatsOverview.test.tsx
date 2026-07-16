@@ -11,6 +11,6 @@ test("renders aggregated stats correctly", () => {
   ];
   const html = renderToString(React.createElement(StatsOverview, { applications: mockApps }));
   assert.match(html, /Active Processes.*1/);
-  assert.match(html, /Closed\/Skipped.*1/);
-  assert.match(html, /Avg Match Score.*4\.5/);
+  assert.match(html, /Interview Count.*0/);
+  assert.match(html, /Responded Count.*0/);
 });

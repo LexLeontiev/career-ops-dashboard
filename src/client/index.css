@@ -103,7 +103,17 @@
   max-width: none;
 }
 .prose table {
-  display: block;
-  overflow-x: auto;
-  white-space: nowrap;
+  table-layout: fixed;
+  width: 100%;
+}
+.prose table th,
+.prose table td {
+  white-space: normal;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+.prose pre {
+  white-space: pre-wrap !important;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }

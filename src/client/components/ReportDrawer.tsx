@@ -3,6 +3,9 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeHighlight from "rehype-highlight";
 
+const remarkPlugins = [remarkGfm];
+const rehypePlugins = [rehypeHighlight];
+
 interface ReportDrawerProps {
   reportPath: string;
   isOpen: boolean;
@@ -80,8 +83,8 @@ export function ReportDrawer({ reportPath, isOpen, onClose, company, role }: Rep
           "div",
           { className: "prose prose-invert prose-sm md:prose-base" },
           React.createElement(ReactMarkdown, {
-            remarkPlugins: [remarkGfm],
-            rehypePlugins: [rehypeHighlight]
+            remarkPlugins: remarkPlugins,
+            rehypePlugins: rehypePlugins
           }, content)
         )
       )
