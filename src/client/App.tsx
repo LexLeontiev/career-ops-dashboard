@@ -3,6 +3,7 @@ import { StatsOverview } from "./components/StatsOverview.js";
 import { FilterBar } from "./components/FilterBar.js";
 import { DataTable, Application } from "./components/DataTable.js";
 import { ReportDrawer } from "./components/ReportDrawer.js";
+import "./index.css";
 
 export default function App() {
   const [applications, setApplications] = useState<Application[]>([]);
@@ -76,40 +77,80 @@ export default function App() {
       : String(bVal).localeCompare(String(aVal));
   });
 
-  return React.createElement(
-    "div",
-    { className: "dashboard-container" },
-    React.createElement(
-      "header",
-      null,
-      React.createElement("h1", { className: "title" }, "Career Ops Dashboard")
-    ),
-    loading && React.createElement("p", null, "Loading data..."),
-    error && React.createElement("div", { style: { color: "var(--color-error)" } }, error),
-    !loading && !error && React.createElement(
-      React.Fragment,
-      null,
-      React.createElement(StatsOverview, { applications }),
-      React.createElement(FilterBar, {
-        searchQuery,
-        setSearchQuery,
-        statusFilter,
-        setStatusFilter
-      }),
-      React.createElement(DataTable, {
-        applications: sortedApps,
-        onSelect: setSelectedApp,
-        sortField,
-        sortOrder,
-        onSort: handleSort
-      })
-    ),
-    selectedApp && React.createElement(ReportDrawer, {
-      reportPath: selectedApp.report,
-      isOpen: !!selectedApp,
-      onClose: () => setSelectedApp(null),
-      company: selectedApp.company,
-      role: selectedApp.role
-    })
+  return (
+    <div className="font-body-md text-on-surface overflow-x-hidden selection:bg-primary-container">
+      <header className="bg-surface-container-lowest dark:bg-surface-container-lowest w-full top-0 sticky z-50 border-b border-border-subtle dark:border-border-subtle">
+        <div className="flex justify-between items-center w-full px-margin-desktop py-stack-md max-w-container-max mx-auto">
+          <div className="flex items-center gap-stack-md cursor-pointer active:opacity-80 transition-all">
+            <span className="material-symbols-outlined text-primary dark:text-primary-fixed-dim font-headline-md text-headline-md" data-icon="terminal">terminal</span>
+            <h1 className="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim">Career Ops</h1>
+          </div>
+
+        </div>
+      </header>
+
+      <div className="flex max-w-container-max mx-auto min-h-screen">
+        <aside className="hidden lg:flex flex-col sticky left-0 top-0 pt-stack-lg h-full w-64 border-r border-border-subtle bg-surface-container dark:bg-surface-container">
+          <div className="px-6 mb-8">
+            <span className="font-headline-sm text-headline-sm font-black text-primary dark:text-primary-fixed-dim">CAREER COMMAND</span>
+          </div>
+          <nav className="flex-1 px-4 space-y-2">
+            <a className="flex items-center gap-3 px-4 py-3 rounded-lg text-primary font-bold border-r-2 border-primary bg-surface-hover transition-all duration-200 ease-in-out" href="#">
+              <span className="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+              <span className="font-label-md text-label-md">Dashboard</span>
+            </a>
+            <a className="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant font-medium hover:bg-surface-hover hover:text-on-surface transition-all duration-200 ease-in-out" href="#">
+              <span className="material-symbols-outlined" data-icon="work_history">work_history</span>
+              <span className="font-label-md text-label-md">Applications</span>
+            </a>
+          </nav>
+        </aside>
+
+        <main className="flex-1 w-full px-margin-mobile md:px-margin-desktop py-stack-lg pb-24 lg:pb-stack-lg">
+          {loading && <p>Loading data...</p>}
+          {error && <div style={{ color: "var(--color-error)" }}>{error}</div>}
+          
+          {!loading && !error && (
+            <>
+              <StatsOverview applications={applications} />
+              <FilterBar 
+                searchQuery={searchQuery}
+                setSearchQuery={setSearchQuery}
+                statusFilter={statusFilter}
+                setStatusFilter={setStatusFilter}
+              />
+              <DataTable 
+                applications={sortedApps}
+                onSelect={setSelectedApp}
+                sortField={sortField}
+                sortOrder={sortOrder}
+                onSort={handleSort}
+              />
+            </>
+          )}
+        </main>
+      </div>
+
+      <nav className="lg:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-4 pt-2 bg-surface-container-low dark:bg-surface-container-low border-t border-border-subtle dark:border-border-subtle shadow-lg">
+        <a className="flex flex-col items-center justify-center bg-primary-container dark:bg-primary-container text-on-primary-container dark:text-on-primary-container rounded-xl py-1 px-4 active:scale-95 transition-transform duration-150" href="#">
+          <span className="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+          <span className="font-label-sm text-label-sm">Dash</span>
+        </a>
+        <a className="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant py-1 px-4 hover:bg-surface-hover active:scale-95 transition-transform duration-150" href="#">
+          <span className="material-symbols-outlined" data-icon="work_history">work_history</span>
+          <span className="font-label-sm text-label-sm">Apps</span>
+        </a>
+      </nav>
+
+      {selectedApp && (
+        <ReportDrawer
+          reportPath={selectedApp.report}
+          isOpen={!!selectedApp}
+          onClose={() => setSelectedApp(null)}
+          company={selectedApp.company}
+          role={selectedApp.role}
+        />
+      )}
+    </div>
   );
 }
