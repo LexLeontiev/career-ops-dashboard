@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import rehypeHighlight from "rehype-highlight";
 
 interface ReportDrawerProps {
   reportPath: string;
@@ -76,8 +78,11 @@ export function ReportDrawer({ reportPath, isOpen, onClose, company, role }: Rep
         error && React.createElement("div", { style: { color: "var(--color-error)" } }, error),
         !loading && !error && content && React.createElement(
           "div",
-          { className: "markdown-content" },
-          React.createElement(ReactMarkdown, null, content)
+          { className: "prose prose-invert prose-sm md:prose-base" },
+          React.createElement(ReactMarkdown, {
+            remarkPlugins: [remarkGfm],
+            rehypePlugins: [rehypeHighlight]
+          }, content)
         )
       )
     )

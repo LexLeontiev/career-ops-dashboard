@@ -98,33 +98,6 @@
   line-height: 1.6;
 }
 
-/* Markdown styling inside drawer */
-.markdown-content h1, .markdown-content h2, .markdown-content h3 {
-  margin-top: 20px;
-  margin-bottom: 10px;
-  color: #f3f4f6;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  padding-bottom: 6px;
-}
-.markdown-content p {
-  margin-bottom: 12px;
-  color: #d1d5db;
-}
-.markdown-content ul, .markdown-content ol {
-  margin-left: 20px;
-  margin-bottom: 12px;
-}
-.markdown-content li {
-  margin-bottom: 4px;
-}
-.markdown-content table {
-  margin-bottom: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-}
-.markdown-content th, .markdown-content td {
-  padding: 8px 12px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-}
 
 .prose {
   max-width: none;
