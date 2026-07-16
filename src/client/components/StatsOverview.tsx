@@ -10,19 +10,27 @@ export function StatsOverview({ applications }: { applications: AppData[] }) {
   let active = 0;
   let interviews = 0;
   let responded = 0;
+  let applied = 0;
 
   for (const app of applications) {
     const status = (app.status || "").toUpperCase();
+    
+    if (status !== "SKIP" && status !== "EVALUATED" && status !== "") {
+      applied++;
+    }
+
     if (status === "APPLIED" || status === "INTERVIEW" || status === "RESPONDED") {
       active++;
     }
     if (status === "INTERVIEW") {
       interviews++;
     }
-    if (status === "RESPONDED") {
+    if (status === "RESPONDED" || status === "INTERVIEW") {
       responded++;
     }
   }
+
+  const respondedRate = applied > 0 ? Math.round((responded / applied) * 100) : 0;
 
   return (
     <section className="grid grid-cols-2 lg:grid-cols-4 gap-gutter mb-stack-lg">
@@ -39,8 +47,8 @@ export function StatsOverview({ applications }: { applications: AppData[] }) {
         <div className="text-secondary font-headline-lg text-headline-lg">{interviews}</div>
       </div>
       <div className="bg-surface-card p-6 rounded-xl border border-border-subtle hover:border-primary/50 transition-colors">
-        <div className="text-text-secondary font-label-sm text-label-sm uppercase mb-2">Responded Count</div>
-        <div className="text-tertiary font-headline-lg text-headline-lg">{responded}</div>
+        <div className="text-text-secondary font-label-sm text-label-sm uppercase mb-2">Responded Rate</div>
+        <div className="text-tertiary font-headline-lg text-headline-lg">{respondedRate}%</div>
       </div>
     </section>
   );

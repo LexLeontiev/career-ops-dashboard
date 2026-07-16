@@ -53,10 +53,18 @@ export default function App() {
     let matchesStatus = true;
     if (statusFilter === "active") {
       matchesStatus = status === "APPLIED" || status === "INTERVIEW" || status === "RESPONDED";
+    } else if (statusFilter === "interview") {
+      matchesStatus = status === "INTERVIEW";
     } else if (statusFilter === "closed") {
       matchesStatus = status === "SKIP" || status === "REJECTED";
     } else if (statusFilter === "evaluated") {
       matchesStatus = status === "EVALUATED";
+    } else if (statusFilter === "skip") {
+      matchesStatus = status === "SKIP";
+    } else if (statusFilter === "rejected") {
+      matchesStatus = status === "REJECTED";
+    } else if (statusFilter === "applied") {
+      matchesStatus = status === "APPLIED";
     }
 
     return matchesSearch && matchesStatus;
@@ -66,6 +74,19 @@ export default function App() {
     if (!sortField) return 0;
     const aVal = a[sortField];
     const bVal = b[sortField];
+
+    if (sortField === "score") {
+      const aScore = parseFloat(String(aVal));
+      const bScore = parseFloat(String(bVal));
+      const aIsNaN = isNaN(aScore);
+      const bIsNaN = isNaN(bScore);
+      
+      if (aIsNaN && bIsNaN) return 0;
+      if (aIsNaN) return 1;
+      if (bIsNaN) return -1;
+      
+      return sortOrder === "asc" ? aScore - bScore : bScore - aScore;
+    }
 
     if (typeof aVal === "number" && typeof bVal === "number") {
       return sortOrder === "asc" ? aVal - bVal : bVal - aVal;

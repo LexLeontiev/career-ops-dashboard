@@ -53,6 +53,18 @@ export function ReportDrawer({ reportPath, isOpen, onClose, company, role }: Rep
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [onClose]);
 
+  // Lock body scroll when open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [isOpen]);
+
   return React.createElement(
     React.Fragment,
     null,

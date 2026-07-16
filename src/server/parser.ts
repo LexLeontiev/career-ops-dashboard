@@ -29,7 +29,12 @@ export async function parseApplicationsMD(): Promise<any[]> {
         score: row.score,
         status: row.status,
         pdf: row.pdf,
-        report: row.report,
+        report: (() => {
+          const raw = row.report || "";
+          const m = raw.match(/\[.*?\]\((.*?)\)/);
+          const link = m ? m[1] : raw;
+          return link.split('/').pop()?.trim() || "";
+        })(),
         notes: row.notes,
       });
     }

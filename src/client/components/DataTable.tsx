@@ -81,7 +81,7 @@ export function DataTable({ applications, onSelect, sortField, sortOrder, onSort
                 Role{renderSortIndicator("role")}
               </th>
               <th className="px-6 py-4 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider cursor-pointer hover:bg-white/5" onClick={() => onSort("score")}>
-                Score{renderSortIndicator("score")}
+                Score / 5{renderSortIndicator("score")}
               </th>
               <th className="px-6 py-4 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider cursor-pointer hover:bg-white/5" onClick={() => onSort("status")}>
                 Status{renderSortIndicator("status")}
@@ -115,7 +115,7 @@ export function DataTable({ applications, onSelect, sortField, sortOrder, onSort
                     <td className="px-6 py-5 font-bold text-white">{app.company}</td>
                     <td className="px-6 py-5 text-on-surface-variant">{app.role}</td>
                     <td className="px-6 py-5">
-                      <span className={`${scoreClass.bg} ${scoreClass.text} px-2.5 py-1 rounded-md text-xs font-bold`}>{app.score}</span>
+                      <span className={`${scoreClass.bg} ${scoreClass.text} px-2.5 py-1 rounded-md text-xs font-bold`}>{app.score.replace(/\s*\/\s*5$/, "")}</span>
                     </td>
                     <td className="px-6 py-5">
                       <span className={`${statusClass.bg} ${statusClass.text} px-2.5 py-1 rounded-md text-xs font-bold`}>{app.status}</span>
