@@ -7,7 +7,7 @@
     "dev": "concurrently \"vite\" \"tsx watch src/server/index.ts\"",
     "build": "tsc && vite build",
     "start": "NODE_ENV=production tsx src/server/index.ts",
-    "test": "node --import tsx --test test/**/*.test.ts"
+    "test": "node --import tsx --test test/**/*.test.ts src/**/*.test.tsx"
   },
   "dependencies": {
     "express": "^4.19.2",
