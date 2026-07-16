@@ -3,8 +3,6 @@ import { StatsOverview } from "./components/StatsOverview.js";
 import { FilterBar } from "./components/FilterBar.js";
 import { DataTable, Application } from "./components/DataTable.js";
 import { ReportDrawer } from "./components/ReportDrawer.js";
-import "./index.css";
-
 export default function App() {
   const [applications, setApplications] = useState<Application[]>([]);
   const [loading, setLoading] = useState(true);
