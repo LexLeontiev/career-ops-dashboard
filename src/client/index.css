@@ -23,6 +23,7 @@ body {
   color: var(--text-main);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   padding: 20px;
+  overflow-x: hidden;
 }
 
 .dashboard-container {
@@ -160,3 +161,104 @@ tr:hover {
 .status-active { background-color: rgba(59, 130, 246, 0.2); color: #93c5fd; border: 1px solid var(--color-primary); }
 .status-closed { background-color: rgba(239, 68, 68, 0.2); color: #fca5a5; border: 1px solid var(--color-error); }
 .status-eval { background-color: rgba(255, 255, 255, 0.1); color: #e5e7eb; border: 1px solid var(--text-muted); }
+
+/* Drawer styles */
+.drawer-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: 100;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.25s ease, visibility 0.25s ease;
+}
+
+.drawer-backdrop.open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 45%;
+  min-width: 450px;
+  height: 100vh;
+  background-color: var(--bg-card);
+  border-left: 1px solid var(--border-color);
+  box-shadow: var(--shadow-lg);
+  z-index: 101;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.drawer.open {
+  transform: translateX(0);
+}
+
+.drawer-header {
+  padding: 20px;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.drawer-title {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.drawer-close-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.drawer-close-btn:hover {
+  color: var(--text-main);
+}
+
+.drawer-body {
+  padding: 24px;
+  overflow-y: auto;
+  flex: 1;
+  line-height: 1.6;
+}
+
+/* Markdown styling inside drawer */
+.markdown-content h1, .markdown-content h2, .markdown-content h3 {
+  margin-top: 20px;
+  margin-bottom: 10px;
+  color: var(--text-main);
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 6px;
+}
+.markdown-content p {
+  margin-bottom: 12px;
+  color: #d1d5db;
+}
+.markdown-content ul, .markdown-content ol {
+  margin-left: 20px;
+  margin-bottom: 12px;
+}
+.markdown-content li {
+  margin-bottom: 4px;
+}
+.markdown-content table {
+  margin-bottom: 16px;
+  border: 1px solid var(--border-color);
+}
+.markdown-content th, .markdown-content td {
+  padding: 8px 12px;
+  border: 1px solid var(--border-color);
+}

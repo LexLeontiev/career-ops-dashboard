@@ -50,7 +50,7 @@ app.get("/api/reports/:filename", (req, res) => {
 
 // Production: serve built static files
 if (process.env.NODE_ENV === "production") {
-  const staticDir = path.resolve(__dirname, "../client");
+  const staticDir = path.resolve(__dirname, "../../dist/client");
   app.use(express.static(staticDir));
   app.get("*", (req, res) => {
     res.sendFile(path.join(staticDir, "index.html"));
