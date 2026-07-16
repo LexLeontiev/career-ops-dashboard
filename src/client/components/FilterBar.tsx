@@ -16,14 +16,14 @@ export function FilterBar({ searchQuery, setSearchQuery, statusFilter, setStatus
       className: "search-input",
       placeholder: "Search company, role, or notes...",
       value: searchQuery,
-      onChange: (e) => setSearchQuery(e.target.value)
+      onChange: (e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)
     }),
     React.createElement(
       "select",
       {
         className: "select-input",
         value: statusFilter,
-        onChange: (e) => setStatusFilter(e.target.value)
+        onChange: (e: React.ChangeEvent<HTMLSelectElement>) => setStatusFilter(e.target.value)
       },
       React.createElement("option", { value: "all" }, "All Statuses"),
       React.createElement("option", { value: "active" }, "Active (Applied / Interview)"),
