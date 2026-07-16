@@ -1,4 +1,6 @@
 @import "tailwindcss";
+@import "highlight.js/styles/github-dark.css";
+@plugin "@tailwindcss/typography";
 @config "../../tailwind.config.js";
 
 @layer base {
@@ -122,4 +124,13 @@
 .markdown-content th, .markdown-content td {
   padding: 8px 12px;
   border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.prose {
+  max-width: none;
+}
+.prose table {
+  display: block;
+  overflow-x: auto;
+  white-space: nowrap;
 }
