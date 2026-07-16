@@ -90,21 +90,7 @@ export default function App() {
       </header>
 
       <div className="flex max-w-container-max mx-auto min-h-screen">
-        <aside className="hidden lg:flex flex-col sticky left-0 top-0 pt-stack-lg h-full w-64 border-r border-border-subtle bg-surface-container dark:bg-surface-container">
-          <div className="px-6 mb-8">
-            <span className="font-headline-sm text-headline-sm font-black text-primary dark:text-primary-fixed-dim">CAREER COMMAND</span>
-          </div>
-          <nav className="flex-1 px-4 space-y-2">
-            <a className="flex items-center gap-3 px-4 py-3 rounded-lg text-primary font-bold border-r-2 border-primary bg-surface-hover transition-all duration-200 ease-in-out" href="#">
-              <span className="material-symbols-outlined" data-icon="dashboard">dashboard</span>
-              <span className="font-label-md text-label-md">Dashboard</span>
-            </a>
-            <a className="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant font-medium hover:bg-surface-hover hover:text-on-surface transition-all duration-200 ease-in-out" href="#">
-              <span className="material-symbols-outlined" data-icon="work_history">work_history</span>
-              <span className="font-label-md text-label-md">Applications</span>
-            </a>
-          </nav>
-        </aside>
+
 
         <main className="flex-1 w-full px-margin-mobile md:px-margin-desktop py-stack-lg pb-24 lg:pb-stack-lg">
           {loading && <p>Loading data...</p>}
@@ -131,16 +117,7 @@ export default function App() {
         </main>
       </div>
 
-      <nav className="lg:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-4 pt-2 bg-surface-container-low dark:bg-surface-container-low border-t border-border-subtle dark:border-border-subtle shadow-lg">
-        <a className="flex flex-col items-center justify-center bg-primary-container dark:bg-primary-container text-on-primary-container dark:text-on-primary-container rounded-xl py-1 px-4 active:scale-95 transition-transform duration-150" href="#">
-          <span className="material-symbols-outlined" data-icon="dashboard">dashboard</span>
-          <span className="font-label-sm text-label-sm">Dash</span>
-        </a>
-        <a className="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant py-1 px-4 hover:bg-surface-hover active:scale-95 transition-transform duration-150" href="#">
-          <span className="material-symbols-outlined" data-icon="work_history">work_history</span>
-          <span className="font-label-sm text-label-sm">Apps</span>
-        </a>
-      </nav>
+
 
       {selectedApp && (
         <ReportDrawer

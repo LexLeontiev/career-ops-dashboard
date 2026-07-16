@@ -8,53 +8,40 @@ interface AppData {
 export function StatsOverview({ applications }: { applications: AppData[] }) {
   const total = applications.length;
   let active = 0;
-  let closed = 0;
-  let scoreSum = 0;
-  let scoreCount = 0;
+  let interviews = 0;
+  let responded = 0;
 
   for (const app of applications) {
     const status = (app.status || "").toUpperCase();
     if (status === "APPLIED" || status === "INTERVIEW" || status === "RESPONDED") {
       active++;
-    } else if (status === "SKIP" || status === "REJECTED") {
-      closed++;
     }
-
-    const val = parseFloat(app.score);
-    if (!isNaN(val)) {
-      scoreSum += val;
-      scoreCount++;
+    if (status === "INTERVIEW") {
+      interviews++;
+    }
+    if (status === "RESPONDED") {
+      responded++;
     }
   }
 
-  const avgScore = scoreCount > 0 ? (scoreSum / scoreCount).toFixed(2) : "N/A";
-
-  return React.createElement(
-    "div",
-    { className: "stats-grid" },
-    React.createElement(
-      "div",
-      { className: "stat-card" },
-      React.createElement("div", { className: "stat-label" }, "Total Analyzed"),
-      React.createElement("div", { className: "stat-value" }, total)
-    ),
-    React.createElement(
-      "div",
-      { className: "stat-card" },
-      React.createElement("div", { className: "stat-label" }, "Active Processes"),
-      React.createElement("div", { className: "stat-value" }, active)
-    ),
-    React.createElement(
-      "div",
-      { className: "stat-card" },
-      React.createElement("div", { className: "stat-label" }, "Closed/Skipped"),
-      React.createElement("div", { className: "stat-value" }, closed)
-    ),
-    React.createElement(
-      "div",
-      { className: "stat-card" },
-      React.createElement("div", { className: "stat-label" }, "Avg Match Score"),
-      React.createElement("div", { className: "stat-value" }, avgScore)
-    )
+  return (
+    <section className="grid grid-cols-2 lg:grid-cols-4 gap-gutter mb-stack-lg">
+      <div className="bg-surface-card p-6 rounded-xl border border-border-subtle hover:border-primary/50 transition-colors">
+        <div className="text-text-secondary font-label-sm text-label-sm uppercase mb-2">Total Analyzed</div>
+        <div className="text-white font-headline-lg text-headline-lg">{total}</div>
+      </div>
+      <div className="bg-surface-card p-6 rounded-xl border border-border-subtle hover:border-primary/50 transition-colors">
+        <div className="text-text-secondary font-label-sm text-label-sm uppercase mb-2">Active Processes</div>
+        <div className="text-primary font-headline-lg text-headline-lg">{active}</div>
+      </div>
+      <div className="bg-surface-card p-6 rounded-xl border border-border-subtle hover:border-primary/50 transition-colors">
+        <div className="text-text-secondary font-label-sm text-label-sm uppercase mb-2">Interview Count</div>
+        <div className="text-secondary font-headline-lg text-headline-lg">{interviews}</div>
+      </div>
+      <div className="bg-surface-card p-6 rounded-xl border border-border-subtle hover:border-primary/50 transition-colors">
+        <div className="text-text-secondary font-label-sm text-label-sm uppercase mb-2">Responded Count</div>
+        <div className="text-tertiary font-headline-lg text-headline-lg">{responded}</div>
+      </div>
+    </section>
   );
 }
