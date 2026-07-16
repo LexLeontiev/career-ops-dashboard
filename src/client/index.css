@@ -69,3 +69,94 @@ header {
   font-size: 24px;
   font-weight: 700;
 }
+
+/* Filters styles */
+.filter-bar {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.search-input, .select-input {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  padding: 10px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.search-input:focus, .select-input:focus {
+  border-color: var(--color-primary);
+}
+
+.search-input {
+  flex: 1;
+}
+
+/* Table styles */
+.table-container {
+  overflow-x: auto;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background-color: var(--bg-card);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+th, td {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border-color);
+  font-size: 14px;
+}
+
+th {
+  background-color: rgba(255,255,255,0.02);
+  font-weight: 600;
+  cursor: pointer;
+  user-select: none;
+}
+
+th:hover {
+  background-color: rgba(255,255,255,0.05);
+}
+
+tr {
+  transition: background 0.15s ease, transform 0.1s ease;
+  cursor: pointer;
+}
+
+tr:hover {
+  background-color: var(--bg-hover);
+}
+
+.badge-score {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-weight: 700;
+  font-size: 12px;
+}
+
+.score-high { background-color: var(--color-success); color: #fff; }
+.score-med { background-color: var(--color-warning); color: #fff; }
+.score-low { background-color: #4b5563; color: #fff; }
+
+.badge-status {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.status-active { background-color: rgba(59, 130, 246, 0.2); color: #93c5fd; border: 1px solid var(--color-primary); }
+.status-closed { background-color: rgba(239, 68, 68, 0.2); color: #fca5a5; border: 1px solid var(--color-error); }
+.status-eval { background-color: rgba(255, 255, 255, 0.1); color: #e5e7eb; border: 1px solid var(--text-muted); }
