@@ -71,31 +71,28 @@ export function DataTable({ applications, onSelect, sortField, sortOrder, onSort
   return (
     <section className="bg-surface-card rounded-xl border border-border-subtle overflow-hidden">
       <div className="overflow-x-auto">
-        <table className="w-full border-collapse">
+        <table className="w-full table-fixed border-collapse">
           <thead>
             <tr className="bg-surface-container-high text-left">
-              <th className="px-6 py-4 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider cursor-pointer hover:bg-white/5" onClick={() => onSort("score")}>
+              <th className="w-[8%] px-6 py-4 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider cursor-pointer hover:bg-white/5" onClick={() => onSort("score")}>
                 Score / 5{renderSortIndicator("score")}
               </th>
-              <th className="px-6 py-4 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider cursor-pointer hover:bg-white/5" onClick={() => onSort("company")}>
+              <th className="w-[14%] px-6 py-4 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider cursor-pointer hover:bg-white/5" onClick={() => onSort("company")}>
                 Company{renderSortIndicator("company")}
               </th>
-              <th className="px-6 py-4 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider cursor-pointer hover:bg-white/5" onClick={() => onSort("role")}>
+              <th className="w-[16%] px-6 py-4 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider cursor-pointer hover:bg-white/5" onClick={() => onSort("role")}>
                 Role{renderSortIndicator("role")}
               </th>
-              <th className="px-6 py-4 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider cursor-pointer hover:bg-white/5" onClick={() => onSort("status")}>
+              <th className="w-[12%] px-6 py-4 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider cursor-pointer hover:bg-white/5" onClick={() => onSort("status")}>
                 Status{renderSortIndicator("status")}
               </th>
-              <th className="px-6 py-4 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider cursor-pointer hover:bg-white/5" onClick={() => onSort("date")}>
+              <th className="w-[12%] px-6 py-4 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider cursor-pointer hover:bg-white/5" onClick={() => onSort("date")}>
                 Last Interaction{renderSortIndicator("date")}
               </th>
-              <th className="px-6 py-4 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider cursor-pointer hover:bg-white/5" onClick={() => onSort("via")}>
-                Added By{renderSortIndicator("via")}
-              </th>
-              <th className="px-6 py-4 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">
+              <th className="w-[8%] px-6 py-4 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">
                 Report
               </th>
-              <th className="px-6 py-4 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">
+              <th className="w-[30%] px-6 py-4 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">
                 Comment
               </th>
             </tr>
@@ -121,7 +118,7 @@ export function DataTable({ applications, onSelect, sortField, sortOrder, onSort
                       <span className={`${statusClass.bg} ${statusClass.text} px-2.5 py-1 rounded-md text-xs font-bold`}>{app.status}</span>
                     </td>
                     <td className="px-6 py-5 text-on-surface-variant">{formatDate(app.date)}</td>
-                    <td className="px-6 py-5 text-on-surface-variant">{app.via}</td>
+
                     <td className="px-6 py-5">
                       <button 
                         className="p-2 rounded-full hover:bg-primary/20 text-on-surface-variant hover:text-primary transition-colors"
@@ -133,11 +130,13 @@ export function DataTable({ applications, onSelect, sortField, sortOrder, onSort
                         <span className="material-symbols-outlined text-[20px]" data-icon="visibility">visibility</span>
                       </button>
                     </td>
-                    <td className="px-6 py-5 text-on-surface-variant text-body-sm">{app.notes}</td>
+                    <td className="px-6 py-5 text-on-surface-variant text-body-sm">
+                      <div className="line-clamp-2" title={app.notes}>{app.notes}</div>
+                    </td>
                   </tr>
                   {isExpanded && (
                     <tr className="bg-surface-dim">
-                      <td className="p-0" colSpan={8}>
+                      <td className="p-0" colSpan={7}>
                         <div className="px-12 py-8 relative">
                           <div className="timeline-connector"></div>
                           <div className="space-y-8">
