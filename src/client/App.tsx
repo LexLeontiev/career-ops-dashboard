@@ -43,12 +43,12 @@ export default function App() {
   const counts = {
     all: 0,
     active: 0,
-    closed: 0,
     applied: 0,
     interview: 0,
     evaluated: 0,
     skip: 0,
     rejected: 0,
+    discarded: 0,
   };
 
   applications.forEach((app) => {
@@ -64,13 +64,13 @@ export default function App() {
     const status = (app.status || "").toUpperCase();
     
     if (status === "APPLIED" || status === "INTERVIEW" || status === "RESPONDED") counts.active++;
-    if (status === "SKIP" || status === "REJECTED") counts.closed++;
     
     if (status === "APPLIED") counts.applied++;
     if (status === "INTERVIEW") counts.interview++;
     if (status === "EVALUATED") counts.evaluated++;
     if (status === "SKIP") counts.skip++;
     if (status === "REJECTED") counts.rejected++;
+    if (status === "DISCARDED") counts.discarded++;
   });
 
   const filteredApps = applications.filter((app) => {
@@ -88,8 +88,6 @@ export default function App() {
       matchesStatus = status === "APPLIED" || status === "INTERVIEW" || status === "RESPONDED";
     } else if (statusFilter === "interview") {
       matchesStatus = status === "INTERVIEW";
-    } else if (statusFilter === "closed") {
-      matchesStatus = status === "SKIP" || status === "REJECTED";
     } else if (statusFilter === "evaluated") {
       matchesStatus = status === "EVALUATED";
     } else if (statusFilter === "skip") {
@@ -98,6 +96,8 @@ export default function App() {
       matchesStatus = status === "REJECTED";
     } else if (statusFilter === "applied") {
       matchesStatus = status === "APPLIED";
+    } else if (statusFilter === "discarded") {
+      matchesStatus = status === "DISCARDED";
     }
 
     return matchesSearch && matchesStatus;

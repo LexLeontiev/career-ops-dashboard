@@ -35,10 +35,10 @@ export function FilterBar({ searchQuery, setSearchQuery, statusFilter, setStatus
           Active <span className="opacity-50 text-xs ml-1.5 font-normal">{counts.active}</span>
         </button>
         <button 
-          onClick={() => setStatusFilter("closed")}
-          className={`flex-shrink-0 px-5 py-2 rounded-full font-label-md text-label-md transition-colors flex items-center ${statusFilter === "closed" ? "bg-primary text-on-primary-container" : "border border-border-subtle text-on-surface-variant hover:bg-surface-hover"}`}
+          onClick={() => setStatusFilter("evaluated")}
+          className={`flex-shrink-0 px-5 py-2 rounded-full font-label-md text-label-md transition-colors flex items-center ${statusFilter === "evaluated" ? "bg-primary text-on-primary-container" : "border border-border-subtle text-on-surface-variant hover:bg-surface-hover"}`}
         >
-          Closed <span className="opacity-50 text-xs ml-1.5 font-normal">{counts.closed}</span>
+          Evaluated <span className="opacity-50 text-xs ml-1.5 font-normal">{counts.evaluated}</span>
         </button>
 
         <div className="w-px h-8 bg-border-subtle mx-2 flex-shrink-0" />
@@ -55,12 +55,7 @@ export function FilterBar({ searchQuery, setSearchQuery, statusFilter, setStatus
         >
           Interview <span className="opacity-50 text-xs ml-1.5 font-normal">{counts.interview}</span>
         </button>
-        <button 
-          onClick={() => setStatusFilter("evaluated")}
-          className={`flex-shrink-0 px-5 py-2 rounded-full font-label-md text-label-md transition-colors flex items-center ${statusFilter === "evaluated" ? "bg-primary text-on-primary-container" : "border border-border-subtle text-on-surface-variant hover:bg-surface-hover"}`}
-        >
-          Evaluated <span className="opacity-50 text-xs ml-1.5 font-normal">{counts.evaluated}</span>
-        </button>
+
         <button 
           onClick={() => setStatusFilter("skip")}
           className={`flex-shrink-0 px-5 py-2 rounded-full font-label-md text-label-md transition-colors flex items-center ${statusFilter === "skip" ? "bg-primary text-on-primary-container" : "border border-border-subtle text-on-surface-variant hover:bg-surface-hover"}`}
@@ -72,6 +67,12 @@ export function FilterBar({ searchQuery, setSearchQuery, statusFilter, setStatus
           className={`flex-shrink-0 px-5 py-2 rounded-full font-label-md text-label-md transition-colors flex items-center ${statusFilter === "rejected" ? "bg-primary text-on-primary-container" : "border border-border-subtle text-on-surface-variant hover:bg-surface-hover"}`}
         >
           Rejected <span className="opacity-50 text-xs ml-1.5 font-normal">{counts.rejected}</span>
+        </button>
+        <button 
+          onClick={() => setStatusFilter("discarded")}
+          className={`flex-shrink-0 px-5 py-2 rounded-full font-label-md text-label-md transition-colors flex items-center ${statusFilter === "discarded" ? "bg-primary text-on-primary-container" : "border border-border-subtle text-on-surface-variant hover:bg-surface-hover"}`}
+        >
+          Discarded <span className="opacity-50 text-xs ml-1.5 font-normal">{counts.discarded}</span>
         </button>
       </div>
     </section>
