@@ -21,7 +21,29 @@ export function FilterBar({ searchQuery, setSearchQuery, statusFilter, setStatus
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
         />
       </div>
-      <div className="flex items-center gap-2 overflow-x-auto pb-2 no-scrollbar">
+
+      {/* Mobile status select dropdown */}
+      <div className="md:hidden">
+        <label htmlFor="status-select" className="sr-only">Filter by Status</label>
+        <select
+          id="status-select"
+          value={statusFilter}
+          onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setStatusFilter(e.target.value)}
+          className="w-full bg-background-main border border-border-subtle rounded-lg py-3 px-4 text-body-md text-on-surface focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all cursor-pointer"
+        >
+          <option value="all">{`All Statuses (${counts.all ?? 0})`}</option>
+          <option value="active">{`Active (${counts.active ?? 0})`}</option>
+          <option value="evaluated">{`Evaluated (${counts.evaluated ?? 0})`}</option>
+          <option value="applied">{`Applied (${counts.applied ?? 0})`}</option>
+          <option value="interview">{`Interview (${counts.interview ?? 0})`}</option>
+          <option value="skip">{`Skip (${counts.skip ?? 0})`}</option>
+          <option value="rejected">{`Rejected (${counts.rejected ?? 0})`}</option>
+          <option value="discarded">{`Discarded (${counts.discarded ?? 0})`}</option>
+        </select>
+      </div>
+
+      {/* Desktop status pill buttons */}
+      <div className="hidden md:flex items-center gap-2 overflow-x-auto pb-2 no-scrollbar">
         <button 
           onClick={() => setStatusFilter("all")}
           className={`flex-shrink-0 px-5 py-2 rounded-full font-label-md text-label-md transition-colors flex items-center ${statusFilter === "all" ? "bg-primary text-on-primary-container" : "border border-border-subtle text-on-surface-variant hover:bg-surface-hover"}`}
@@ -78,3 +100,4 @@ export function FilterBar({ searchQuery, setSearchQuery, statusFilter, setStatus
     </section>
   );
 }
+
