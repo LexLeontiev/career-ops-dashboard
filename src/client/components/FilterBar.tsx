@@ -28,7 +28,10 @@ export function FilterBar({ searchQuery, setSearchQuery, statusFilter, setStatus
         <select
           id="status-select"
           value={statusFilter}
-          onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setStatusFilter(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+            setStatusFilter(e.target.value);
+            e.target.blur();
+          }}
           className="w-full appearance-none bg-background-main border border-border-subtle rounded-lg py-3 pl-4 pr-10 text-body-md text-on-surface focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all cursor-pointer"
         >
           <option value="all">{`All Statuses (${counts.all ?? 0})`}</option>
