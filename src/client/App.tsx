@@ -15,6 +15,24 @@ export default function App() {
 
   const [selectedApp, setSelectedApp] = useState<Application | null>(null);
 
+  const [isBlurred, setIsBlurred] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem("career_ops_blur_mode") === "true";
+    } catch {
+      return false;
+    }
+  });
+
+  const toggleBlur = () => {
+    setIsBlurred((prev) => {
+      const next = !prev;
+      try {
+        localStorage.setItem("career_ops_blur_mode", JSON.stringify(next));
+      } catch {}
+      return next;
+    });
+  };
+
   useEffect(() => {
     const loadData = async () => {
       try {
@@ -138,6 +156,16 @@ export default function App() {
             <h1 className="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim">Career Ops</h1>
           </div>
 
+          <button
+            onClick={toggleBlur}
+            title={isBlurred ? "Disable privacy blur" : "Enable privacy blur"}
+            className="p-2 px-3 rounded-lg bg-surface-container-high hover:bg-surface-hover text-on-surface-variant transition-colors flex items-center gap-2 text-label-sm font-label-sm cursor-pointer"
+          >
+            <span className="material-symbols-outlined text-[20px]">
+              {isBlurred ? "visibility_off" : "visibility"}
+            </span>
+            <span>{isBlurred ? "Privacy On" : "Privacy Off"}</span>
+          </button>
         </div>
       </header>
 
@@ -164,11 +192,13 @@ export default function App() {
                 sortField={sortField}
                 sortOrder={sortOrder}
                 onSort={handleSort}
+                isBlurred={isBlurred}
               />
             </>
           )}
         </main>
       </div>
+
 
 
 
