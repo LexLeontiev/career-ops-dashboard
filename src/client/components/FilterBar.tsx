@@ -23,13 +23,13 @@ export function FilterBar({ searchQuery, setSearchQuery, statusFilter, setStatus
       </div>
 
       {/* Mobile status select dropdown */}
-      <div className="md:hidden">
+      <div className="relative md:hidden">
         <label htmlFor="status-select" className="sr-only">Filter by Status</label>
         <select
           id="status-select"
           value={statusFilter}
           onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setStatusFilter(e.target.value)}
-          className="w-full bg-background-main border border-border-subtle rounded-lg py-3 px-4 text-body-md text-on-surface focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all cursor-pointer"
+          className="w-full appearance-none bg-background-main border border-border-subtle rounded-lg py-3 pl-4 pr-10 text-body-md text-on-surface focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all cursor-pointer"
         >
           <option value="all">{`All Statuses (${counts.all ?? 0})`}</option>
           <option value="active">{`Active (${counts.active ?? 0})`}</option>
@@ -40,6 +40,9 @@ export function FilterBar({ searchQuery, setSearchQuery, statusFilter, setStatus
           <option value="rejected">{`Rejected (${counts.rejected ?? 0})`}</option>
           <option value="discarded">{`Discarded (${counts.discarded ?? 0})`}</option>
         </select>
+        <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-outline pointer-events-none" data-icon="expand_more">
+          expand_more
+        </span>
       </div>
 
       {/* Desktop status pill buttons */}
