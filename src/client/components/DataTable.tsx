@@ -18,10 +18,13 @@ interface DataTableProps {
   sortField: keyof Application | "";
   sortOrder: "asc" | "desc";
   onSort: (field: keyof Application) => void;
+  isBlurred?: boolean;
 }
 
-export function DataTable({ applications, onSelect, sortField, sortOrder, onSort }: DataTableProps) {
+export function DataTable({ applications, onSelect, sortField, sortOrder, onSort, isBlurred }: DataTableProps) {
   const [expandedRows, setExpandedRows] = useState<Record<number, boolean>>({});
+
+  const blurClass = isBlurred ? "blur-[4px] select-none hover:blur-none transition-all duration-200 cursor-pointer" : "";
 
   const toggleTimeline = (e: React.MouseEvent, id: number) => {
     e.stopPropagation();
@@ -34,6 +37,12 @@ export function DataTable({ applications, onSelect, sortField, sortOrder, onSort
     if (score >= 4.5 || score >= 90) return { bg: "bg-[#10b981]/15", text: "text-[#10b981]" };
     if (score >= 3.5 || score >= 70) return { bg: "bg-[#f59e0b]/15", text: "text-[#f59e0b]" };
     return { bg: "bg-[#4b5563]/15", text: "text-[#4b5563]" };
+  };
+
+  const formatScoreDisplay = (scoreStr: string) => {
+    const score = parseFloat(scoreStr);
+    if (isNaN(score)) return scoreStr.replace(/\s*\/\s*5$/, "");
+    return score.toFixed(1);
   };
 
   const getStatusInfo = (statusStr: string) => {
@@ -110,10 +119,10 @@ export function DataTable({ applications, onSelect, sortField, sortOrder, onSort
                     onClick={(e) => toggleTimeline(e, app.num)}
                   >
                     <td className="px-6 py-5">
-                      <span className={`${scoreClass.bg} ${scoreClass.text} px-2.5 py-1 rounded-md text-xs font-bold`}>{app.score.replace(/\s*\/\s*5$/, "")}</span>
+                      <span className={`${scoreClass.bg} ${scoreClass.text} px-2.5 py-1 rounded-md text-xs font-bold`}>{formatScoreDisplay(app.score)}</span>
                     </td>
-                    <td className="px-6 py-5 font-bold text-white">{app.company}</td>
-                    <td className="px-6 py-5 text-on-surface-variant">{app.role}</td>
+                    <td className={`px-6 py-5 font-bold text-white ${blurClass}`}>{app.company}</td>
+                    <td className={`px-6 py-5 text-on-surface-variant ${blurClass}`}>{app.role}</td>
                     <td className="px-6 py-5">
                       <span className={`${statusClass.bg} ${statusClass.text} px-2.5 py-1 rounded-md text-xs font-bold`}>{app.status}</span>
                     </td>
@@ -131,7 +140,7 @@ export function DataTable({ applications, onSelect, sortField, sortOrder, onSort
                       </button>
                     </td>
                     <td className="px-6 py-5 text-on-surface-variant text-body-sm">
-                      <div className="line-clamp-2" title={app.notes}>{app.notes}</div>
+                      <div className={`line-clamp-2 ${blurClass}`} title={app.notes}>{app.notes}</div>
                     </td>
                   </tr>
                   {isExpanded && (
@@ -145,7 +154,7 @@ export function DataTable({ applications, onSelect, sortField, sortOrder, onSort
                               <div className="flex flex-col">
                                 <span className="text-xs font-label-sm text-on-surface-variant mb-1">{formatDate(app.date)}</span>
                                 <h4 className="font-bold text-white mb-1">Status: {app.status}</h4>
-                                <p className="text-on-surface-variant text-body-sm max-w-2xl">{app.notes}</p>
+                                <p className={`text-on-surface-variant text-body-sm max-w-2xl ${blurClass}`}>{app.notes}</p>
                               </div>
                             </div>
                           </div>
@@ -157,6 +166,7 @@ export function DataTable({ applications, onSelect, sortField, sortOrder, onSort
               );
             })}
           </tbody>
+
         </table>
       </div>
     </section>
