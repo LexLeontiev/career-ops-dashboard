@@ -9,7 +9,7 @@ export default function App() {
   const [error, setError] = useState("");
 
   const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("active");
   const [sortField, setSortField] = useState<keyof Application | "">("score");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
 
@@ -153,7 +153,10 @@ export default function App() {
         <div className="flex justify-between items-center w-full px-margin-desktop py-stack-md max-w-container-max mx-auto">
           <div className="flex items-center gap-stack-md cursor-pointer active:opacity-80 transition-all">
             <span className="material-symbols-outlined text-primary dark:text-primary-fixed-dim font-headline-md text-headline-md" data-icon="terminal">terminal</span>
-            <h1 className="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim">Career Ops</h1>
+            <div className="flex flex-col justify-center">
+              <h1 className="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim leading-none">Career Ops</h1>
+              <span className="text-[10px] font-label-sm font-semibold tracking-widest uppercase text-on-surface-variant/80 dark:text-on-surface-variant/80 mt-1">Dashboard</span>
+            </div>
           </div>
 
           <button
