@@ -6,5 +6,8 @@ export default defineConfig({
     setupFiles: ["./test/setup.ts"],
     restoreMocks: true,
     clearMocks: true,
+    execArgv: process.allowedNodeEnvironmentFlags.has("--no-experimental-webstorage")
+      ? ["--no-experimental-webstorage"]
+      : [],
   },
 });
