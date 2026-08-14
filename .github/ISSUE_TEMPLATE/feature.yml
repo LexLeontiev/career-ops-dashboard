@@ -1,0 +1,32 @@
+name: Feature request
+description: Propose a focused improvement within the read-only dashboard boundary.
+title: "feature: "
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What user problem does this address?
+    validations:
+      required: true
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Proposed outcome
+      description: Describe the smallest useful outcome.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+    validations:
+      required: true
+  - type: textarea
+    id: upstream-boundary
+    attributes:
+      label: Upstream-boundary impact
+      description: Explain how this remains a read-only consumer of career-ops, or why it does not touch the boundary.
+    validations:
+      required: true

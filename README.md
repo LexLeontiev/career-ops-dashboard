@@ -1,46 +1,98 @@
 # career-ops-dashboard
 
-> A clean, docs-style web interface for the [career-ops](https://github.com/Fighter90/career-ops) AI job-search pipeline.
+[![CI](https://github.com/LexLeontiev/career-ops-dashboard/actions/workflows/ci.yml/badge.svg)](https://github.com/LexLeontiev/career-ops-dashboard/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-This project is a web UI companion for `career-ops`. It allows you to search, evaluate, and track your job applications through a dashboard while relying on the underlying `career-ops` data files.
+> Unofficial community UI — not affiliated with or endorsed by career-ops or its maintainers.
 
-_Disclaimer: This project is not affiliated with or endorsed by career-ops. All official documentation for career-ops can be found at [career-ops.org/docs](https://career-ops.org/docs)._
+career-ops-dashboard is a local-first React and Express dashboard for viewing application-tracker data and Markdown reports from a local [career-ops](https://github.com/santifer/career-ops) checkout. It reads upstream data without changing it, keeps data on your machine, and binds to localhost by default.
+
+![Dashboard preview](docs/assets/dashboard-preview.png)
+
+## Features
+
+- Browse, filter, and sort applications from the upstream tracker.
+- Open read-only Markdown reports in an accessible drawer.
+- Use the privacy mode to obscure visible application details on demand.
+- Choose light or dark appearance locally in the browser.
+
+## Privacy and security
+
+The dashboard reads data only from your local career-ops checkout. It does not write to upstream files, send telemetry, require authentication, or sync data to the cloud. Keep resumes, trackers, reports, and credentials out of issues, pull requests, and screenshots.
+
+The server binds to `127.0.0.1` by default. Changing `HOST` may expose private job-search data to your local network.
 
 ## Requirements
 
-- **Node.js** >= 18
-- **Git**
-- The original [career-ops](https://github.com/Fighter90/career-ops) repository.
+- Node.js 22.13 or newer; CI runs on Node 22 and 24.
+- macOS or Linux. Windows is supported through WSL only.
+- Git and a local clone of [career-ops](https://github.com/santifer/career-ops).
 
-## Quick Start
+## Quick start
 
-`career-ops-dashboard` is designed to run locally alongside your existing `career-ops` CLI project.
-
-### 1. Workspace Structure
-
-Your workspace should look like this:
-
-```text
-workspace/
-├── career-ops/             <- Original CLI
-└── career-ops-dashboard/   <- This project
-```
-
-### 2. Download and Run
-
-Clone this repository next to your `career-ops` folder and run the start script. It will automatically check your environment, install NPM dependencies, and start the local server.
+Clone both repositories, then start the dashboard from its directory:
 
 ```bash
-git clone https://github.com/your-username/career-ops-dashboard.git
+git clone https://github.com/santifer/career-ops.git
+git clone https://github.com/LexLeontiev/career-ops-dashboard.git
 cd career-ops-dashboard
 bash bin/start.sh
 ```
 
+The start script expects the two repositories to be side by side. Open the local address printed by the server when startup completes.
+
 ## Configuration
 
-By default, the dashboard looks for your `career-ops` data in the `../career-ops` directory.
-If your `career-ops` folder is located elsewhere, you can override this path by setting the `CAREER_OPS_ROOT` environment variable before running the script:
+| Variable          | Default         | Purpose                                                                                                        |
+| ----------------- | --------------- | -------------------------------------------------------------------------------------------------------------- |
+| `CAREER_OPS_ROOT` | `../career-ops` | Path to the local career-ops checkout.                                                                         |
+| `HOST`            | `127.0.0.1`     | Address on which the API server listens. Changing it may expose private job-search data to your local network. |
+| `PORT`            | `3001`          | API server port.                                                                                               |
+
+For a non-default upstream location:
 
 ```bash
-CAREER_OPS_ROOT=/absolute/path/to/your/career-ops bash bin/start.sh
+CAREER_OPS_ROOT=/path/to/career-ops bash bin/start.sh
 ```
+
+## Development
+
+Install dependencies and run the development server:
+
+```bash
+npm ci
+npm run dev
+```
+
+Run the test suite and the complete local quality gate before opening a pull request:
+
+```bash
+npm test
+npm run check
+```
+
+## Architecture
+
+See [ARCHITECTURE.md](ARCHITECTURE.md) for the data flow, read-only boundary, and component responsibilities.
+
+## Troubleshooting
+
+- If startup cannot find the upstream checkout, set `CAREER_OPS_ROOT` to its local path.
+- If port `3001` is unavailable, start with another port: `PORT=3002 npm run dev`.
+- If the tracker parser or expected `data/applications.md` and `reports/` paths are absent, update your local career-ops checkout before starting the dashboard.
+
+## Contributing
+
+Contributions are welcome. Read [CONTRIBUTING.md](CONTRIBUTING.md) and agree to the [Code of Conduct](CODE_OF_CONDUCT.md) before opening a pull request.
+
+## Security
+
+See [SECURITY.md](SECURITY.md) for supported versions and private vulnerability-reporting channels.
+
+## Upstream compatibility
+
+The canonical upstream is [santifer/career-ops](https://github.com/santifer/career-ops). This dashboard uses its tracker parser through a local adapter and never vendors or modifies the upstream parser. Compatibility depends on the documented upstream tracker layout; report breakage with synthetic reproduction data only.
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
