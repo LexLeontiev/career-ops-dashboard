@@ -11,6 +11,6 @@ import "./index.css";
 const rootEl = document.getElementById("root");
 if (rootEl) {
   ReactDOM.createRoot(rootEl).render(
-    React.createElement(React.StrictMode, null, React.createElement(App))
+    React.createElement(React.StrictMode, null, React.createElement(App)),
   );
 }

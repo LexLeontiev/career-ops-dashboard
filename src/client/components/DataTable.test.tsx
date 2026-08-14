@@ -6,15 +6,28 @@ import { DataTable } from "./DataTable.js";
 
 test("table displays job details and score class colorings", () => {
   const mockApps = [
-    { num: 47, date: "2026-07-14", company: "Fingerprint", via: "—", role: "Senior Android", score: "5.0/5", status: "Evaluated", pdf: "✅", report: "reports/046.md", notes: "Great match" }
+    {
+      num: 47,
+      date: "2026-07-14",
+      company: "Fingerprint",
+      via: "—",
+      role: "Senior Android",
+      score: "5.0/5",
+      status: "Evaluated",
+      pdf: "✅",
+      report: "reports/046.md",
+      notes: "Great match",
+    },
   ];
-  const html = renderToString(React.createElement(DataTable, {
-    applications: mockApps,
-    onSelect: () => {},
-    sortField: "score",
-    sortOrder: "desc",
-    onSort: () => {}
-  }));
+  const html = renderToString(
+    React.createElement(DataTable, {
+      applications: mockApps,
+      onSelect: () => {},
+      sortField: "score",
+      sortOrder: "desc",
+      onSort: () => {},
+    }),
+  );
   expect(html).toMatch(/Fingerprint/);
   expect(html).toMatch(/Senior Android/);
   expect(html).toMatch(/5\.0/);
@@ -23,16 +36,29 @@ test("table displays job details and score class colorings", () => {
 
 test("table renders fixed-size privacy noise when isBlurred is true", () => {
   const mockApps = [
-    { num: 47, date: "2026-07-14", company: "Fingerprint", via: "—", role: "Senior Android", score: "5.0/5", status: "Evaluated", pdf: "✅", report: "reports/046.md", notes: "Great match" }
+    {
+      num: 47,
+      date: "2026-07-14",
+      company: "Fingerprint",
+      via: "—",
+      role: "Senior Android",
+      score: "5.0/5",
+      status: "Evaluated",
+      pdf: "✅",
+      report: "reports/046.md",
+      notes: "Great match",
+    },
   ];
-  const html = renderToString(React.createElement(DataTable, {
-    applications: mockApps,
-    onSelect: () => {},
-    sortField: "score",
-    sortOrder: "desc",
-    onSort: () => {},
-    isBlurred: true
-  }));
+  const html = renderToString(
+    React.createElement(DataTable, {
+      applications: mockApps,
+      onSelect: () => {},
+      sortField: "score",
+      sortOrder: "desc",
+      onSort: () => {},
+      isBlurred: true,
+    }),
+  );
   expect(html).toMatch(/privacy-noise--score privacy-noise--active/);
   expect(html).toMatch(/privacy-noise--company privacy-noise--active/);
   expect(html).toMatch(/privacy-noise--role privacy-noise--active/);
@@ -48,16 +74,29 @@ test("table renders fixed-size privacy noise when isBlurred is true", () => {
 
 test("table keeps the same privacy wrappers without noise when isBlurred is false", () => {
   const mockApps = [
-    { num: 47, date: "2026-07-14", company: "Fingerprint", via: "—", role: "Senior Android", score: "5.0/5", status: "Evaluated", pdf: "✅", report: "reports/046.md", notes: "Great match" }
+    {
+      num: 47,
+      date: "2026-07-14",
+      company: "Fingerprint",
+      via: "—",
+      role: "Senior Android",
+      score: "5.0/5",
+      status: "Evaluated",
+      pdf: "✅",
+      report: "reports/046.md",
+      notes: "Great match",
+    },
   ];
-  const html = renderToString(React.createElement(DataTable, {
-    applications: mockApps,
-    onSelect: () => {},
-    sortField: "score",
-    sortOrder: "desc",
-    onSort: () => {},
-    isBlurred: false
-  }));
+  const html = renderToString(
+    React.createElement(DataTable, {
+      applications: mockApps,
+      onSelect: () => {},
+      sortField: "score",
+      sortOrder: "desc",
+      onSort: () => {},
+      isBlurred: false,
+    }),
+  );
   expect(html).toMatch(/privacy-noise privacy-noise--score/);
   expect(html).toMatch(/privacy-noise privacy-noise--company/);
   expect(html).toMatch(/privacy-noise privacy-noise--role/);

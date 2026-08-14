@@ -55,9 +55,10 @@ describe("App application loading lifecycle", () => {
   });
 
   test("ignores abort errors", async () => {
-    vi.stubGlobal("fetch", vi.fn().mockRejectedValue(
-      new DOMException("Request aborted", "AbortError"),
-    ));
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockRejectedValue(new DOMException("Request aborted", "AbortError")),
+    );
 
     render(<App />);
 
@@ -68,10 +69,13 @@ describe("App application loading lifecycle", () => {
 
   test("aborts the application request on unmount", () => {
     let requestSignal: AbortSignal | undefined;
-    vi.stubGlobal("fetch", vi.fn((_input: RequestInfo | URL, init?: RequestInit) => {
-      requestSignal = init?.signal ?? undefined;
-      return new Promise<Response>(() => {});
-    }));
+    vi.stubGlobal(
+      "fetch",
+      vi.fn((_input: RequestInfo | URL, init?: RequestInit) => {
+        requestSignal = init?.signal ?? undefined;
+        return new Promise<Response>(() => {});
+      }),
+    );
 
     const { unmount } = render(<App />);
 

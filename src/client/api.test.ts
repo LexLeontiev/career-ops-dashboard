@@ -5,18 +5,23 @@ describe("fetchApplications", () => {
   test("returns a validated application list and forwards the abort signal", async () => {
     const controller = new AbortController();
     const request = vi.fn().mockResolvedValue(
-      new Response(JSON.stringify([{
-        num: 1,
-        date: "2026-08-01",
-        company: "Acme Labs",
-        via: "—",
-        role: "Platform Engineer",
-        score: "4.5/5",
-        status: "INTERVIEW",
-        pdf: "✅",
-        report: "001-acme-platform-engineer.md",
-        notes: "Synthetic fixture",
-      }]), { status: 200, headers: { "content-type": "application/json" } }),
+      new Response(
+        JSON.stringify([
+          {
+            num: 1,
+            date: "2026-08-01",
+            company: "Acme Labs",
+            via: "—",
+            role: "Platform Engineer",
+            score: "4.5/5",
+            status: "INTERVIEW",
+            pdf: "✅",
+            report: "001-acme-platform-engineer.md",
+            notes: "Synthetic fixture",
+          },
+        ]),
+        { status: 200, headers: { "content-type": "application/json" } },
+      ),
     );
 
     await expect(fetchApplications(controller.signal, request)).resolves.toHaveLength(1);
@@ -24,12 +29,18 @@ describe("fetchApplications", () => {
   });
 
   test("rejects HTTP and malformed payloads", async () => {
-    await expect(fetchApplications(new AbortController().signal, vi.fn().mockResolvedValue(
-      new Response("{}", { status: 503 }),
-    ))).rejects.toThrow("Failed to load applications (HTTP 503)");
+    await expect(
+      fetchApplications(
+        new AbortController().signal,
+        vi.fn().mockResolvedValue(new Response("{}", { status: 503 })),
+      ),
+    ).rejects.toThrow("Failed to load applications (HTTP 503)");
 
-    await expect(fetchApplications(new AbortController().signal, vi.fn().mockResolvedValue(
-      new Response("{}", { status: 200 }),
-    ))).rejects.toThrow("Invalid applications response");
+    await expect(
+      fetchApplications(
+        new AbortController().signal,
+        vi.fn().mockResolvedValue(new Response("{}", { status: 200 })),
+      ),
+    ).rejects.toThrow("Invalid applications response");
   });
 });

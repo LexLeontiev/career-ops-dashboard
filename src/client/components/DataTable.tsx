@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { FileText } from "lucide-react";
 import type { Application } from "../../shared/application.js";
 
@@ -25,10 +25,6 @@ function PrivacyText({ children, isPrivate, revealLabel, title, variant }: Priva
   const [isRevealed, setIsRevealed] = useState(false);
   const isHidden = isPrivate && !isRevealed;
 
-  useEffect(() => {
-    setIsRevealed(false);
-  }, [isPrivate]);
-
   const reveal = (event: React.MouseEvent | React.KeyboardEvent) => {
     event.stopPropagation();
     setIsRevealed(true);
@@ -39,12 +35,16 @@ function PrivacyText({ children, isPrivate, revealLabel, title, variant }: Priva
       className={`privacy-noise privacy-noise--${variant}${isHidden ? " privacy-noise--active" : ""}`}
       data-private={isHidden ? "true" : undefined}
       onClick={isHidden ? reveal : undefined}
-      onKeyDown={isHidden ? (event) => {
-        if (event.key === "Enter" || event.key === " ") {
-          event.preventDefault();
-          reveal(event);
-        }
-      } : undefined}
+      onKeyDown={
+        isHidden
+          ? (event) => {
+              if (event.key === "Enter" || event.key === " ") {
+                event.preventDefault();
+                reveal(event);
+              }
+            }
+          : undefined
+      }
       role={isHidden ? "button" : undefined}
       tabIndex={isHidden ? 0 : undefined}
       aria-label={isHidden ? revealLabel : undefined}
@@ -55,19 +55,28 @@ function PrivacyText({ children, isPrivate, revealLabel, title, variant }: Priva
   );
 }
 
-export function DataTable({ applications, onSelect, sortField, sortOrder, onSort, isBlurred }: DataTableProps) {
+export function DataTable({
+  applications,
+  onSelect,
+  sortField,
+  sortOrder,
+  onSort,
+  isBlurred,
+}: DataTableProps) {
   const [expandedRows, setExpandedRows] = useState<Record<number, boolean>>({});
 
   const toggleTimeline = (e: React.MouseEvent, id: number) => {
     e.stopPropagation();
-    setExpandedRows(prev => ({ ...prev, [id]: !prev[id] }));
+    setExpandedRows((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
   const getScoreInfo = (scoreStr: string) => {
     const score = parseFloat(scoreStr);
     if (isNaN(score)) return { bg: "bg-slate-500/15", text: "text-slate-600 dark:text-slate-400" };
-    if (score >= 4.5 || score >= 90) return { bg: "bg-emerald-500/15", text: "text-emerald-600 dark:text-emerald-400" };
-    if (score >= 3.5 || score >= 70) return { bg: "bg-amber-500/15", text: "text-amber-700 dark:text-amber-400" };
+    if (score >= 4.5 || score >= 90)
+      return { bg: "bg-emerald-500/15", text: "text-emerald-600 dark:text-emerald-400" };
+    if (score >= 3.5 || score >= 70)
+      return { bg: "bg-amber-500/15", text: "text-amber-700 dark:text-amber-400" };
     return { bg: "bg-slate-500/15", text: "text-slate-600 dark:text-slate-400" };
   };
 
@@ -79,8 +88,10 @@ export function DataTable({ applications, onSelect, sortField, sortOrder, onSort
 
   const getStatusInfo = (statusStr: string) => {
     const status = (statusStr || "").toUpperCase();
-    if (status === "APPLIED" || status === "INTERVIEW" || status === "RESPONDED") return { bg: "bg-primary/15", text: "text-primary" };
-    if (status === "SKIP" || status === "REJECTED") return { bg: "bg-error-container/20", text: "text-error" };
+    if (status === "APPLIED" || status === "INTERVIEW" || status === "RESPONDED")
+      return { bg: "bg-primary/15", text: "text-primary" };
+    if (status === "SKIP" || status === "REJECTED")
+      return { bg: "bg-error-container/20", text: "text-error" };
     return { bg: "bg-slate-500/15", text: "text-slate-600 dark:text-slate-400" };
   };
 
@@ -93,14 +104,20 @@ export function DataTable({ applications, onSelect, sortField, sortOrder, onSort
     const yesterday = new Date(today);
     yesterday.setDate(yesterday.getDate() - 1);
 
-    const isToday = date.getDate() === today.getDate() && date.getMonth() === today.getMonth() && date.getFullYear() === today.getFullYear();
-    const isYesterday = date.getDate() === yesterday.getDate() && date.getMonth() === yesterday.getMonth() && date.getFullYear() === yesterday.getFullYear();
+    const isToday =
+      date.getDate() === today.getDate() &&
+      date.getMonth() === today.getMonth() &&
+      date.getFullYear() === today.getFullYear();
+    const isYesterday =
+      date.getDate() === yesterday.getDate() &&
+      date.getMonth() === yesterday.getMonth() &&
+      date.getFullYear() === yesterday.getFullYear();
 
     if (isToday) return "Today";
     if (isYesterday) return "Yesterday";
 
-    const dd = String(date.getDate()).padStart(2, '0');
-    const mm = String(date.getMonth() + 1).padStart(2, '0');
+    const dd = String(date.getDate()).padStart(2, "0");
+    const mm = String(date.getMonth() + 1).padStart(2, "0");
     return `${dd}.${mm}`;
   };
 
@@ -117,41 +134,88 @@ export function DataTable({ applications, onSelect, sortField, sortOrder, onSort
             <tr className="bg-surface-container-high text-left">
               <th
                 className="w-[8%] font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider"
-                aria-sort={sortField === "score" ? (sortOrder === "asc" ? "ascending" : "descending") : "none"}
+                aria-sort={
+                  sortField === "score"
+                    ? sortOrder === "asc"
+                      ? "ascending"
+                      : "descending"
+                    : "none"
+                }
               >
-                <button type="button" className="w-full px-6 py-4 text-left cursor-pointer hover:bg-surface-hover" onClick={() => onSort("score")} aria-label="Sort by Score / 5">
+                <button
+                  type="button"
+                  className="w-full px-6 py-4 text-left cursor-pointer hover:bg-surface-hover"
+                  onClick={() => onSort("score")}
+                  aria-label="Sort by Score / 5"
+                >
                   Score / 5{renderSortIndicator("score")}
                 </button>
               </th>
               <th
                 className="w-[14%] font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider"
-                aria-sort={sortField === "company" ? (sortOrder === "asc" ? "ascending" : "descending") : "none"}
+                aria-sort={
+                  sortField === "company"
+                    ? sortOrder === "asc"
+                      ? "ascending"
+                      : "descending"
+                    : "none"
+                }
               >
-                <button type="button" className="w-full px-6 py-4 text-left cursor-pointer hover:bg-surface-hover" onClick={() => onSort("company")} aria-label="Sort by Company">
+                <button
+                  type="button"
+                  className="w-full px-6 py-4 text-left cursor-pointer hover:bg-surface-hover"
+                  onClick={() => onSort("company")}
+                  aria-label="Sort by Company"
+                >
                   Company{renderSortIndicator("company")}
                 </button>
               </th>
               <th
                 className="w-[16%] font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider"
-                aria-sort={sortField === "role" ? (sortOrder === "asc" ? "ascending" : "descending") : "none"}
+                aria-sort={
+                  sortField === "role" ? (sortOrder === "asc" ? "ascending" : "descending") : "none"
+                }
               >
-                <button type="button" className="w-full px-6 py-4 text-left cursor-pointer hover:bg-surface-hover" onClick={() => onSort("role")} aria-label="Sort by Role">
+                <button
+                  type="button"
+                  className="w-full px-6 py-4 text-left cursor-pointer hover:bg-surface-hover"
+                  onClick={() => onSort("role")}
+                  aria-label="Sort by Role"
+                >
                   Role{renderSortIndicator("role")}
                 </button>
               </th>
               <th
                 className="w-[12%] font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider"
-                aria-sort={sortField === "status" ? (sortOrder === "asc" ? "ascending" : "descending") : "none"}
+                aria-sort={
+                  sortField === "status"
+                    ? sortOrder === "asc"
+                      ? "ascending"
+                      : "descending"
+                    : "none"
+                }
               >
-                <button type="button" className="w-full px-6 py-4 text-left cursor-pointer hover:bg-surface-hover" onClick={() => onSort("status")} aria-label="Sort by Status">
+                <button
+                  type="button"
+                  className="w-full px-6 py-4 text-left cursor-pointer hover:bg-surface-hover"
+                  onClick={() => onSort("status")}
+                  aria-label="Sort by Status"
+                >
                   Status{renderSortIndicator("status")}
                 </button>
               </th>
               <th
                 className="w-[12%] font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider"
-                aria-sort={sortField === "date" ? (sortOrder === "asc" ? "ascending" : "descending") : "none"}
+                aria-sort={
+                  sortField === "date" ? (sortOrder === "asc" ? "ascending" : "descending") : "none"
+                }
               >
-                <button type="button" className="w-full px-6 py-4 text-left cursor-pointer hover:bg-surface-hover" onClick={() => onSort("date")} aria-label="Sort by Last Interaction">
+                <button
+                  type="button"
+                  className="w-full px-6 py-4 text-left cursor-pointer hover:bg-surface-hover"
+                  onClick={() => onSort("date")}
+                  aria-label="Sort by Last Interaction"
+                >
                   Last Interaction{renderSortIndicator("date")}
                 </button>
               </th>
@@ -168,24 +232,30 @@ export function DataTable({ applications, onSelect, sortField, sortOrder, onSort
               const scoreClass = getScoreInfo(app.score);
               const statusClass = getStatusInfo(app.status);
               const isExpanded = !!expandedRows[app.num];
-              
+
               return (
                 <React.Fragment key={app.num}>
-                  <tr 
-                    className="hover:bg-surface-hover cursor-pointer transition-colors group" 
+                  <tr
+                    className="hover:bg-surface-hover cursor-pointer transition-colors group"
                     onClick={(e) => toggleTimeline(e, app.num)}
                   >
                     <td className="px-6 py-5">
                       <PrivacyText
+                        key={isBlurred ? "private" : "visible"}
                         isPrivate={!!isBlurred}
                         revealLabel="Reveal score"
                         variant="score"
                       >
-                        <span className={`${scoreClass.bg} ${scoreClass.text} px-2.5 py-1 rounded-md text-xs font-bold`}>{formatScoreDisplay(app.score)}</span>
+                        <span
+                          className={`${scoreClass.bg} ${scoreClass.text} px-2.5 py-1 rounded-md text-xs font-bold`}
+                        >
+                          {formatScoreDisplay(app.score)}
+                        </span>
                       </PrivacyText>
                     </td>
                     <td className="px-6 py-5 font-bold text-on-surface">
                       <PrivacyText
+                        key={isBlurred ? "private" : "visible"}
                         isPrivate={!!isBlurred}
                         revealLabel="Reveal company"
                         title={app.company}
@@ -196,6 +266,7 @@ export function DataTable({ applications, onSelect, sortField, sortOrder, onSort
                     </td>
                     <td className="px-6 py-5 text-on-surface-variant">
                       <PrivacyText
+                        key={isBlurred ? "private" : "visible"}
                         isPrivate={!!isBlurred}
                         revealLabel="Reveal role"
                         title={app.role}
@@ -205,10 +276,15 @@ export function DataTable({ applications, onSelect, sortField, sortOrder, onSort
                       </PrivacyText>
                     </td>
                     <td className="px-6 py-5">
-                      <span className={`${statusClass.bg} ${statusClass.text} px-2.5 py-1 rounded-md text-xs font-bold`}>{app.status}</span>
+                      <span
+                        className={`${statusClass.bg} ${statusClass.text} px-2.5 py-1 rounded-md text-xs font-bold`}
+                      >
+                        {app.status}
+                      </span>
                     </td>
                     <td className="px-6 py-5 text-on-surface-variant">
                       <PrivacyText
+                        key={isBlurred ? "private" : "visible"}
                         isPrivate={!!isBlurred}
                         revealLabel="Reveal last interaction date"
                         variant="date"
@@ -218,7 +294,7 @@ export function DataTable({ applications, onSelect, sortField, sortOrder, onSort
                     </td>
 
                     <td className="px-6 py-5">
-                      <button 
+                      <button
                         type="button"
                         className="p-2 rounded-full hover:bg-primary/20 text-on-surface-variant hover:text-primary transition-colors"
                         aria-label={`Open report for ${app.company}`}
@@ -232,6 +308,7 @@ export function DataTable({ applications, onSelect, sortField, sortOrder, onSort
                     </td>
                     <td className="px-6 py-5 text-on-surface-variant text-body-sm">
                       <PrivacyText
+                        key={isBlurred ? "private" : "visible"}
                         isPrivate={!!isBlurred}
                         revealLabel="Reveal comment"
                         title={app.notes}
@@ -252,6 +329,7 @@ export function DataTable({ applications, onSelect, sortField, sortOrder, onSort
                               <div className="flex flex-col">
                                 <div className="text-xs font-label-sm text-on-surface-variant mb-1">
                                   <PrivacyText
+                                    key={isBlurred ? "private" : "visible"}
                                     isPrivate={!!isBlurred}
                                     revealLabel="Reveal timeline date"
                                     variant="date"
@@ -259,9 +337,12 @@ export function DataTable({ applications, onSelect, sortField, sortOrder, onSort
                                     {formatDate(app.date)}
                                   </PrivacyText>
                                 </div>
-                                <h4 className="font-bold text-on-surface mb-1">Status: {app.status}</h4>
+                                <h4 className="font-bold text-on-surface mb-1">
+                                  Status: {app.status}
+                                </h4>
                                 <div className="text-on-surface-variant text-body-sm max-w-2xl">
                                   <PrivacyText
+                                    key={isBlurred ? "private" : "visible"}
                                     isPrivate={!!isBlurred}
                                     revealLabel="Reveal timeline comment"
                                     variant="timeline-notes"
@@ -280,7 +361,6 @@ export function DataTable({ applications, onSelect, sortField, sortOrder, onSort
               );
             })}
           </tbody>
-
         </table>
       </div>
     </section>

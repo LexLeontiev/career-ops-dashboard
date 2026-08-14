@@ -1,9 +1,6 @@
 import { parseApplicationsPayload, type Application } from "../shared/application.js";
 
-export type FetchLike = (
-  input: RequestInfo | URL,
-  init?: RequestInit,
-) => Promise<Response>;
+export type FetchLike = (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>;
 
 export async function fetchApplications(
   signal: AbortSignal,

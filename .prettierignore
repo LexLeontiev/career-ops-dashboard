@@ -1,0 +1,9 @@
+node_modules/
+dist/
+coverage/
+package-lock.json
+.agent/
+.agents/
+scratch/
+docs/superpowers/
+docs/assets/*.png

@@ -60,9 +60,8 @@ export function ReportDrawer({ reportPath, isOpen, onClose, company, role }: Rep
   useEffect(() => {
     if (!isOpen) return;
 
-    openerRef.current = document.activeElement instanceof HTMLElement
-      ? document.activeElement
-      : null;
+    openerRef.current =
+      document.activeElement instanceof HTMLElement ? document.activeElement : null;
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     closeButtonRef.current?.focus();
@@ -80,10 +79,7 @@ export function ReportDrawer({ reportPath, isOpen, onClose, company, role }: Rep
 
   return (
     <>
-      <div
-        className={`drawer-backdrop ${isOpen ? "open" : ""}`}
-        onClick={onClose}
-      />
+      <div className={`drawer-backdrop ${isOpen ? "open" : ""}`} onClick={onClose} />
       <div
         className={`drawer ${isOpen ? "open" : ""}`}
         role="dialog"
@@ -92,25 +88,38 @@ export function ReportDrawer({ reportPath, isOpen, onClose, company, role }: Rep
       >
         <div className="drawer-header">
           <div>
-            <div className="drawer-title" id="report-drawer-title">{company}</div>
+            <div className="drawer-title" id="report-drawer-title">
+              {company}
+            </div>
             <div style={{ fontSize: "13px", color: "var(--text-muted)" }}>{role}</div>
           </div>
-          <button ref={closeButtonRef} type="button" className="drawer-close-btn" onClick={onClose} aria-label="Close report">
+          <button
+            ref={closeButtonRef}
+            type="button"
+            className="drawer-close-btn"
+            onClick={onClose}
+            aria-label="Close report"
+          >
             <X aria-hidden="true" focusable="false" />
           </button>
         </div>
         <div className="drawer-body">
           {loading && <p role="status">Loading report...</p>}
-          {error && <div role="alert" style={{ color: "var(--color-error)" }}>{error}</div>}
+          {error && (
+            <div role="alert" style={{ color: "var(--color-error)" }}>
+              {error}
+            </div>
+          )}
           {!loading && !error && content && (
             <div className="prose dark:prose-invert prose-sm md:prose-base">
               <ReactMarkdown
                 remarkPlugins={remarkPlugins}
                 rehypePlugins={rehypePlugins}
                 components={{
-                  a: ({ node, ...props }) => (
-                    <a {...props} target="_blank" rel="noopener noreferrer" />
-                  ),
+                  a: ({ node, ...props }) => {
+                    void node;
+                    return <a {...props} target="_blank" rel="noopener noreferrer" />;
+                  },
                 }}
               >
                 {content}

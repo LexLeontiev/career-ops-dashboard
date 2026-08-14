@@ -33,7 +33,14 @@
     "smoke:production": "node --import tsx scripts/production-smoke.mjs",
     "test": "vitest run",
     "test:watch": "vitest",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": "eslint .",
+    "licenses:check": "node scripts/check-licenses.mjs",
+    "secrets:check": "bash scripts/check-secrets.sh",
+    "audit:prod": "npm audit --omit=dev --audit-level=moderate",
+    "check": "npm run format:check && npm run lint && npm run typecheck && npm test && npm run build && npm run smoke:production && npm run licenses:check && npm run secrets:check"
   },
   "dependencies": {
     "@fontsource/hanken-grotesk": "^5.3.0",
@@ -48,6 +55,7 @@
     "remark-gfm": "^4.0.1"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@tailwindcss/postcss": "^4.3.3",
     "@tailwindcss/typography": "^0.5.20",
     "@testing-library/dom": "^10.4.1",
@@ -60,11 +68,16 @@
     "@types/react-dom": "^19.2.4",
     "autoprefixer": "^10.5.4",
     "concurrently": "^8.2.2",
+    "eslint": "^10.8.1",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "globals": "^17.11.0",
     "jsdom": "^29.1.1",
     "postcss": "^8.5.26",
+    "prettier": "^3.9.6",
     "tailwindcss": "^4.3.3",
     "tsx": "^4.23.12",
     "typescript": "^5.3.3",
+    "typescript-eslint": "^8.67.0",
     "vite": "^8.2.1",
     "vitest": "^4.1.10"
   }

@@ -18,10 +18,13 @@ test("implements the open dialog focus, Escape, request, and scroll lifecycle", 
   opener.focus();
 
   let requestSignal: AbortSignal | undefined;
-  vi.stubGlobal("fetch", vi.fn((_input: RequestInfo | URL, init?: RequestInit) => {
-    requestSignal = init?.signal ?? undefined;
-    return new Promise<Response>(() => {});
-  }));
+  vi.stubGlobal(
+    "fetch",
+    vi.fn((_input: RequestInfo | URL, init?: RequestInit) => {
+      requestSignal = init?.signal ?? undefined;
+      return new Promise<Response>(() => {});
+    }),
+  );
   const onClose = vi.fn();
   document.body.style.overflow = "clip";
 
@@ -35,10 +38,7 @@ test("implements the open dialog focus, Escape, request, and scroll lifecycle", 
     />,
   );
 
-  expect(screen.getByRole("dialog", { name: /acme labs/i })).toHaveAttribute(
-    "aria-modal",
-    "true",
-  );
+  expect(screen.getByRole("dialog", { name: /acme labs/i })).toHaveAttribute("aria-modal", "true");
   expect(screen.getByRole("button", { name: /close report/i })).toHaveFocus();
   expect(screen.getByRole("status")).toHaveTextContent("Loading report");
   expect(document.body.style.overflow).toBe("hidden");
@@ -58,10 +58,9 @@ test("renders external Markdown links safely without enabling raw HTML", async (
   vi.stubGlobal(
     "fetch",
     vi.fn().mockResolvedValue(
-      new Response(
-        "[External](https://example.com)\n\n<script>alert(1)</script>",
-        { status: 200 },
-      ),
+      new Response("[External](https://example.com)\n\n<script>alert(1)</script>", {
+        status: 200,
+      }),
     ),
   );
 

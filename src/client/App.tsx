@@ -48,7 +48,9 @@ export default function App() {
       const next = !prev;
       try {
         localStorage.setItem("career_ops_blur_mode", JSON.stringify(next));
-      } catch {}
+      } catch {
+        // Persistence is optional when browser storage is unavailable.
+      }
       return next;
     });
   };
@@ -62,7 +64,9 @@ export default function App() {
       const nextTheme = currentTheme === "dark" ? "light" : "dark";
       try {
         localStorage.setItem(THEME_STORAGE_KEY, nextTheme);
-      } catch {}
+      } catch {
+        // Persistence is optional when browser storage is unavailable.
+      }
       return nextTheme;
     });
   };
@@ -112,9 +116,9 @@ export default function App() {
 
     counts.all++;
     const status = (app.status || "").toUpperCase();
-    
+
     if (status === "APPLIED" || status === "INTERVIEW" || status === "RESPONDED") counts.active++;
-    
+
     if (status === "APPLIED") counts.applied++;
     if (status === "INTERVIEW") counts.interview++;
     if (status === "EVALUATED") counts.evaluated++;
@@ -163,11 +167,11 @@ export default function App() {
       const bScore = parseFloat(String(bVal));
       const aIsNaN = isNaN(aScore);
       const bIsNaN = isNaN(bScore);
-      
+
       if (aIsNaN && bIsNaN) return 0;
       if (aIsNaN) return 1;
       if (bIsNaN) return -1;
-      
+
       return sortOrder === "asc" ? aScore - bScore : bScore - aScore;
     }
 
@@ -186,8 +190,12 @@ export default function App() {
           <div className="flex items-center gap-stack-md cursor-pointer active:opacity-80 transition-all">
             <Terminal aria-hidden="true" focusable="false" className="text-primary" size={28} />
             <div className="flex flex-col justify-center">
-              <h1 className="font-headline-md text-headline-md font-bold text-primary leading-none">Career Ops</h1>
-              <span className="text-[10px] font-label-sm font-semibold tracking-widest uppercase text-on-surface-variant/80 mt-1">Dashboard</span>
+              <h1 className="font-headline-md text-headline-md font-bold text-primary leading-none">
+                Career Ops
+              </h1>
+              <span className="text-[10px] font-label-sm font-semibold tracking-widest uppercase text-on-surface-variant/80 mt-1">
+                Dashboard
+              </span>
             </div>
           </div>
 
@@ -200,9 +208,11 @@ export default function App() {
               aria-pressed={isBlurred}
               className="p-2 sm:px-3 rounded-lg bg-surface-container-high hover:bg-surface-hover text-on-surface-variant transition-colors flex items-center gap-2 text-label-sm font-label-sm cursor-pointer"
             >
-              {isBlurred
-                ? <EyeOff aria-hidden="true" focusable="false" size={20} />
-                : <Eye aria-hidden="true" focusable="false" size={20} />}
+              {isBlurred ? (
+                <EyeOff aria-hidden="true" focusable="false" size={20} />
+              ) : (
+                <Eye aria-hidden="true" focusable="false" size={20} />
+              )}
               <span className="hidden sm:inline">{isBlurred ? "Privacy On" : "Privacy Off"}</span>
             </button>
 
@@ -214,9 +224,11 @@ export default function App() {
               aria-pressed={theme === "dark"}
               className="p-2 sm:px-3 rounded-lg bg-surface-container-high hover:bg-surface-hover text-on-surface-variant transition-colors flex items-center gap-2 text-label-sm font-label-sm cursor-pointer"
             >
-              {theme === "dark"
-                ? <Moon aria-hidden="true" focusable="false" size={20} />
-                : <Sun aria-hidden="true" focusable="false" size={20} />}
+              {theme === "dark" ? (
+                <Moon aria-hidden="true" focusable="false" size={20} />
+              ) : (
+                <Sun aria-hidden="true" focusable="false" size={20} />
+              )}
               <span className="hidden sm:inline">{theme === "dark" ? "Dark" : "Light"}</span>
             </button>
           </div>
@@ -224,23 +236,25 @@ export default function App() {
       </header>
 
       <div className="flex max-w-container-max mx-auto min-h-screen">
-
-
         <main className="flex-1 w-full px-margin-mobile md:px-margin-desktop py-stack-lg pb-24 lg:pb-stack-lg">
           {loading && <p role="status">Loading applications…</p>}
-          {error && <div role="alert" style={{ color: "var(--color-error)" }}>{error}</div>}
-          
+          {error && (
+            <div role="alert" style={{ color: "var(--color-error)" }}>
+              {error}
+            </div>
+          )}
+
           {!loading && !error && (
             <>
               <StatsOverview applications={applications} />
-              <FilterBar 
+              <FilterBar
                 searchQuery={searchQuery}
                 setSearchQuery={setSearchQuery}
                 statusFilter={statusFilter}
                 setStatusFilter={setStatusFilter}
                 counts={counts}
               />
-              <DataTable 
+              <DataTable
                 applications={sortedApps}
                 onSelect={setSelectedApp}
                 sortField={sortField}
@@ -252,9 +266,6 @@ export default function App() {
           )}
         </main>
       </div>
-
-
-
 
       {selectedApp && (
         <React.Suspense fallback={null}>

@@ -13,12 +13,7 @@ export interface CreateAppOptions {
 const reportFilenamePattern = /^[A-Za-z0-9][A-Za-z0-9_-]*\.md$/;
 
 function isErrorWithCode(error: unknown, code: string): boolean {
-  return (
-    typeof error === "object" &&
-    error !== null &&
-    "code" in error &&
-    error.code === code
-  );
+  return typeof error === "object" && error !== null && "code" in error && error.code === code;
 }
 
 export function resolveReportPath(reportsDirectory: string, filename: string): string {

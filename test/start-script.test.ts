@@ -1,12 +1,4 @@
-import {
-  chmod,
-  copyFile,
-  mkdir,
-  mkdtemp,
-  readFile,
-  rm,
-  writeFile,
-} from "node:fs/promises";
+import { chmod, copyFile, mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -109,24 +101,23 @@ describe("bin/start.sh", () => {
     );
   });
 
-  test.each([
-    "data/applications.md",
-    "reports",
-    "tracker-parse.mjs",
-  ])("rejects an upstream tree missing %s", async (missingPath) => {
-    const fixtureRoot = await makeTemporaryDirectory("career-ops-incomplete-");
-    await createCareerOpsFixture(fixtureRoot);
-    await rm(path.join(fixtureRoot, missingPath), { recursive: true });
+  test.each(["data/applications.md", "reports", "tracker-parse.mjs"])(
+    "rejects an upstream tree missing %s",
+    async (missingPath) => {
+      const fixtureRoot = await makeTemporaryDirectory("career-ops-incomplete-");
+      await createCareerOpsFixture(fixtureRoot);
+      await rm(path.join(fixtureRoot, missingPath), { recursive: true });
 
-    const result = spawnSync("bash", ["bin/start.sh", "--check"], {
-      cwd: projectRoot,
-      env: { ...process.env, CAREER_OPS_ROOT: fixtureRoot },
-      encoding: "utf8",
-    });
+      const result = spawnSync("bash", ["bin/start.sh", "--check"], {
+        cwd: projectRoot,
+        env: { ...process.env, CAREER_OPS_ROOT: fixtureRoot },
+        encoding: "utf8",
+      });
 
-    expect(result.status).not.toBe(0);
-    expect(`${result.stdout}\n${result.stderr}`).toContain(missingPath);
-  });
+      expect(result.status).not.toBe(0);
+      expect(`${result.stdout}\n${result.stderr}`).toContain(missingPath);
+    },
+  );
 
   test("locates dashboard files independently of the caller working directory", async () => {
     const fixtureRoot = await makeTemporaryDirectory("career-ops-fixture-");
@@ -159,29 +150,33 @@ describe("bin/start.sh", () => {
     expect(result.stdout).toContain("Environment check passed");
   });
 
-  test.each([
-    { args: ["--unknown"] },
-    { args: ["--check", "extra"] },
-  ])("rejects unsupported arguments with usage and exit status 2: $args", ({ args }) => {
-    const result = spawnSync("bash", ["bin/start.sh", ...args], {
-      cwd: projectRoot,
-      env: { ...process.env },
-      encoding: "utf8",
-    });
+  test.each([{ args: ["--unknown"] }, { args: ["--check", "extra"] }])(
+    "rejects unsupported arguments with usage and exit status 2: $args",
+    ({ args }) => {
+      const result = spawnSync("bash", ["bin/start.sh", ...args], {
+        cwd: projectRoot,
+        env: { ...process.env },
+        encoding: "utf8",
+      });
 
-    expect(result.status).toBe(2);
-    expect(`${result.stdout}\n${result.stderr}`).toContain("Usage:");
-  });
+      expect(result.status).toBe(2);
+      expect(`${result.stdout}\n${result.stderr}`).toContain("Usage:");
+    },
+  );
 
   test("rejects Node versions below 22.13", async () => {
     const fixture = await createSyntheticDashboard();
     const fakeBin = await createFakeRuntime(fixture.dashboardRoot, "22.12.9");
 
-    const result = spawnSync("bash", [path.join(fixture.dashboardRoot, "bin", "start.sh"), "--check"], {
-      cwd: fixture.unrelatedCwd,
-      env: { ...process.env, PATH: `${fakeBin}:${process.env.PATH ?? ""}` },
-      encoding: "utf8",
-    });
+    const result = spawnSync(
+      "bash",
+      [path.join(fixture.dashboardRoot, "bin", "start.sh"), "--check"],
+      {
+        cwd: fixture.unrelatedCwd,
+        env: { ...process.env, PATH: `${fakeBin}:${process.env.PATH ?? ""}` },
+        encoding: "utf8",
+      },
+    );
 
     expect(result.status).not.toBe(0);
     expect(`${result.stdout}\n${result.stderr}`).toContain("Node.js >= 22.13 required");
@@ -191,11 +186,15 @@ describe("bin/start.sh", () => {
     const fixture = await createSyntheticDashboard();
     const fakeBin = await createFakeRuntime(fixture.dashboardRoot, "22.13.0");
 
-    const result = spawnSync("bash", [path.join(fixture.dashboardRoot, "bin", "start.sh"), "--check"], {
-      cwd: fixture.unrelatedCwd,
-      env: { ...process.env, PATH: `${fakeBin}:${process.env.PATH ?? ""}` },
-      encoding: "utf8",
-    });
+    const result = spawnSync(
+      "bash",
+      [path.join(fixture.dashboardRoot, "bin", "start.sh"), "--check"],
+      {
+        cwd: fixture.unrelatedCwd,
+        env: { ...process.env, PATH: `${fakeBin}:${process.env.PATH ?? ""}` },
+        encoding: "utf8",
+      },
+    );
 
     expect(result.status).toBe(0);
     expect(result.stdout).toContain("Environment check passed");

@@ -50,13 +50,8 @@ export async function parseApplicationsMD(
   try {
     markdown = await readFile(paths.applicationsFile, "utf8");
   } catch (error: unknown) {
-    if (
-      typeof error === "object" &&
-      error !== null &&
-      "code" in error &&
-      error.code === "ENOENT"
-    ) {
-      throw new Error(`Applications file not found at ${paths.applicationsFile}`);
+    if (typeof error === "object" && error !== null && "code" in error && error.code === "ENOENT") {
+      throw new Error(`Applications file not found at ${paths.applicationsFile}`, { cause: error });
     }
     throw error;
   }

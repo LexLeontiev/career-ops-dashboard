@@ -4,7 +4,7 @@
 
 This project is a web UI companion for `career-ops`. It allows you to search, evaluate, and track your job applications through a dashboard while relying on the underlying `career-ops` data files.
 
-*Disclaimer: This project is not affiliated with or endorsed by career-ops. All official documentation for career-ops can be found at [career-ops.org/docs](https://career-ops.org/docs).*
+_Disclaimer: This project is not affiliated with or endorsed by career-ops. All official documentation for career-ops can be found at [career-ops.org/docs](https://career-ops.org/docs)._
 
 ## Requirements
 
@@ -14,10 +14,12 @@ This project is a web UI companion for `career-ops`. It allows you to search, ev
 
 ## Quick Start
 
-`career-ops-dashboard` is designed to run locally alongside your existing `career-ops` CLI project. 
+`career-ops-dashboard` is designed to run locally alongside your existing `career-ops` CLI project.
 
 ### 1. Workspace Structure
+
 Your workspace should look like this:
+
 ```text
 workspace/
 ├── career-ops/             <- Original CLI
@@ -36,7 +38,7 @@ bash bin/start.sh
 
 ## Configuration
 
-By default, the dashboard looks for your `career-ops` data in the `../career-ops` directory. 
+By default, the dashboard looks for your `career-ops` data in the `../career-ops` directory.
 If your `career-ops` folder is located elsewhere, you can override this path by setting the `CAREER_OPS_ROOT` environment variable before running the script:
 
 ```bash

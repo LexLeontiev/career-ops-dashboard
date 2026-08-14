@@ -22,7 +22,7 @@ test("renders status select dropdown for mobile screens with correct counts and 
       statusFilter: "active",
       setStatusFilter: () => {},
       counts,
-    })
+    }),
   );
 
   expect(html).toMatch(/<select/);

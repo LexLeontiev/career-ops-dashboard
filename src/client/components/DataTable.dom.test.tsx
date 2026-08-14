@@ -45,7 +45,5 @@ test("exposes sortable headers and report actions to keyboard users", async () =
   expect(onSort).toHaveBeenCalledTimes(2);
   expect(onSort).toHaveBeenLastCalledWith("score");
 
-  expect(
-    screen.getByRole("button", { name: /open report for acme labs/i }),
-  ).toBeInTheDocument();
+  expect(screen.getByRole("button", { name: /open report for acme labs/i })).toBeInTheDocument();
 });

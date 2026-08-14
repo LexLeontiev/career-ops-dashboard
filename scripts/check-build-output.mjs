@@ -15,7 +15,7 @@ async function collectFiles(directory) {
   for (const entry of entries) {
     const entryPath = path.join(directory, entry.name);
     if (entry.isDirectory()) {
-      files.push(...await collectFiles(entryPath));
+      files.push(...(await collectFiles(entryPath)));
     } else if (entry.isFile()) {
       files.push(entryPath);
     }

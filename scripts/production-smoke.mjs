@@ -26,7 +26,7 @@ try {
 } finally {
   if (server.listening) {
     await new Promise((resolve, reject) => {
-      server.close((error) => error ? reject(error) : resolve());
+      server.close((error) => (error ? reject(error) : resolve()));
     });
   }
 }

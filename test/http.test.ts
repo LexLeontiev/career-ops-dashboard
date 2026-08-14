@@ -4,10 +4,7 @@ import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { createApp, resolveReportPath } from "../src/server/app.js";
 import { resolveCareerOpsPaths } from "../src/server/config.js";
 import { parsePort } from "../src/server/start.js";
-import {
-  createCareerOpsFixture,
-  type CareerOpsFixture,
-} from "./helpers/career-ops-fixture.js";
+import { createCareerOpsFixture, type CareerOpsFixture } from "./helpers/career-ops-fixture.js";
 import { withHttpServer } from "./helpers/http-server.js";
 
 const securityHeaders = {
@@ -39,9 +36,7 @@ describe("HTTP application", () => {
         expect.objectContaining({ company: "Acme Labs" }),
       ]);
 
-      const reportResponse = await fetch(
-        `${baseUrl}/api/reports/001-acme-platform-engineer.md`,
-      );
+      const reportResponse = await fetch(`${baseUrl}/api/reports/001-acme-platform-engineer.md`);
       expect(reportResponse.status).toBe(200);
       expect(reportResponse.headers.get("content-type")).toContain("text/markdown");
       expect(await reportResponse.text()).toContain("Synthetic report");

@@ -13,9 +13,7 @@ export function startServer(): void {
   const host = process.env.HOST?.trim() || "127.0.0.1";
   const port = parsePort(process.env.PORT);
   const staticDirectory =
-    process.env.NODE_ENV === "production"
-      ? path.resolve(process.cwd(), "dist/client")
-      : false;
+    process.env.NODE_ENV === "production" ? path.resolve(process.cwd(), "dist/client") : false;
   createApp({ staticDirectory }).listen(port, host, () => {
     console.log(`Server listening at http://${host}:${port}`);
   });
