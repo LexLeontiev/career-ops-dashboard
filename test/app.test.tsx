@@ -9,5 +9,4 @@ test("renders app container header", () => {
   expect(html).toMatch(/Career Ops/);
   expect(html).toMatch(/Privacy Off/);
   expect(html).toMatch(/Switch to light theme/);
-  expect(html).toMatch(/dark_mode/);
 });

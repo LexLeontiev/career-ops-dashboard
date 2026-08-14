@@ -1,4 +1,5 @@
 import React from "react";
+import { ChevronDown, Search } from "lucide-react";
 
 interface FilterBarProps {
   searchQuery: string;
@@ -12,8 +13,10 @@ export function FilterBar({ searchQuery, setSearchQuery, statusFilter, setStatus
   return (
     <section className="mb-stack-lg space-y-4">
       <div className="relative max-w-md">
-        <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline" data-icon="search">search</span>
+        <Search aria-hidden="true" focusable="false" className="absolute left-3 top-1/2 -translate-y-1/2 text-outline" size={20} />
+        <label className="sr-only" htmlFor="application-search">Search applications</label>
         <input 
+          id="application-search"
           className="w-full bg-background-main border border-border-subtle rounded-lg py-3 pl-10 pr-4 text-body-md focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all" 
           placeholder="Search company, role, or notes..." 
           type="text"
@@ -43,9 +46,7 @@ export function FilterBar({ searchQuery, setSearchQuery, statusFilter, setStatus
           <option value="rejected">{`Rejected (${counts.rejected ?? 0})`}</option>
           <option value="discarded">{`Discarded (${counts.discarded ?? 0})`}</option>
         </select>
-        <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-outline pointer-events-none" data-icon="expand_more">
-          expand_more
-        </span>
+        <ChevronDown aria-hidden="true" focusable="false" className="absolute right-3 top-1/2 -translate-y-1/2 text-outline pointer-events-none" size={20} />
       </div>
 
       {/* Desktop status pill buttons */}
@@ -106,4 +107,3 @@ export function FilterBar({ searchQuery, setSearchQuery, statusFilter, setStatus
     </section>
   );
 }
-

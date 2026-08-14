@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { FileText } from "lucide-react";
 import type { Application } from "../../shared/application.js";
 
 interface DataTableProps {
@@ -114,20 +115,45 @@ export function DataTable({ applications, onSelect, sortField, sortOrder, onSort
         <table className="w-full table-fixed border-collapse">
           <thead>
             <tr className="bg-surface-container-high text-left">
-              <th className="w-[8%] px-6 py-4 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider cursor-pointer hover:bg-surface-hover" onClick={() => onSort("score")}>
-                Score / 5{renderSortIndicator("score")}
+              <th
+                className="w-[8%] font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider"
+                aria-sort={sortField === "score" ? (sortOrder === "asc" ? "ascending" : "descending") : "none"}
+              >
+                <button type="button" className="w-full px-6 py-4 text-left cursor-pointer hover:bg-surface-hover" onClick={() => onSort("score")} aria-label="Sort by Score / 5">
+                  Score / 5{renderSortIndicator("score")}
+                </button>
               </th>
-              <th className="w-[14%] px-6 py-4 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider cursor-pointer hover:bg-surface-hover" onClick={() => onSort("company")}>
-                Company{renderSortIndicator("company")}
+              <th
+                className="w-[14%] font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider"
+                aria-sort={sortField === "company" ? (sortOrder === "asc" ? "ascending" : "descending") : "none"}
+              >
+                <button type="button" className="w-full px-6 py-4 text-left cursor-pointer hover:bg-surface-hover" onClick={() => onSort("company")} aria-label="Sort by Company">
+                  Company{renderSortIndicator("company")}
+                </button>
               </th>
-              <th className="w-[16%] px-6 py-4 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider cursor-pointer hover:bg-surface-hover" onClick={() => onSort("role")}>
-                Role{renderSortIndicator("role")}
+              <th
+                className="w-[16%] font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider"
+                aria-sort={sortField === "role" ? (sortOrder === "asc" ? "ascending" : "descending") : "none"}
+              >
+                <button type="button" className="w-full px-6 py-4 text-left cursor-pointer hover:bg-surface-hover" onClick={() => onSort("role")} aria-label="Sort by Role">
+                  Role{renderSortIndicator("role")}
+                </button>
               </th>
-              <th className="w-[12%] px-6 py-4 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider cursor-pointer hover:bg-surface-hover" onClick={() => onSort("status")}>
-                Status{renderSortIndicator("status")}
+              <th
+                className="w-[12%] font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider"
+                aria-sort={sortField === "status" ? (sortOrder === "asc" ? "ascending" : "descending") : "none"}
+              >
+                <button type="button" className="w-full px-6 py-4 text-left cursor-pointer hover:bg-surface-hover" onClick={() => onSort("status")} aria-label="Sort by Status">
+                  Status{renderSortIndicator("status")}
+                </button>
               </th>
-              <th className="w-[12%] px-6 py-4 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider cursor-pointer hover:bg-surface-hover" onClick={() => onSort("date")}>
-                Last Interaction{renderSortIndicator("date")}
+              <th
+                className="w-[12%] font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider"
+                aria-sort={sortField === "date" ? (sortOrder === "asc" ? "ascending" : "descending") : "none"}
+              >
+                <button type="button" className="w-full px-6 py-4 text-left cursor-pointer hover:bg-surface-hover" onClick={() => onSort("date")} aria-label="Sort by Last Interaction">
+                  Last Interaction{renderSortIndicator("date")}
+                </button>
               </th>
               <th className="w-[8%] px-6 py-4 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">
                 Report
@@ -193,13 +219,15 @@ export function DataTable({ applications, onSelect, sortField, sortOrder, onSort
 
                     <td className="px-6 py-5">
                       <button 
+                        type="button"
                         className="p-2 rounded-full hover:bg-primary/20 text-on-surface-variant hover:text-primary transition-colors"
+                        aria-label={`Open report for ${app.company}`}
                         onClick={(e) => {
                           e.stopPropagation();
                           onSelect(app);
                         }}
                       >
-                        <span className="material-symbols-outlined text-[20px]" data-icon="visibility">visibility</span>
+                        <FileText aria-hidden="true" focusable="false" size={20} />
                       </button>
                     </td>
                     <td className="px-6 py-5 text-on-surface-variant text-body-sm">

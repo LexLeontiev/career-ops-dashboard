@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { Eye, EyeOff, Moon, Sun, Terminal } from "lucide-react";
 import type { Application } from "../shared/application.js";
 import { fetchApplications } from "./api.js";
 import { StatsOverview } from "./components/StatsOverview.js";
@@ -183,7 +184,7 @@ export default function App() {
       <header className="bg-surface-container-lowest w-full top-0 sticky z-50 border-b border-border-subtle">
         <div className="flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop py-stack-md max-w-container-max mx-auto">
           <div className="flex items-center gap-stack-md cursor-pointer active:opacity-80 transition-all">
-            <span className="material-symbols-outlined text-primary font-headline-md text-headline-md" data-icon="terminal">terminal</span>
+            <Terminal aria-hidden="true" focusable="false" className="text-primary" size={28} />
             <div className="flex flex-col justify-center">
               <h1 className="font-headline-md text-headline-md font-bold text-primary leading-none">Career Ops</h1>
               <span className="text-[10px] font-label-sm font-semibold tracking-widest uppercase text-on-surface-variant/80 mt-1">Dashboard</span>
@@ -192,28 +193,30 @@ export default function App() {
 
           <div className="flex items-center gap-2">
             <button
+              type="button"
               onClick={toggleBlur}
               title={isBlurred ? "Disable privacy mode" : "Enable privacy mode"}
               aria-label={isBlurred ? "Disable privacy mode" : "Enable privacy mode"}
               aria-pressed={isBlurred}
               className="p-2 sm:px-3 rounded-lg bg-surface-container-high hover:bg-surface-hover text-on-surface-variant transition-colors flex items-center gap-2 text-label-sm font-label-sm cursor-pointer"
             >
-              <span className="material-symbols-outlined text-[20px]">
-                {isBlurred ? "visibility_off" : "visibility"}
-              </span>
+              {isBlurred
+                ? <EyeOff aria-hidden="true" focusable="false" size={20} />
+                : <Eye aria-hidden="true" focusable="false" size={20} />}
               <span className="hidden sm:inline">{isBlurred ? "Privacy On" : "Privacy Off"}</span>
             </button>
 
             <button
+              type="button"
               onClick={toggleTheme}
               title={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
               aria-label={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
               aria-pressed={theme === "dark"}
               className="p-2 sm:px-3 rounded-lg bg-surface-container-high hover:bg-surface-hover text-on-surface-variant transition-colors flex items-center gap-2 text-label-sm font-label-sm cursor-pointer"
             >
-              <span className="material-symbols-outlined text-[20px]">
-                {theme === "dark" ? "dark_mode" : "light_mode"}
-              </span>
+              {theme === "dark"
+                ? <Moon aria-hidden="true" focusable="false" size={20} />
+                : <Sun aria-hidden="true" focusable="false" size={20} />}
               <span className="hidden sm:inline">{theme === "dark" ? "Dark" : "Light"}</span>
             </button>
           </div>

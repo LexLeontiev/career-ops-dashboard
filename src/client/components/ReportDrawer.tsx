@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { X } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeHighlight from "rehype-highlight";
@@ -18,9 +19,17 @@ export function ReportDrawer({ reportPath, isOpen, onClose, company, role }: Rep
   const [content, setContent] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const openerRef = useRef<HTMLElement | null>(null);
+  const onCloseRef = useRef(onClose);
+
+  useEffect(() => {
+    onCloseRef.current = onClose;
+  }, [onClose]);
 
   useEffect(() => {
     if (!isOpen || !reportPath) return;
+    const controller = new AbortController();
 
     const fetchReport = async () => {
       setLoading(true);
@@ -28,40 +37,44 @@ export function ReportDrawer({ reportPath, isOpen, onClose, company, role }: Rep
       setContent("");
       try {
         const filename = reportPath.replace(/^reports\//, "");
-        const res = await fetch(`/api/reports/${encodeURIComponent(filename)}`);
+        const res = await fetch(`/api/reports/${encodeURIComponent(filename)}`, {
+          signal: controller.signal,
+        });
         if (!res.ok) {
           throw new Error("Detailed report file not found on disk.");
         }
         const text = await res.text();
         setContent(text);
-      } catch (err: any) {
-        setError(err.message || "Failed to load report");
+      } catch (err: unknown) {
+        if (controller.signal.aborted) return;
+        setError(err instanceof Error ? err.message : "Failed to load report");
       } finally {
-        setLoading(false);
+        if (!controller.signal.aborted) setLoading(false);
       }
     };
 
-    fetchReport();
+    void fetchReport();
+    return () => controller.abort();
   }, [isOpen, reportPath]);
 
-  // Escape key handler
   useEffect(() => {
+    if (!isOpen) return;
+
+    openerRef.current = document.activeElement instanceof HTMLElement
+      ? document.activeElement
+      : null;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    closeButtonRef.current?.focus();
+
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape") onCloseRef.current();
     };
     window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [onClose]);
-
-  // Lock body scroll when open
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "unset";
-    }
     return () => {
-      document.body.style.overflow = "unset";
+      window.removeEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = previousOverflow;
+      openerRef.current?.focus();
     };
   }, [isOpen]);
 
@@ -71,17 +84,24 @@ export function ReportDrawer({ reportPath, isOpen, onClose, company, role }: Rep
         className={`drawer-backdrop ${isOpen ? "open" : ""}`}
         onClick={onClose}
       />
-      <div className={`drawer ${isOpen ? "open" : ""}`}>
+      <div
+        className={`drawer ${isOpen ? "open" : ""}`}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="report-drawer-title"
+      >
         <div className="drawer-header">
           <div>
-            <div className="drawer-title">{company}</div>
+            <div className="drawer-title" id="report-drawer-title">{company}</div>
             <div style={{ fontSize: "13px", color: "var(--text-muted)" }}>{role}</div>
           </div>
-          <button className="drawer-close-btn" onClick={onClose}>✕</button>
+          <button ref={closeButtonRef} type="button" className="drawer-close-btn" onClick={onClose} aria-label="Close report">
+            <X aria-hidden="true" focusable="false" />
+          </button>
         </div>
         <div className="drawer-body">
-          {loading && <p>Loading report...</p>}
-          {error && <div style={{ color: "var(--color-error)" }}>{error}</div>}
+          {loading && <p role="status">Loading report...</p>}
+          {error && <div role="alert" style={{ color: "var(--color-error)" }}>{error}</div>}
           {!loading && !error && content && (
             <div className="prose dark:prose-invert prose-sm md:prose-base">
               <ReactMarkdown
