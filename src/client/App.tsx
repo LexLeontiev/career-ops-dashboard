@@ -3,6 +3,11 @@ import { StatsOverview } from "./components/StatsOverview.js";
 import { FilterBar } from "./components/FilterBar.js";
 import { DataTable, Application } from "./components/DataTable.js";
 import { ReportDrawer } from "./components/ReportDrawer.js";
+
+type Theme = "light" | "dark";
+
+const THEME_STORAGE_KEY = "career_ops_theme";
+
 export default function App() {
   const [applications, setApplications] = useState<Application[]>([]);
   const [loading, setLoading] = useState(true);
@@ -14,6 +19,14 @@ export default function App() {
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
 
   const [selectedApp, setSelectedApp] = useState<Application | null>(null);
+
+  const [theme, setTheme] = useState<Theme>(() => {
+    try {
+      return localStorage.getItem(THEME_STORAGE_KEY) === "light" ? "light" : "dark";
+    } catch {
+      return "dark";
+    }
+  });
 
   const [isBlurred, setIsBlurred] = useState<boolean>(() => {
     try {
@@ -30,6 +43,20 @@ export default function App() {
         localStorage.setItem("career_ops_blur_mode", JSON.stringify(next));
       } catch {}
       return next;
+    });
+  };
+
+  useEffect(() => {
+    document.documentElement.classList.toggle("dark", theme === "dark");
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme((currentTheme) => {
+      const nextTheme = currentTheme === "dark" ? "light" : "dark";
+      try {
+        localStorage.setItem(THEME_STORAGE_KEY, nextTheme);
+      } catch {}
+      return nextTheme;
     });
   };
 
@@ -149,26 +176,43 @@ export default function App() {
 
   return (
     <div className="font-body-md text-on-surface overflow-x-hidden selection:bg-primary-container">
-      <header className="bg-surface-container-lowest dark:bg-surface-container-lowest w-full top-0 sticky z-50 border-b border-border-subtle dark:border-border-subtle">
-        <div className="flex justify-between items-center w-full px-margin-desktop py-stack-md max-w-container-max mx-auto">
+      <header className="bg-surface-container-lowest w-full top-0 sticky z-50 border-b border-border-subtle">
+        <div className="flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop py-stack-md max-w-container-max mx-auto">
           <div className="flex items-center gap-stack-md cursor-pointer active:opacity-80 transition-all">
-            <span className="material-symbols-outlined text-primary dark:text-primary-fixed-dim font-headline-md text-headline-md" data-icon="terminal">terminal</span>
+            <span className="material-symbols-outlined text-primary font-headline-md text-headline-md" data-icon="terminal">terminal</span>
             <div className="flex flex-col justify-center">
-              <h1 className="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim leading-none">Career Ops</h1>
-              <span className="text-[10px] font-label-sm font-semibold tracking-widest uppercase text-on-surface-variant/80 dark:text-on-surface-variant/80 mt-1">Dashboard</span>
+              <h1 className="font-headline-md text-headline-md font-bold text-primary leading-none">Career Ops</h1>
+              <span className="text-[10px] font-label-sm font-semibold tracking-widest uppercase text-on-surface-variant/80 mt-1">Dashboard</span>
             </div>
           </div>
 
-          <button
-            onClick={toggleBlur}
-            title={isBlurred ? "Disable privacy blur" : "Enable privacy blur"}
-            className="p-2 px-3 rounded-lg bg-surface-container-high hover:bg-surface-hover text-on-surface-variant transition-colors flex items-center gap-2 text-label-sm font-label-sm cursor-pointer"
-          >
-            <span className="material-symbols-outlined text-[20px]">
-              {isBlurred ? "visibility_off" : "visibility"}
-            </span>
-            <span>{isBlurred ? "Privacy On" : "Privacy Off"}</span>
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={toggleBlur}
+              title={isBlurred ? "Disable privacy mode" : "Enable privacy mode"}
+              aria-label={isBlurred ? "Disable privacy mode" : "Enable privacy mode"}
+              aria-pressed={isBlurred}
+              className="p-2 sm:px-3 rounded-lg bg-surface-container-high hover:bg-surface-hover text-on-surface-variant transition-colors flex items-center gap-2 text-label-sm font-label-sm cursor-pointer"
+            >
+              <span className="material-symbols-outlined text-[20px]">
+                {isBlurred ? "visibility_off" : "visibility"}
+              </span>
+              <span className="hidden sm:inline">{isBlurred ? "Privacy On" : "Privacy Off"}</span>
+            </button>
+
+            <button
+              onClick={toggleTheme}
+              title={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
+              aria-label={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
+              aria-pressed={theme === "dark"}
+              className="p-2 sm:px-3 rounded-lg bg-surface-container-high hover:bg-surface-hover text-on-surface-variant transition-colors flex items-center gap-2 text-label-sm font-label-sm cursor-pointer"
+            >
+              <span className="material-symbols-outlined text-[20px]">
+                {theme === "dark" ? "dark_mode" : "light_mode"}
+              </span>
+              <span className="hidden sm:inline">{theme === "dark" ? "Dark" : "Light"}</span>
+            </button>
+          </div>
         </div>
       </header>
 

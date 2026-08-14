@@ -65,41 +65,40 @@ export function ReportDrawer({ reportPath, isOpen, onClose, company, role }: Rep
     };
   }, [isOpen]);
 
-  return React.createElement(
-    React.Fragment,
-    null,
-    React.createElement("div", {
-      className: `drawer-backdrop ${isOpen ? "open" : ""}`,
-      onClick: onClose
-    }),
-    React.createElement(
-      "div",
-      { className: `drawer ${isOpen ? "open" : ""}` },
-      React.createElement(
-        "div",
-        { className: "drawer-header" },
-        React.createElement(
-          "div",
-          null,
-          React.createElement("div", { className: "drawer-title" }, company),
-          React.createElement("div", { style: { fontSize: "13px", color: "var(--text-muted)" } }, role)
-        ),
-        React.createElement("button", { className: "drawer-close-btn", onClick: onClose }, "✕")
-      ),
-      React.createElement(
-        "div",
-        { className: "drawer-body" },
-        loading && React.createElement("p", null, "Loading report..."),
-        error && React.createElement("div", { style: { color: "var(--color-error)" } }, error),
-        !loading && !error && content && React.createElement(
-          "div",
-          { className: "prose prose-invert prose-sm md:prose-base" },
-          React.createElement(ReactMarkdown, {
-            remarkPlugins: remarkPlugins,
-            rehypePlugins: rehypePlugins
-          }, content)
-        )
-      )
-    )
+  return (
+    <>
+      <div
+        className={`drawer-backdrop ${isOpen ? "open" : ""}`}
+        onClick={onClose}
+      />
+      <div className={`drawer ${isOpen ? "open" : ""}`}>
+        <div className="drawer-header">
+          <div>
+            <div className="drawer-title">{company}</div>
+            <div style={{ fontSize: "13px", color: "var(--text-muted)" }}>{role}</div>
+          </div>
+          <button className="drawer-close-btn" onClick={onClose}>✕</button>
+        </div>
+        <div className="drawer-body">
+          {loading && <p>Loading report...</p>}
+          {error && <div style={{ color: "var(--color-error)" }}>{error}</div>}
+          {!loading && !error && content && (
+            <div className="prose dark:prose-invert prose-sm md:prose-base">
+              <ReactMarkdown
+                remarkPlugins={remarkPlugins}
+                rehypePlugins={rehypePlugins}
+                components={{
+                  a: ({ node, ...props }) => (
+                    <a {...props} target="_blank" rel="noopener noreferrer" />
+                  ),
+                }}
+              >
+                {content}
+              </ReactMarkdown>
+            </div>
+          )}
+        </div>
+      </div>
+    </>
   );
 }

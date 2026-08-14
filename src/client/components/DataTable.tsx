@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 export interface Application {
   num: number;
@@ -21,10 +21,52 @@ interface DataTableProps {
   isBlurred?: boolean;
 }
 
+type PrivacyTextVariant = "score" | "company" | "role" | "date" | "table-notes" | "timeline-notes";
+
+interface PrivacyTextProps {
+  children: React.ReactNode;
+  isPrivate: boolean;
+  revealLabel: string;
+  title?: string;
+  variant: PrivacyTextVariant;
+}
+
+function PrivacyText({ children, isPrivate, revealLabel, title, variant }: PrivacyTextProps) {
+  const [isRevealed, setIsRevealed] = useState(false);
+  const isHidden = isPrivate && !isRevealed;
+
+  useEffect(() => {
+    setIsRevealed(false);
+  }, [isPrivate]);
+
+  const reveal = (event: React.MouseEvent | React.KeyboardEvent) => {
+    event.stopPropagation();
+    setIsRevealed(true);
+  };
+
+  return (
+    <span
+      className={`privacy-noise privacy-noise--${variant}${isHidden ? " privacy-noise--active" : ""}`}
+      data-private={isHidden ? "true" : undefined}
+      onClick={isHidden ? reveal : undefined}
+      onKeyDown={isHidden ? (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          reveal(event);
+        }
+      } : undefined}
+      role={isHidden ? "button" : undefined}
+      tabIndex={isHidden ? 0 : undefined}
+      aria-label={isHidden ? revealLabel : undefined}
+      title={isHidden ? undefined : title}
+    >
+      <span className="privacy-noise__content">{children}</span>
+    </span>
+  );
+}
+
 export function DataTable({ applications, onSelect, sortField, sortOrder, onSort, isBlurred }: DataTableProps) {
   const [expandedRows, setExpandedRows] = useState<Record<number, boolean>>({});
-
-  const blurClass = isBlurred ? "blur-[4px] select-none hover:blur-none transition-all duration-200 cursor-pointer" : "";
 
   const toggleTimeline = (e: React.MouseEvent, id: number) => {
     e.stopPropagation();
@@ -33,10 +75,10 @@ export function DataTable({ applications, onSelect, sortField, sortOrder, onSort
 
   const getScoreInfo = (scoreStr: string) => {
     const score = parseFloat(scoreStr);
-    if (isNaN(score)) return { bg: "bg-[#4b5563]/15", text: "text-[#4b5563]" };
-    if (score >= 4.5 || score >= 90) return { bg: "bg-[#10b981]/15", text: "text-[#10b981]" };
-    if (score >= 3.5 || score >= 70) return { bg: "bg-[#f59e0b]/15", text: "text-[#f59e0b]" };
-    return { bg: "bg-[#4b5563]/15", text: "text-[#4b5563]" };
+    if (isNaN(score)) return { bg: "bg-slate-500/15", text: "text-slate-600 dark:text-slate-400" };
+    if (score >= 4.5 || score >= 90) return { bg: "bg-emerald-500/15", text: "text-emerald-600 dark:text-emerald-400" };
+    if (score >= 3.5 || score >= 70) return { bg: "bg-amber-500/15", text: "text-amber-700 dark:text-amber-400" };
+    return { bg: "bg-slate-500/15", text: "text-slate-600 dark:text-slate-400" };
   };
 
   const formatScoreDisplay = (scoreStr: string) => {
@@ -47,9 +89,9 @@ export function DataTable({ applications, onSelect, sortField, sortOrder, onSort
 
   const getStatusInfo = (statusStr: string) => {
     const status = (statusStr || "").toUpperCase();
-    if (status === "APPLIED" || status === "INTERVIEW" || status === "RESPONDED") return { bg: "bg-primary-container/20", text: "text-primary-fixed-dim" };
+    if (status === "APPLIED" || status === "INTERVIEW" || status === "RESPONDED") return { bg: "bg-primary/15", text: "text-primary" };
     if (status === "SKIP" || status === "REJECTED") return { bg: "bg-error-container/20", text: "text-error" };
-    return { bg: "bg-[#9ca3af]/15", text: "text-[#9ca3af]" };
+    return { bg: "bg-slate-500/15", text: "text-slate-600 dark:text-slate-400" };
   };
 
   const formatDate = (dateStr: string) => {
@@ -83,19 +125,19 @@ export function DataTable({ applications, onSelect, sortField, sortOrder, onSort
         <table className="w-full table-fixed border-collapse">
           <thead>
             <tr className="bg-surface-container-high text-left">
-              <th className="w-[8%] px-6 py-4 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider cursor-pointer hover:bg-white/5" onClick={() => onSort("score")}>
+              <th className="w-[8%] px-6 py-4 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider cursor-pointer hover:bg-surface-hover" onClick={() => onSort("score")}>
                 Score / 5{renderSortIndicator("score")}
               </th>
-              <th className="w-[14%] px-6 py-4 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider cursor-pointer hover:bg-white/5" onClick={() => onSort("company")}>
+              <th className="w-[14%] px-6 py-4 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider cursor-pointer hover:bg-surface-hover" onClick={() => onSort("company")}>
                 Company{renderSortIndicator("company")}
               </th>
-              <th className="w-[16%] px-6 py-4 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider cursor-pointer hover:bg-white/5" onClick={() => onSort("role")}>
+              <th className="w-[16%] px-6 py-4 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider cursor-pointer hover:bg-surface-hover" onClick={() => onSort("role")}>
                 Role{renderSortIndicator("role")}
               </th>
-              <th className="w-[12%] px-6 py-4 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider cursor-pointer hover:bg-white/5" onClick={() => onSort("status")}>
+              <th className="w-[12%] px-6 py-4 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider cursor-pointer hover:bg-surface-hover" onClick={() => onSort("status")}>
                 Status{renderSortIndicator("status")}
               </th>
-              <th className="w-[12%] px-6 py-4 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider cursor-pointer hover:bg-white/5" onClick={() => onSort("date")}>
+              <th className="w-[12%] px-6 py-4 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider cursor-pointer hover:bg-surface-hover" onClick={() => onSort("date")}>
                 Last Interaction{renderSortIndicator("date")}
               </th>
               <th className="w-[8%] px-6 py-4 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">
@@ -119,14 +161,46 @@ export function DataTable({ applications, onSelect, sortField, sortOrder, onSort
                     onClick={(e) => toggleTimeline(e, app.num)}
                   >
                     <td className="px-6 py-5">
-                      <span className={`${scoreClass.bg} ${scoreClass.text} px-2.5 py-1 rounded-md text-xs font-bold`}>{formatScoreDisplay(app.score)}</span>
+                      <PrivacyText
+                        isPrivate={!!isBlurred}
+                        revealLabel="Reveal score"
+                        variant="score"
+                      >
+                        <span className={`${scoreClass.bg} ${scoreClass.text} px-2.5 py-1 rounded-md text-xs font-bold`}>{formatScoreDisplay(app.score)}</span>
+                      </PrivacyText>
                     </td>
-                    <td className={`px-6 py-5 font-bold text-white ${blurClass}`}>{app.company}</td>
-                    <td className={`px-6 py-5 text-on-surface-variant ${blurClass}`}>{app.role}</td>
+                    <td className="px-6 py-5 font-bold text-on-surface">
+                      <PrivacyText
+                        isPrivate={!!isBlurred}
+                        revealLabel="Reveal company"
+                        title={app.company}
+                        variant="company"
+                      >
+                        {app.company}
+                      </PrivacyText>
+                    </td>
+                    <td className="px-6 py-5 text-on-surface-variant">
+                      <PrivacyText
+                        isPrivate={!!isBlurred}
+                        revealLabel="Reveal role"
+                        title={app.role}
+                        variant="role"
+                      >
+                        {app.role}
+                      </PrivacyText>
+                    </td>
                     <td className="px-6 py-5">
                       <span className={`${statusClass.bg} ${statusClass.text} px-2.5 py-1 rounded-md text-xs font-bold`}>{app.status}</span>
                     </td>
-                    <td className="px-6 py-5 text-on-surface-variant">{formatDate(app.date)}</td>
+                    <td className="px-6 py-5 text-on-surface-variant">
+                      <PrivacyText
+                        isPrivate={!!isBlurred}
+                        revealLabel="Reveal last interaction date"
+                        variant="date"
+                      >
+                        {formatDate(app.date)}
+                      </PrivacyText>
+                    </td>
 
                     <td className="px-6 py-5">
                       <button 
@@ -140,7 +214,14 @@ export function DataTable({ applications, onSelect, sortField, sortOrder, onSort
                       </button>
                     </td>
                     <td className="px-6 py-5 text-on-surface-variant text-body-sm">
-                      <div className={`line-clamp-2 ${blurClass}`} title={app.notes}>{app.notes}</div>
+                      <PrivacyText
+                        isPrivate={!!isBlurred}
+                        revealLabel="Reveal comment"
+                        title={app.notes}
+                        variant="table-notes"
+                      >
+                        {app.notes}
+                      </PrivacyText>
                     </td>
                   </tr>
                   {isExpanded && (
@@ -152,9 +233,25 @@ export function DataTable({ applications, onSelect, sortField, sortOrder, onSort
                             <div className="relative pl-10">
                               <div className="absolute left-[-2px] top-1.5 w-4 h-4 rounded-full bg-primary/40 ring-4 ring-transparent"></div>
                               <div className="flex flex-col">
-                                <span className="text-xs font-label-sm text-on-surface-variant mb-1">{formatDate(app.date)}</span>
-                                <h4 className="font-bold text-white mb-1">Status: {app.status}</h4>
-                                <p className={`text-on-surface-variant text-body-sm max-w-2xl ${blurClass}`}>{app.notes}</p>
+                                <div className="text-xs font-label-sm text-on-surface-variant mb-1">
+                                  <PrivacyText
+                                    isPrivate={!!isBlurred}
+                                    revealLabel="Reveal timeline date"
+                                    variant="date"
+                                  >
+                                    {formatDate(app.date)}
+                                  </PrivacyText>
+                                </div>
+                                <h4 className="font-bold text-on-surface mb-1">Status: {app.status}</h4>
+                                <div className="text-on-surface-variant text-body-sm max-w-2xl">
+                                  <PrivacyText
+                                    isPrivate={!!isBlurred}
+                                    revealLabel="Reveal timeline comment"
+                                    variant="timeline-notes"
+                                  >
+                                    {app.notes}
+                                  </PrivacyText>
+                                </div>
                               </div>
                             </div>
                           </div>

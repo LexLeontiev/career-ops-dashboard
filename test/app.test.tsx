@@ -7,4 +7,7 @@ import App from "../src/client/App.js";
 test("renders app container header", () => {
   const html = renderToString(React.createElement(App));
   assert.match(html, /Career Ops/);
+  assert.match(html, /Privacy Off/);
+  assert.match(html, /Switch to light theme/);
+  assert.match(html, /dark_mode/);
 });
