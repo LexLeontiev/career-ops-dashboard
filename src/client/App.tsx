@@ -1,9 +1,14 @@
 import React, { useEffect, useState } from "react";
 import type { Application } from "../shared/application.js";
+import { fetchApplications } from "./api.js";
 import { StatsOverview } from "./components/StatsOverview.js";
 import { FilterBar } from "./components/FilterBar.js";
 import { DataTable } from "./components/DataTable.js";
-import { ReportDrawer } from "./components/ReportDrawer.js";
+
+const ReportDrawer = React.lazy(async () => {
+  const module = await import("./components/ReportDrawer.js");
+  return { default: module.ReportDrawer };
+});
 
 type Theme = "light" | "dark";
 
@@ -62,19 +67,17 @@ export default function App() {
   };
 
   useEffect(() => {
-    const loadData = async () => {
-      try {
-        const res = await fetch("/api/applications");
-        if (!res.ok) throw new Error("Failed to load applications");
-        const data = await res.json();
-        setApplications(data);
-      } catch (err: any) {
-        setError(err.message || "Failed to load data");
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadData();
+    const controller = new AbortController();
+    void fetchApplications(controller.signal)
+      .then(setApplications)
+      .catch((cause: unknown) => {
+        if (cause instanceof DOMException && cause.name === "AbortError") return;
+        setError(cause instanceof Error ? cause.message : "Failed to load applications");
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setLoading(false);
+      });
+    return () => controller.abort();
   }, []);
 
   const handleSort = (field: keyof Application) => {
@@ -221,8 +224,8 @@ export default function App() {
 
 
         <main className="flex-1 w-full px-margin-mobile md:px-margin-desktop py-stack-lg pb-24 lg:pb-stack-lg">
-          {loading && <p>Loading data...</p>}
-          {error && <div style={{ color: "var(--color-error)" }}>{error}</div>}
+          {loading && <p role="status">Loading applications…</p>}
+          {error && <div role="alert" style={{ color: "var(--color-error)" }}>{error}</div>}
           
           {!loading && !error && (
             <>
@@ -251,13 +254,15 @@ export default function App() {
 
 
       {selectedApp && (
-        <ReportDrawer
-          reportPath={selectedApp.report}
-          isOpen={!!selectedApp}
-          onClose={() => setSelectedApp(null)}
-          company={selectedApp.company}
-          role={selectedApp.role}
-        />
+        <React.Suspense fallback={null}>
+          <ReportDrawer
+            reportPath={selectedApp.report}
+            isOpen={!!selectedApp}
+            onClose={() => setSelectedApp(null)}
+            company={selectedApp.company}
+            role={selectedApp.role}
+          />
+        </React.Suspense>
       )}
     </div>
   );
