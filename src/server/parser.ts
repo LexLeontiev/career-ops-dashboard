@@ -1,44 +1,79 @@
-import fs from "node:fs";
-import path from "node:path";
-import { getApplicationsPath, careerOpsRoot } from "./config.js";
+import { readFile } from "node:fs/promises";
+import { pathToFileURL } from "node:url";
+import type { Application } from "../shared/application.js";
+import { getCareerOpsPaths, type CareerOpsPaths } from "./config.js";
 
-export async function parseApplicationsMD(): Promise<any[]> {
-  const filePath = getApplicationsPath();
-  if (!fs.existsSync(filePath)) {
-    throw new Error(`Applications file not found at ${filePath}`);
-  }
+interface TrackerParser {
+  resolveColumns(lines: string[]): unknown;
+  parseTrackerRow(line: string, colmap: unknown): unknown;
+}
 
-  // Dynamically import tracker-parse.mjs to prevent code duplication
-  const parserPath = path.join(careerOpsRoot(), "tracker-parse.mjs");
-  const parserUrl = `file://${parserPath}`;
-  const trackerParse = await import(parserUrl);
+function isTrackerParser(value: unknown): value is TrackerParser {
+  if (typeof value !== "object" || value === null) return false;
+  const candidate = value as Record<string, unknown>;
+  return (
+    typeof candidate.resolveColumns === "function" &&
+    typeof candidate.parseTrackerRow === "function"
+  );
+}
 
-  const lines = fs.readFileSync(filePath, "utf-8").split("\n");
-  const colmap = trackerParse.resolveColumns(lines);
+function normalizeReport(value: unknown): string {
+  const raw = String(value ?? "");
+  const markdownLink = raw.match(/\[[^\]]*\]\(([^)]+)\)/);
+  const link = markdownLink?.[1] ?? raw;
+  return link.split(/[\\/]/).pop()?.trim() ?? "";
+}
 
-  const applications: any[] = [];
-  for (const line of lines) {
-    const row = trackerParse.parseTrackerRow(line, colmap);
-    if (row) {
-      applications.push({
-        num: row.num,
-        date: row.date,
-        company: row.company,
-        via: row.via || "—",
-        role: row.role,
-        score: row.score,
-        status: row.status,
-        pdf: row.pdf,
-        report: (() => {
-          const raw = row.report || "";
-          const m = raw.match(/\[.*?\]\((.*?)\)/);
-          const link = m ? m[1] : raw;
-          return link.split('/').pop()?.trim() || "";
-        })(),
-        notes: row.notes,
-      });
+function normalizeApplication(value: unknown): Application | null {
+  if (typeof value !== "object" || value === null) return null;
+  const candidate = value as Record<string, unknown>;
+  if (typeof candidate.num !== "number" || !Number.isFinite(candidate.num)) return null;
+
+  return {
+    num: candidate.num,
+    date: String(candidate.date ?? ""),
+    company: String(candidate.company ?? ""),
+    via: String(candidate.via ?? "") || "—",
+    role: String(candidate.role ?? ""),
+    score: String(candidate.score ?? ""),
+    status: String(candidate.status ?? ""),
+    pdf: String(candidate.pdf ?? ""),
+    report: normalizeReport(candidate.report),
+    notes: String(candidate.notes ?? ""),
+  };
+}
+
+export async function parseApplicationsMD(
+  paths: CareerOpsPaths = getCareerOpsPaths(),
+): Promise<Application[]> {
+  let markdown: string;
+  try {
+    markdown = await readFile(paths.applicationsFile, "utf8");
+  } catch (error: unknown) {
+    if (
+      typeof error === "object" &&
+      error !== null &&
+      "code" in error &&
+      error.code === "ENOENT"
+    ) {
+      throw new Error(`Applications file not found at ${paths.applicationsFile}`);
     }
+    throw error;
   }
 
-  return applications.sort((a, b) => b.num - a.num);
+  const trackerParser: unknown = await import(pathToFileURL(paths.parserFile).href);
+  if (!isTrackerParser(trackerParser)) {
+    throw new TypeError("Upstream parser missing resolveColumns or parseTrackerRow");
+  }
+
+  const lines = markdown.split("\n");
+  const colmap = trackerParser.resolveColumns(lines);
+  const applications: Application[] = [];
+
+  for (const line of lines) {
+    const application = normalizeApplication(trackerParser.parseTrackerRow(line, colmap));
+    if (application) applications.push(application);
+  }
+
+  return applications.sort((left, right) => right.num - left.num);
 }

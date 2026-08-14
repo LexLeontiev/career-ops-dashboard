@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
+import type { Application } from "../shared/application.js";
 import { StatsOverview } from "./components/StatsOverview.js";
 import { FilterBar } from "./components/FilterBar.js";
-import { DataTable, Application } from "./components/DataTable.js";
+import { DataTable } from "./components/DataTable.js";
 import { ReportDrawer } from "./components/ReportDrawer.js";
 
 type Theme = "light" | "dark";

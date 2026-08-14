@@ -1,17 +1,29 @@
 import path from "node:path";
-import fs from "node:fs";
 
-export function careerOpsRoot(): string {
-  const env = process.env.CAREER_OPS_ROOT?.trim();
-  if (env) return env;
-  // If we are in project/src/server/ or similar, resolver must handle absolute paths safely relative to the workspace root.
-  return path.resolve(process.cwd(), "../career-ops");
+export interface CareerOpsPaths {
+  root: string;
+  applicationsFile: string;
+  reportsDirectory: string;
+  parserFile: string;
 }
 
-export function getApplicationsPath(): string {
-  return path.join(careerOpsRoot(), "data", "applications.md");
+export function resolveCareerOpsPaths(root: string, cwd = process.cwd()): CareerOpsPaths {
+  const resolvedRoot = path.resolve(cwd, root);
+  return {
+    root: resolvedRoot,
+    applicationsFile: path.join(resolvedRoot, "data", "applications.md"),
+    reportsDirectory: path.join(resolvedRoot, "reports"),
+    parserFile: path.join(resolvedRoot, "tracker-parse.mjs"),
+  };
+}
+
+export function getCareerOpsPaths(
+  env: NodeJS.ProcessEnv = process.env,
+  cwd = process.cwd(),
+): CareerOpsPaths {
+  return resolveCareerOpsPaths(env.CAREER_OPS_ROOT?.trim() || "../career-ops", cwd);
 }
 
 export function getReportsDirectory(): string {
-  return path.join(careerOpsRoot(), "reports");
+  return getCareerOpsPaths().reportsDirectory;
 }

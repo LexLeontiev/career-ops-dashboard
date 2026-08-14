@@ -6,7 +6,7 @@ import { DataTable } from "./DataTable.js";
 
 test("table displays job details and score class colorings", () => {
   const mockApps = [
-    { num: 47, date: "2026-07-14", company: "Fingerprint", via: "—", role: "Senior Android", score: "5.0/5", status: "Evaluated", report: "reports/046.md", notes: "Great match" }
+    { num: 47, date: "2026-07-14", company: "Fingerprint", via: "—", role: "Senior Android", score: "5.0/5", status: "Evaluated", pdf: "✅", report: "reports/046.md", notes: "Great match" }
   ];
   const html = renderToString(React.createElement(DataTable, {
     applications: mockApps,
@@ -23,7 +23,7 @@ test("table displays job details and score class colorings", () => {
 
 test("table renders fixed-size privacy noise when isBlurred is true", () => {
   const mockApps = [
-    { num: 47, date: "2026-07-14", company: "Fingerprint", via: "—", role: "Senior Android", score: "5.0/5", status: "Evaluated", report: "reports/046.md", notes: "Great match" }
+    { num: 47, date: "2026-07-14", company: "Fingerprint", via: "—", role: "Senior Android", score: "5.0/5", status: "Evaluated", pdf: "✅", report: "reports/046.md", notes: "Great match" }
   ];
   const html = renderToString(React.createElement(DataTable, {
     applications: mockApps,
@@ -48,7 +48,7 @@ test("table renders fixed-size privacy noise when isBlurred is true", () => {
 
 test("table keeps the same privacy wrappers without noise when isBlurred is false", () => {
   const mockApps = [
-    { num: 47, date: "2026-07-14", company: "Fingerprint", via: "—", role: "Senior Android", score: "5.0/5", status: "Evaluated", report: "reports/046.md", notes: "Great match" }
+    { num: 47, date: "2026-07-14", company: "Fingerprint", via: "—", role: "Senior Android", score: "5.0/5", status: "Evaluated", pdf: "✅", report: "reports/046.md", notes: "Great match" }
   ];
   const html = renderToString(React.createElement(DataTable, {
     applications: mockApps,

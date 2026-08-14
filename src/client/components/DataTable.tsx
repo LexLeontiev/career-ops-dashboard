@@ -1,16 +1,5 @@
 import React, { useEffect, useState } from "react";
-
-export interface Application {
-  num: number;
-  date: string;
-  company: string;
-  via: string;
-  role: string;
-  score: string;
-  status: string;
-  report: string;
-  notes: string;
-}
+import type { Application } from "../../shared/application.js";
 
 interface DataTableProps {
   applications: Application[];
