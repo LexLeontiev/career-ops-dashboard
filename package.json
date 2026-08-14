@@ -1,8 +1,31 @@
 {
-  "name": "career-ops-web",
-  "version": "1.0.0",
+  "name": "career-ops-dashboard",
+  "version": "0.1.0",
+  "description": "Unofficial local-first dashboard for the career-ops job-search pipeline.",
   "private": true,
   "type": "module",
+  "license": "MIT",
+  "author": "Alexey Leontyev",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LexLeontiev/career-ops-dashboard.git"
+  },
+  "homepage": "https://github.com/LexLeontiev/career-ops-dashboard#readme",
+  "bugs": {
+    "url": "https://github.com/LexLeontiev/career-ops-dashboard/issues"
+  },
+  "keywords": [
+    "career-ops",
+    "job-search",
+    "dashboard",
+    "local-first",
+    "react",
+    "typescript"
+  ],
+  "engines": {
+    "node": ">=22.13.0",
+    "npm": ">=10"
+  },
   "scripts": {
     "dev": "concurrently \"vite\" \"tsx watch src/server/index.ts\"",
     "build": "tsc && vite build",
@@ -13,10 +36,10 @@
     "@fontsource/hanken-grotesk": "^5.3.0",
     "@fontsource/jetbrains-mono": "^5.3.0",
     "express": "^4.19.2",
-    "highlight.js": "^11.11.1",
+    "highlight.js": "^11.12.0",
     "material-symbols": "^0.46.0",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
     "react-markdown": "^9.0.1",
     "rehype-highlight": "^7.0.2",
     "remark-gfm": "^4.0.1"
@@ -25,15 +48,15 @@
     "@tailwindcss/postcss": "^4.3.3",
     "@tailwindcss/typography": "^0.5.20",
     "@types/express": "^4.17.21",
-    "@types/node": "^20.11.24",
-    "@types/react": "^19.0.0",
-    "@types/react-dom": "^19.0.0",
+    "@types/node": "^24.13.3",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.4",
     "autoprefixer": "^10.5.4",
     "concurrently": "^8.2.2",
-    "postcss": "^8.5.19",
+    "postcss": "^8.5.26",
     "tailwindcss": "^4.3.3",
-    "tsx": "^4.7.1",
+    "tsx": "^4.23.12",
     "typescript": "^5.3.3",
-    "vite": "^5.1.4"
+    "vite": "^8.2.1"
   }
 }
