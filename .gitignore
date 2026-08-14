@@ -1,6 +1,22 @@
+# Dependencies and build output
 node_modules/
 dist/
-.superpowers/
-.DS_Store
+coverage/
 
+# Environment and credentials
 .env
+.env.*
+!.env.example
+
+# Agent/tool working state
+.agent/
+.agents/
+.superpowers/
+docs/superpowers/
+scratch/
+
+# Logs and OS/editor state
+*.log
+.DS_Store
+.idea/
+.vscode/
