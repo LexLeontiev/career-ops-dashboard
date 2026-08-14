@@ -38,9 +38,9 @@ async function createSyntheticDashboard(): Promise<{
   const sandbox = await makeTemporaryDirectory("career-ops-start-");
   const dashboardRoot = path.join(sandbox, "career-ops-dashboard");
   const upstreamRoot = path.join(sandbox, "career-ops");
-  const unrelatedCwd = path.join(sandbox, "elsewhere");
+  const unrelatedCwd = path.join(sandbox, "caller", "deep", "elsewhere");
   await mkdir(path.join(dashboardRoot, "bin"), { recursive: true });
-  await mkdir(unrelatedCwd);
+  await mkdir(unrelatedCwd, { recursive: true });
   await copyFile(startScript, path.join(dashboardRoot, "bin", "start.sh"));
   await createCareerOpsFixture(upstreamRoot);
   return { dashboardRoot, upstreamRoot, unrelatedCwd };
