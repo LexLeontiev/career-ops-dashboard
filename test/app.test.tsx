@@ -1,13 +1,13 @@
-import assert from "node:assert";
-import test from "node:test";
+// @vitest-environment jsdom
+import { expect, test } from "vitest";
 import React from "react";
 import { renderToString } from "react-dom/server";
 import App from "../src/client/App.js";
 
 test("renders app container header", () => {
   const html = renderToString(React.createElement(App));
-  assert.match(html, /Career Ops/);
-  assert.match(html, /Privacy Off/);
-  assert.match(html, /Switch to light theme/);
-  assert.match(html, /dark_mode/);
+  expect(html).toMatch(/Career Ops/);
+  expect(html).toMatch(/Privacy Off/);
+  expect(html).toMatch(/Switch to light theme/);
+  expect(html).toMatch(/dark_mode/);
 });

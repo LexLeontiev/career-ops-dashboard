@@ -1,5 +1,5 @@
-import assert from "node:assert";
-import test from "node:test";
+// @vitest-environment jsdom
+import { expect, test } from "vitest";
 import React from "react";
 import { renderToString } from "react-dom/server";
 import { DataTable } from "./DataTable.js";
@@ -15,10 +15,10 @@ test("table displays job details and score class colorings", () => {
     sortOrder: "desc",
     onSort: () => {}
   }));
-  assert.match(html, /Fingerprint/);
-  assert.match(html, /Senior Android/);
-  assert.match(html, /5\.0/);
-  assert.match(html, /Great match/);
+  expect(html).toMatch(/Fingerprint/);
+  expect(html).toMatch(/Senior Android/);
+  expect(html).toMatch(/5\.0/);
+  expect(html).toMatch(/Great match/);
 });
 
 test("table renders fixed-size privacy noise when isBlurred is true", () => {
@@ -33,17 +33,17 @@ test("table renders fixed-size privacy noise when isBlurred is true", () => {
     onSort: () => {},
     isBlurred: true
   }));
-  assert.match(html, /privacy-noise--score privacy-noise--active/);
-  assert.match(html, /privacy-noise--company privacy-noise--active/);
-  assert.match(html, /privacy-noise--role privacy-noise--active/);
-  assert.match(html, /privacy-noise--date privacy-noise--active/);
-  assert.match(html, /privacy-noise--table-notes privacy-noise--active/);
-  assert.match(html, /data-private="true"/);
-  assert.match(html, /aria-label="Reveal score"/);
-  assert.match(html, /aria-label="Reveal company"/);
-  assert.match(html, /aria-label="Reveal last interaction date"/);
-  assert.doesNotMatch(html, /blur-\[4px\]/);
-  assert.doesNotMatch(html, /title="Great match"/);
+  expect(html).toMatch(/privacy-noise--score privacy-noise--active/);
+  expect(html).toMatch(/privacy-noise--company privacy-noise--active/);
+  expect(html).toMatch(/privacy-noise--role privacy-noise--active/);
+  expect(html).toMatch(/privacy-noise--date privacy-noise--active/);
+  expect(html).toMatch(/privacy-noise--table-notes privacy-noise--active/);
+  expect(html).toMatch(/data-private="true"/);
+  expect(html).toMatch(/aria-label="Reveal score"/);
+  expect(html).toMatch(/aria-label="Reveal company"/);
+  expect(html).toMatch(/aria-label="Reveal last interaction date"/);
+  expect(html).not.toMatch(/blur-\[4px\]/);
+  expect(html).not.toMatch(/title="Great match"/);
 });
 
 test("table keeps the same privacy wrappers without noise when isBlurred is false", () => {
@@ -58,13 +58,13 @@ test("table keeps the same privacy wrappers without noise when isBlurred is fals
     onSort: () => {},
     isBlurred: false
   }));
-  assert.match(html, /privacy-noise privacy-noise--score/);
-  assert.match(html, /privacy-noise privacy-noise--company/);
-  assert.match(html, /privacy-noise privacy-noise--role/);
-  assert.match(html, /privacy-noise privacy-noise--date/);
-  assert.match(html, /privacy-noise privacy-noise--table-notes/);
-  assert.doesNotMatch(html, /privacy-noise--active/);
-  assert.doesNotMatch(html, /data-private="true"/);
-  assert.doesNotMatch(html, /blur-\[4px\]/);
-  assert.match(html, /title="Great match"/);
+  expect(html).toMatch(/privacy-noise privacy-noise--score/);
+  expect(html).toMatch(/privacy-noise privacy-noise--company/);
+  expect(html).toMatch(/privacy-noise privacy-noise--role/);
+  expect(html).toMatch(/privacy-noise privacy-noise--date/);
+  expect(html).toMatch(/privacy-noise privacy-noise--table-notes/);
+  expect(html).not.toMatch(/privacy-noise--active/);
+  expect(html).not.toMatch(/data-private="true"/);
+  expect(html).not.toMatch(/blur-\[4px\]/);
+  expect(html).toMatch(/title="Great match"/);
 });

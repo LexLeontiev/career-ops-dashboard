@@ -1,7 +1,6 @@
-import assert from "node:assert";
-import test from "node:test";
+import { expect, test } from "vitest";
 
 test("environment check", () => {
   const env = process.env.NODE_ENV;
-  assert.ok(env === "test" || env === undefined, "Environment is valid");
+  expect(env === "test" || env === undefined, "Environment is valid").toBeTruthy();
 });
