@@ -1,3 +1,3 @@
 # Acme Labs — Platform Engineer
 
-Synthetic application report for the hermetic test fixture.
+Synthetic report for Acme Labs in the hermetic test fixture.

@@ -27,9 +27,9 @@
     "npm": ">=10"
   },
   "scripts": {
-    "dev": "concurrently \"vite\" \"tsx watch src/server/index.ts\"",
+    "dev": "concurrently \"vite\" \"tsx watch src/server/start.ts\"",
     "build": "npm run typecheck && vite build",
-    "start": "NODE_ENV=production tsx src/server/index.ts",
+    "start": "NODE_ENV=production tsx src/server/start.ts",
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit"
