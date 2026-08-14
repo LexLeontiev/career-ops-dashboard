@@ -30,6 +30,7 @@
     "dev": "concurrently \"vite\" \"tsx watch src/server/start.ts\"",
     "build": "npm run typecheck && vite build && node scripts/check-build-output.mjs",
     "start": "NODE_ENV=production tsx src/server/start.ts",
+    "smoke:production": "node --import tsx scripts/production-smoke.mjs",
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit"
