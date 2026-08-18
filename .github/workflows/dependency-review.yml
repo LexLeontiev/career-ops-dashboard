@@ -1,7 +1,8 @@
 name: Dependency Review
 
+# Restore the pull_request trigger when the repository becomes public.
 on:
-  pull_request:
+  workflow_dispatch:
 
 permissions:
   contents: read
