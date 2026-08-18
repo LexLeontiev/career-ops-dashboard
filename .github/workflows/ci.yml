@@ -10,12 +10,11 @@ permissions:
 
 jobs:
   quality:
-    name: ${{ matrix.os }} / Node ${{ matrix.node }}
-    runs-on: ${{ matrix.os }}
+    name: ubuntu-latest / Node ${{ matrix.node }}
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest]
         node: [22, 24]
     steps:
       - name: Check out repository
@@ -26,6 +25,25 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.node }}
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Run release checks
+        run: npm run check
+
+  macos:
+    name: macos-latest / Node 24
+    if: github.event_name == 'push'
+    runs-on: macos-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
           cache: npm
       - name: Install dependencies
         run: npm ci
