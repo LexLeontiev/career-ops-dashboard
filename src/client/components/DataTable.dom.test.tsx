@@ -47,3 +47,26 @@ test("exposes sortable headers and report actions to keyboard users", async () =
 
   expect(screen.getByRole("button", { name: /open report for acme labs/i })).toBeInTheDocument();
 });
+
+test("disables the report action when an application has no report", async () => {
+  const user = userEvent.setup();
+  const onSelect = vi.fn();
+
+  render(
+    <DataTable
+      applications={[{ ...application, report: "" }]}
+      onSelect={onSelect}
+      sortField="score"
+      sortOrder="desc"
+      onSort={vi.fn()}
+    />,
+  );
+
+  const reportButton = screen.getByRole("button", {
+    name: /report unavailable for acme labs/i,
+  });
+  expect(reportButton).toBeDisabled();
+
+  await user.click(reportButton);
+  expect(onSelect).not.toHaveBeenCalled();
+});

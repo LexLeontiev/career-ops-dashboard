@@ -6,6 +6,7 @@ Complete these manual gates in order before a public release:
 - [ ] Obtain written permission to publish under the `career-ops-dashboard` name.
 - [ ] Confirm `npm run check` and both npm audits pass.
 - [ ] Confirm the GitHub Actions matrix is green.
+- [ ] Run a runtime smoke test against a fresh canonical `santifer/career-ops` checkout in a disposable external environment.
 - [ ] Enable secret scanning and push protection.
 - [ ] Enable private vulnerability reporting.
 - [ ] Protect `main` and require the CI quality job.

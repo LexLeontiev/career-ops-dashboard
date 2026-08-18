@@ -19,16 +19,18 @@ export function ReportDrawer({ reportPath, isOpen, onClose, company, role }: Rep
   const [content, setContent] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
+  const drawerRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const openerRef = useRef<HTMLElement | null>(null);
   const onCloseRef = useRef(onClose);
+  const shouldOpen = isOpen && reportPath.trim().length > 0;
 
   useEffect(() => {
     onCloseRef.current = onClose;
   }, [onClose]);
 
   useEffect(() => {
-    if (!isOpen || !reportPath) return;
+    if (!shouldOpen) return;
     const controller = new AbortController();
 
     const fetchReport = async () => {
@@ -36,12 +38,15 @@ export function ReportDrawer({ reportPath, isOpen, onClose, company, role }: Rep
       setError("");
       setContent("");
       try {
-        const filename = reportPath.replace(/^reports\//, "");
+        const filename = reportPath.trim().replace(/^reports\//, "");
         const res = await fetch(`/api/reports/${encodeURIComponent(filename)}`, {
           signal: controller.signal,
         });
-        if (!res.ok) {
+        if (res.status === 404) {
           throw new Error("Detailed report file not found on disk.");
+        }
+        if (!res.ok) {
+          throw new Error("Failed to load report.");
         }
         const text = await res.text();
         setContent(text);
@@ -55,10 +60,10 @@ export function ReportDrawer({ reportPath, isOpen, onClose, company, role }: Rep
 
     void fetchReport();
     return () => controller.abort();
-  }, [isOpen, reportPath]);
+  }, [reportPath, shouldOpen]);
 
   useEffect(() => {
-    if (!isOpen) return;
+    if (!shouldOpen) return;
 
     openerRef.current =
       document.activeElement instanceof HTMLElement ? document.activeElement : null;
@@ -67,7 +72,38 @@ export function ReportDrawer({ reportPath, isOpen, onClose, company, role }: Rep
     closeButtonRef.current?.focus();
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onCloseRef.current();
+      if (e.key === "Escape") {
+        onCloseRef.current();
+        return;
+      }
+      if (e.key !== "Tab" || !drawerRef.current) return;
+
+      const focusableElements = Array.from(
+        drawerRef.current.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+        ),
+      );
+      const firstFocusable = focusableElements[0];
+      const lastFocusable = focusableElements.at(-1);
+      if (!firstFocusable || !lastFocusable) {
+        e.preventDefault();
+        drawerRef.current.focus();
+        return;
+      }
+
+      const focusIsOutsideDrawer =
+        !(document.activeElement instanceof Node) ||
+        !drawerRef.current.contains(document.activeElement);
+      if (e.shiftKey && (document.activeElement === firstFocusable || focusIsOutsideDrawer)) {
+        e.preventDefault();
+        lastFocusable.focus();
+      } else if (
+        !e.shiftKey &&
+        (document.activeElement === lastFocusable || focusIsOutsideDrawer)
+      ) {
+        e.preventDefault();
+        firstFocusable.focus();
+      }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => {
@@ -75,16 +111,20 @@ export function ReportDrawer({ reportPath, isOpen, onClose, company, role }: Rep
       document.body.style.overflow = previousOverflow;
       openerRef.current?.focus();
     };
-  }, [isOpen]);
+  }, [shouldOpen]);
+
+  if (!shouldOpen) return null;
 
   return (
     <>
       <div className={`drawer-backdrop ${isOpen ? "open" : ""}`} onClick={onClose} />
       <div
-        className={`drawer ${isOpen ? "open" : ""}`}
+        ref={drawerRef}
+        className="drawer open"
         role="dialog"
         aria-modal="true"
         aria-labelledby="report-drawer-title"
+        tabIndex={-1}
       >
         <div className="drawer-header">
           <div>

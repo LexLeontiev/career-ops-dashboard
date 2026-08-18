@@ -232,6 +232,7 @@ export function DataTable({
               const scoreClass = getScoreInfo(app.score);
               const statusClass = getStatusInfo(app.status);
               const isExpanded = !!expandedRows[app.num];
+              const hasReport = app.report.trim().length > 0;
 
               return (
                 <React.Fragment key={app.num}>
@@ -296,11 +297,16 @@ export function DataTable({
                     <td className="px-6 py-5">
                       <button
                         type="button"
-                        className="p-2 rounded-full hover:bg-primary/20 text-on-surface-variant hover:text-primary transition-colors"
-                        aria-label={`Open report for ${app.company}`}
+                        className={`p-2 rounded-full text-on-surface-variant transition-colors ${hasReport ? "hover:bg-primary/20 hover:text-primary" : "cursor-not-allowed opacity-50"}`}
+                        aria-label={
+                          hasReport
+                            ? `Open report for ${app.company}`
+                            : `Report unavailable for ${app.company}`
+                        }
+                        disabled={!hasReport}
                         onClick={(e) => {
                           e.stopPropagation();
-                          onSelect(app);
+                          if (hasReport) onSelect(app);
                         }}
                       >
                         <FileText aria-hidden="true" focusable="false" size={20} />

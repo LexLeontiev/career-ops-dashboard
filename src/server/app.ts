@@ -8,6 +8,7 @@ export interface CreateAppOptions {
   paths?: CareerOpsPaths;
   logger?: Pick<Console, "error">;
   staticDirectory?: string | false;
+  readReport?: (filePath: string) => Promise<string>;
 }
 
 const reportFilenamePattern = /^[A-Za-z0-9][A-Za-z0-9_-]*\.md$/;
@@ -34,6 +35,7 @@ export function createApp(options: CreateAppOptions = {}): Express {
   const app = express();
   const paths = options.paths ?? getCareerOpsPaths();
   const logger = options.logger ?? console;
+  const readReport = options.readReport ?? ((filePath: string) => readFile(filePath, "utf8"));
 
   app.use((_request, response, next) => {
     response.set({
@@ -66,7 +68,7 @@ export function createApp(options: CreateAppOptions = {}): Express {
     }
 
     try {
-      const content = await readFile(filePath, "utf8");
+      const content = await readReport(filePath);
       response.type("text/markdown").send(content);
     } catch (error: unknown) {
       if (isErrorWithCode(error, "ENOENT")) {

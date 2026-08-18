@@ -80,3 +80,78 @@ test("renders external Markdown links safely without enabling raw HTML", async (
   await waitFor(() => expect(screen.queryByRole("status")).not.toBeInTheDocument());
   expect(container.querySelector("script")).not.toBeInTheDocument();
 });
+
+test("does not open the drawer when the report path is empty", () => {
+  const fetchReport = vi.fn();
+  vi.stubGlobal("fetch", fetchReport);
+  const openerView = render(<button type="button">Open unavailable report</button>);
+  const opener = screen.getByRole("button", { name: "Open unavailable report" });
+  opener.focus();
+
+  render(
+    <ReportDrawer
+      reportPath=""
+      isOpen
+      onClose={vi.fn()}
+      company="Acme Labs"
+      role="Platform Engineer"
+    />,
+  );
+
+  expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+  expect(fetchReport).not.toHaveBeenCalled();
+  expect(opener).toHaveFocus();
+  expect(document.body.style.overflow).toBe("");
+  openerView.unmount();
+});
+
+test("keeps Tab and Shift+Tab focus inside the open drawer", async () => {
+  const user = userEvent.setup();
+  vi.stubGlobal(
+    "fetch",
+    vi.fn().mockResolvedValue(new Response("[External](https://example.com)", { status: 200 })),
+  );
+
+  render(
+    <>
+      <button type="button">Before drawer</button>
+      <ReportDrawer
+        reportPath="reports/acme.md"
+        isOpen
+        onClose={vi.fn()}
+        company="Acme Labs"
+        role="Platform Engineer"
+      />
+      <button type="button">After drawer</button>
+    </>,
+  );
+
+  const closeButton = screen.getByRole("button", { name: /close report/i });
+  const reportLink = await screen.findByRole("link", { name: "External" });
+  expect(closeButton).toHaveFocus();
+
+  await user.tab({ shift: true });
+  expect(reportLink).toHaveFocus();
+
+  await user.tab();
+  expect(closeButton).toHaveFocus();
+});
+
+test.each([
+  [404, "Detailed report file not found on disk."],
+  [500, "Failed to load report."],
+])("maps report HTTP %i responses to the appropriate error", async (status, message) => {
+  vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response("", { status })));
+
+  render(
+    <ReportDrawer
+      reportPath="reports/acme.md"
+      isOpen
+      onClose={vi.fn()}
+      company="Acme Labs"
+      role="Platform Engineer"
+    />,
+  );
+
+  expect(await screen.findByRole("alert")).toHaveTextContent(message);
+});

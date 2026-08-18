@@ -20,10 +20,13 @@ describe("application payload validation", () => {
     expect(parseApplicationsPayload([validApplication])).toEqual([validApplication]);
   });
 
-  test.each([null, {}, [null], [{ ...validApplication, num: "1" }]])(
-    "rejects malformed payload %#",
-    (payload) => {
-      expect(() => parseApplicationsPayload(payload)).toThrow("Invalid applications response");
-    },
-  );
+  test.each([
+    null,
+    {},
+    [null],
+    [{ ...validApplication, num: "1" }],
+    [{ ...validApplication, pdf: null }],
+  ])("rejects malformed payload %#", (payload) => {
+    expect(() => parseApplicationsPayload(payload)).toThrow("Invalid applications response");
+  });
 });

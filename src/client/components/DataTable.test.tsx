@@ -9,14 +9,14 @@ test("table displays job details and score class colorings", () => {
     {
       num: 47,
       date: "2026-07-14",
-      company: "Fingerprint",
-      via: "—",
-      role: "Senior Android",
+      company: "Quasar Works",
+      via: "Synthetic referral",
+      role: "Orbital Systems Engineer",
       score: "5.0/5",
       status: "Evaluated",
-      pdf: "✅",
-      report: "reports/046.md",
-      notes: "Great match",
+      pdf: "quasar-fixture.pdf",
+      report: "reports/047-quasar-fixture.md",
+      notes: "Fixture-only match note",
     },
   ];
   const html = renderToString(
@@ -28,10 +28,10 @@ test("table displays job details and score class colorings", () => {
       onSort: () => {},
     }),
   );
-  expect(html).toMatch(/Fingerprint/);
-  expect(html).toMatch(/Senior Android/);
+  expect(html).toMatch(/Quasar Works/);
+  expect(html).toMatch(/Orbital Systems Engineer/);
   expect(html).toMatch(/5\.0/);
-  expect(html).toMatch(/Great match/);
+  expect(html).toMatch(/Fixture-only match note/);
 });
 
 test("table renders fixed-size privacy noise when isBlurred is true", () => {
@@ -39,14 +39,14 @@ test("table renders fixed-size privacy noise when isBlurred is true", () => {
     {
       num: 47,
       date: "2026-07-14",
-      company: "Fingerprint",
-      via: "—",
-      role: "Senior Android",
+      company: "Quasar Works",
+      via: "Synthetic referral",
+      role: "Orbital Systems Engineer",
       score: "5.0/5",
       status: "Evaluated",
-      pdf: "✅",
-      report: "reports/046.md",
-      notes: "Great match",
+      pdf: "quasar-fixture.pdf",
+      report: "reports/047-quasar-fixture.md",
+      notes: "Fixture-only match note",
     },
   ];
   const html = renderToString(
@@ -69,7 +69,7 @@ test("table renders fixed-size privacy noise when isBlurred is true", () => {
   expect(html).toMatch(/aria-label="Reveal company"/);
   expect(html).toMatch(/aria-label="Reveal last interaction date"/);
   expect(html).not.toMatch(/blur-\[4px\]/);
-  expect(html).not.toMatch(/title="Great match"/);
+  expect(html).not.toMatch(/title="Fixture-only match note"/);
 });
 
 test("table keeps the same privacy wrappers without noise when isBlurred is false", () => {
@@ -77,14 +77,14 @@ test("table keeps the same privacy wrappers without noise when isBlurred is fals
     {
       num: 47,
       date: "2026-07-14",
-      company: "Fingerprint",
-      via: "—",
-      role: "Senior Android",
+      company: "Quasar Works",
+      via: "Synthetic referral",
+      role: "Orbital Systems Engineer",
       score: "5.0/5",
       status: "Evaluated",
-      pdf: "✅",
-      report: "reports/046.md",
-      notes: "Great match",
+      pdf: "quasar-fixture.pdf",
+      report: "reports/047-quasar-fixture.md",
+      notes: "Fixture-only match note",
     },
   ];
   const html = renderToString(
@@ -105,5 +105,5 @@ test("table keeps the same privacy wrappers without noise when isBlurred is fals
   expect(html).not.toMatch(/privacy-noise--active/);
   expect(html).not.toMatch(/data-private="true"/);
   expect(html).not.toMatch(/blur-\[4px\]/);
-  expect(html).toMatch(/title="Great match"/);
+  expect(html).toMatch(/title="Fixture-only match note"/);
 });

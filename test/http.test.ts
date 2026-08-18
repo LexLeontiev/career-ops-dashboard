@@ -93,6 +93,32 @@ describe("HTTP application", () => {
     expect(logger.error.mock.calls[0]?.[0]).toBeInstanceOf(Error);
   });
 
+  test("returns a generic 500 and logs a non-ENOENT report read failure", async () => {
+    const paths = resolveCareerOpsPaths(fixture.root);
+    const readFailure = Object.assign(new Error("permission denied"), { code: "EACCES" });
+    const loggedErrors: unknown[] = [];
+
+    await withHttpServer(
+      createApp({
+        paths,
+        logger: { error: (error: unknown) => loggedErrors.push(error) },
+        readReport: async () => {
+          throw readFailure;
+        },
+      }),
+      async (baseUrl) => {
+        const response = await fetch(`${baseUrl}/api/reports/001-acme-platform-engineer.md`);
+        expect(response.status).toBe(500);
+        expect(await response.json()).toEqual({ error: "Failed to read report content" });
+        for (const [name, value] of Object.entries(securityHeaders)) {
+          expect(response.headers.get(name)).toBe(value);
+        }
+      },
+    );
+
+    expect(loggedErrors).toEqual([readFailure]);
+  });
+
   test("serves an injected static directory with a GET SPA fallback", async () => {
     const paths = resolveCareerOpsPaths(fixture.root);
     const staticDirectory = path.join(fixture.root, "static");
