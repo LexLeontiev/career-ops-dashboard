@@ -90,7 +90,7 @@ export function createApp(options: CreateAppOptions = {}): Express {
   if (typeof options.staticDirectory === "string") {
     const staticDirectory = path.resolve(options.staticDirectory);
     app.use(express.static(staticDirectory));
-    app.get("*", (_request, response) => {
+    app.get("/{*splat}", (_request, response) => {
       response.sendFile(path.join(staticDirectory, "index.html"));
     });
   }
