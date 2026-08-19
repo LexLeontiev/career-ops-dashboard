@@ -8,8 +8,12 @@ updates:
     groups:
       npm-production:
         dependency-type: production
+        patterns: ["*"]
+        update-types: [minor, patch]
       npm-development:
         dependency-type: development
+        patterns: ["*"]
+        update-types: [minor, patch]
   - package-ecosystem: github-actions
     directory: /
     schedule:
@@ -18,3 +22,4 @@ updates:
     groups:
       github-actions:
         patterns: ["*"]
+        update-types: [minor, patch]
