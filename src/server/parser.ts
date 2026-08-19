@@ -8,6 +8,14 @@ interface TrackerParser {
   parseTrackerRow(line: string, colmap: unknown): unknown;
 }
 
+export class ApplicationsFileNotFoundError extends Error {
+  override readonly name = "ApplicationsFileNotFoundError";
+
+  constructor(filePath: string, options?: ErrorOptions) {
+    super(`Applications file not found at ${filePath}`, options);
+  }
+}
+
 function isTrackerParser(value: unknown): value is TrackerParser {
   if (typeof value !== "object" || value === null) return false;
   const candidate = value as Record<string, unknown>;
@@ -51,7 +59,7 @@ export async function parseApplicationsMD(
     markdown = await readFile(paths.applicationsFile, "utf8");
   } catch (error: unknown) {
     if (typeof error === "object" && error !== null && "code" in error && error.code === "ENOENT") {
-      throw new Error(`Applications file not found at ${paths.applicationsFile}`, { cause: error });
+      throw new ApplicationsFileNotFoundError(paths.applicationsFile, { cause: error });
     }
     throw error;
   }

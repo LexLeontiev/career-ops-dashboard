@@ -2,7 +2,7 @@ import express, { type Express } from "express";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { getCareerOpsPaths, type CareerOpsPaths } from "./config.js";
-import { parseApplicationsMD } from "./parser.js";
+import { ApplicationsFileNotFoundError, parseApplicationsMD } from "./parser.js";
 
 export interface CreateAppOptions {
   paths?: CareerOpsPaths;
@@ -51,6 +51,13 @@ export function createApp(options: CreateAppOptions = {}): Express {
     try {
       response.json(await parseApplicationsMD(paths));
     } catch (error: unknown) {
+      if (error instanceof ApplicationsFileNotFoundError) {
+        response.status(404).json({
+          code: "TRACKER_NOT_INITIALIZED",
+          error: "The career-ops tracker has not been initialized.",
+        });
+        return;
+      }
       logger.error(error);
       response.status(500).json({
         error: "Unable to load applications. Check CAREER_OPS_ROOT and server logs.",

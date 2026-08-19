@@ -30,16 +30,26 @@ The server binds to `127.0.0.1` by default. Changing `HOST` may expose private j
 
 ## Quick start
 
-Clone both repositories, then start the dashboard from its directory:
+Initialize career-ops first:
 
 ```bash
-git clone https://github.com/santifer/career-ops.git
+npx @santifer/career-ops init
+cd career-ops
+codex # or claude
+```
+
+Complete the first-run onboarding in your AI CLI. It creates `data/applications.md`, which the dashboard reads as its tracker. Then exit the CLI and install the dashboard beside the career-ops directory:
+
+```bash
+cd ..
 git clone https://github.com/LexLeontiev/career-ops-dashboard.git
 cd career-ops-dashboard
 bash bin/start.sh
 ```
 
-The start script expects the two repositories to be side by side. Open the local address printed by the server when startup completes.
+The start script expects the two directories to be side by side. Open the local address printed by the server when startup completes.
+
+If you start the dashboard before onboarding is complete, it shows a link to the official [career-ops Quick Start](https://github.com/santifer/career-ops#quick-start). The dashboard remains read-only and never creates or modifies the tracker itself.
 
 ## Configuration
 
@@ -79,7 +89,8 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for the data flow, read-only boundary, an
 
 - If startup cannot find the upstream checkout, set `CAREER_OPS_ROOT` to its local path.
 - If port `3001` is unavailable, start with another port: `PORT=3002 npm run dev`.
-- If the tracker parser or expected `data/applications.md` and `reports/` paths are absent, update your local career-ops checkout before starting the dashboard.
+- If `data/applications.md` is absent, open your AI CLI in the career-ops directory and complete first-run onboarding.
+- If the tracker parser or `reports/` directory is absent, update your local career-ops checkout before starting the dashboard.
 
 ## Contributing
 

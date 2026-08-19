@@ -43,4 +43,18 @@ describe("fetchApplications", () => {
       ),
     ).rejects.toThrow("Invalid applications response");
   });
+
+  test("identifies the server response for an uninitialized tracker", async () => {
+    const response = new Response(
+      JSON.stringify({
+        code: "TRACKER_NOT_INITIALIZED",
+        error: "The career-ops tracker has not been initialized.",
+      }),
+      { status: 404, headers: { "content-type": "application/json" } },
+    );
+
+    await expect(
+      fetchApplications(new AbortController().signal, vi.fn().mockResolvedValue(response)),
+    ).rejects.toMatchObject({ name: "TrackerNotInitializedError" });
+  });
 });
