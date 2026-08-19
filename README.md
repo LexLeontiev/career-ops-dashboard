@@ -24,7 +24,7 @@ The server binds to `127.0.0.1` by default. Changing `HOST` may expose private j
 
 ## Requirements
 
-- Node.js 22.13 or newer; CI runs on Node 22 and 24.
+- Node.js 22.22.2+ on the 22.x line or 24.15.0+ on the 24.x line; Node 24 LTS is recommended and CI runs on both branches.
 - macOS or Linux. Windows is supported through WSL only.
 - Git and a local clone of [career-ops](https://github.com/santifer/career-ops).
 
