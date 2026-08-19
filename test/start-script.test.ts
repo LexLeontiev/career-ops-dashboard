@@ -101,7 +101,23 @@ describe("bin/start.sh", () => {
     );
   });
 
-  test.each(["data/applications.md", "reports", "tracker-parse.mjs"])(
+  test("allows an upstream tree whose tracker has not been initialized", async () => {
+    const fixtureRoot = await makeTemporaryDirectory("career-ops-incomplete-");
+    await createCareerOpsFixture(fixtureRoot);
+    await rm(path.join(fixtureRoot, "data/applications.md"));
+
+    const result = spawnSync("bash", ["bin/start.sh", "--check"], {
+      cwd: projectRoot,
+      env: { ...process.env, CAREER_OPS_ROOT: fixtureRoot },
+      encoding: "utf8",
+    });
+
+    expect(result.status).toBe(0);
+    expect(result.stdout).toContain("Tracker not initialized yet");
+    expect(result.stdout).toContain("Environment check passed");
+  });
+
+  test.each(["reports", "tracker-parse.mjs"])(
     "rejects an upstream tree missing %s",
     async (missingPath) => {
       const fixtureRoot = await makeTemporaryDirectory("career-ops-incomplete-");

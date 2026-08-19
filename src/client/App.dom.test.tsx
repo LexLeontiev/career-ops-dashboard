@@ -26,6 +26,16 @@ function applicationsResponse(): Response {
   });
 }
 
+function trackerNotInitializedResponse(): Response {
+  return new Response(
+    JSON.stringify({
+      code: "TRACKER_NOT_INITIALIZED",
+      error: "The career-ops tracker has not been initialized.",
+    }),
+    { status: 404, headers: { "content-type": "application/json" } },
+  );
+}
+
 describe("App application loading lifecycle", () => {
   beforeEach(() => {
     localStorage.clear();
@@ -52,6 +62,25 @@ describe("App application loading lifecycle", () => {
     render(<App />);
 
     expect(await screen.findByRole("alert")).toHaveTextContent("Failed to load applications");
+  });
+
+  test("shows activation guidance when the career-ops tracker is not initialized", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(trackerNotInitializedResponse()));
+
+    render(<App />);
+
+    expect(
+      await screen.findByRole("heading", { name: "Activate your career-ops tracker" }),
+    ).toBeInTheDocument();
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+    expect(screen.queryByRole("table")).not.toBeInTheDocument();
+    const quickStartLink = screen.getByRole("link", { name: "Open career-ops Quick Start" });
+    expect(quickStartLink).toHaveAttribute(
+      "href",
+      "https://github.com/santifer/career-ops#quick-start",
+    );
+    expect(quickStartLink).toHaveAttribute("target", "_blank");
+    expect(quickStartLink).toHaveAttribute("rel", "noreferrer");
   });
 
   test("ignores abort errors", async () => {

@@ -58,8 +58,7 @@ if [ ! -d "$CAREER_OPS_ROOT" ]; then
 fi
 
 if [ ! -f "$CAREER_OPS_ROOT/data/applications.md" ]; then
-  red "  error: career-ops is missing data/applications.md at '$CAREER_OPS_ROOT'."
-  exit 1
+  dim "  ⚠ Tracker not initialized yet; dashboard will show setup guidance."
 fi
 if [ ! -d "$CAREER_OPS_ROOT/reports" ]; then
   red "  error: career-ops is missing reports at '$CAREER_OPS_ROOT'."

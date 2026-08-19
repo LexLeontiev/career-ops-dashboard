@@ -73,10 +73,30 @@ describe("HTTP application", () => {
     });
   });
 
-  test("returns a stable generic error and logs the original applications failure", async () => {
+  test("reports a missing tracker as not initialized without logging an error", async () => {
     const paths = resolveCareerOpsPaths(fixture.root);
     const logger = { error: vi.fn() };
     await rm(paths.applicationsFile);
+
+    await withHttpServer(createApp({ paths, logger }), async (baseUrl) => {
+      const response = await fetch(`${baseUrl}/api/applications`);
+      expect(response.status).toBe(404);
+      expect(await response.json()).toEqual({
+        code: "TRACKER_NOT_INITIALIZED",
+        error: "The career-ops tracker has not been initialized.",
+      });
+      for (const [name, value] of Object.entries(securityHeaders)) {
+        expect(response.headers.get(name)).toBe(value);
+      }
+    });
+
+    expect(logger.error).not.toHaveBeenCalled();
+  });
+
+  test("returns a stable generic error and logs an unexpected applications failure", async () => {
+    const paths = resolveCareerOpsPaths(fixture.root);
+    const logger = { error: vi.fn() };
+    await writeFile(paths.parserFile, "export const unsupported = true;\n", "utf8");
 
     await withHttpServer(createApp({ paths, logger }), async (baseUrl) => {
       const response = await fetch(`${baseUrl}/api/applications`);
@@ -91,6 +111,31 @@ describe("HTTP application", () => {
 
     expect(logger.error).toHaveBeenCalledOnce();
     expect(logger.error.mock.calls[0]?.[0]).toBeInstanceOf(Error);
+  });
+
+  test("does not treat an unrelated parser ENOENT as an uninitialized tracker", async () => {
+    const paths = resolveCareerOpsPaths(fixture.root);
+    const logger = { error: vi.fn() };
+    await writeFile(
+      paths.parserFile,
+      [
+        "export function resolveColumns() { return {}; }",
+        'export function parseTrackerRow() { throw Object.assign(new Error("missing parser dependency"), { code: "ENOENT" }); }',
+        "",
+      ].join("\n"),
+      "utf8",
+    );
+
+    await withHttpServer(createApp({ paths, logger }), async (baseUrl) => {
+      const response = await fetch(`${baseUrl}/api/applications`);
+      expect(response.status).toBe(500);
+      expect(await response.json()).toEqual({
+        error: "Unable to load applications. Check CAREER_OPS_ROOT and server logs.",
+      });
+    });
+
+    expect(logger.error).toHaveBeenCalledOnce();
+    expect(logger.error.mock.calls[0]?.[0]).toMatchObject({ code: "ENOENT" });
   });
 
   test("returns a generic 500 and logs a non-ENOENT report read failure", async () => {

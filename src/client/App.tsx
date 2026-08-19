@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { Eye, EyeOff, Moon, Sun, Terminal } from "lucide-react";
+import { ExternalLink, Eye, EyeOff, Moon, Sun, Terminal } from "lucide-react";
 import type { Application } from "../shared/application.js";
-import { fetchApplications } from "./api.js";
+import { fetchApplications, TrackerNotInitializedError } from "./api.js";
 import { StatsOverview } from "./components/StatsOverview.js";
 import { FilterBar } from "./components/FilterBar.js";
 import { DataTable } from "./components/DataTable.js";
@@ -15,10 +15,43 @@ type Theme = "light" | "dark";
 
 const THEME_STORAGE_KEY = "career_ops_theme";
 
+function TrackerSetupEmptyState() {
+  return (
+    <section
+      aria-labelledby="tracker-setup-title"
+      className="mx-auto mt-10 flex max-w-2xl flex-col items-center rounded-xl border border-border-subtle bg-surface-card px-6 py-12 text-center md:px-12"
+    >
+      <div className="mb-stack-md flex h-14 w-14 items-center justify-center rounded-full bg-primary/15 text-primary">
+        <Terminal aria-hidden="true" focusable="false" size={26} />
+      </div>
+      <h2 id="tracker-setup-title" className="font-headline-sm text-headline-sm text-on-surface">
+        Activate your career-ops tracker
+      </h2>
+      <p className="mt-stack-sm max-w-xl text-body-lg text-on-surface-variant">
+        Complete the career-ops Quick Start and first-run onboarding to create your application
+        tracker. Then refresh this page to open the dashboard.
+      </p>
+      <p className="mt-stack-md text-body-sm text-on-surface-variant">
+        This dashboard is read-only and will never create or modify your tracker.
+      </p>
+      <a
+        className="mt-stack-lg inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-3 font-label-md text-label-md font-semibold text-on-primary transition-opacity hover:opacity-90"
+        href="https://github.com/santifer/career-ops#quick-start"
+        target="_blank"
+        rel="noreferrer"
+      >
+        Open career-ops Quick Start
+        <ExternalLink aria-hidden="true" focusable="false" size={16} />
+      </a>
+    </section>
+  );
+}
+
 export default function App() {
   const [applications, setApplications] = useState<Application[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [trackerNotInitialized, setTrackerNotInitialized] = useState(false);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("active");
@@ -77,6 +110,10 @@ export default function App() {
       .then(setApplications)
       .catch((cause: unknown) => {
         if (cause instanceof DOMException && cause.name === "AbortError") return;
+        if (cause instanceof TrackerNotInitializedError) {
+          setTrackerNotInitialized(true);
+          return;
+        }
         setError(cause instanceof Error ? cause.message : "Failed to load applications");
       })
       .finally(() => {
@@ -244,7 +281,9 @@ export default function App() {
             </div>
           )}
 
-          {!loading && !error && (
+          {!loading && trackerNotInitialized && <TrackerSetupEmptyState />}
+
+          {!loading && !error && !trackerNotInitialized && (
             <>
               <StatsOverview applications={applications} />
               <FilterBar
