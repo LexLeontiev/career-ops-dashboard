@@ -82,6 +82,45 @@ describe("App application loading lifecycle", () => {
     );
   });
 
+  test("renders follow-up reminders beside activity from the read-only API", async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    vi.setSystemTime(new Date(2026, 7, 20, 12));
+    vi.stubGlobal(
+      "fetch",
+      vi.fn((input: RequestInfo | URL) => {
+        if (String(input) === "/api/reminders") {
+          return Promise.resolve(
+            new Response(
+              JSON.stringify([
+                {
+                  appNum: 29,
+                  date: "2026-08-21",
+                  company: "Proton",
+                  notes: "Interview complete; feedback pending.",
+                  urgency: "overdue",
+                },
+              ]),
+              { status: 200, headers: { "content-type": "application/json" } },
+            ),
+          );
+        }
+        return Promise.resolve(applicationsResponse());
+      }),
+    );
+
+    render(<App />);
+
+    const activity = await screen.findByRole("region", { name: "Activity" });
+    const reminders = screen.getByRole("region", { name: "Reminders" });
+    expect(reminders).toHaveTextContent("Tomorrow · Aug 21");
+    expect(reminders).toHaveTextContent("Proton");
+    expect(reminders).toHaveTextContent("Interview complete; feedback pending.");
+    expect(activity.parentElement).toBe(reminders.parentElement);
+    expect(activity.parentElement).toHaveClass("grid-cols-1", "lg:grid-cols-2");
+    expect(activity).toHaveClass("h-[17rem]");
+    expect(reminders).toHaveClass("h-[17rem]");
+  });
+
   test("announces a stable error when loading rejects", async () => {
     vi.stubGlobal("fetch", vi.fn().mockRejectedValue("network unavailable"));
 

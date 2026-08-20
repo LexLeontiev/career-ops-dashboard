@@ -95,7 +95,7 @@ export function ActivityHeatmap({ days }: { days: ActivityDay[] }) {
   return (
     <section
       aria-labelledby="activity-title"
-      className="mb-stack-lg w-fit max-w-full rounded-xl border border-border-subtle bg-surface-card p-4 md:p-6"
+      className="flex h-[17rem] w-full max-w-full flex-col rounded-xl border border-border-subtle bg-surface-card p-4 md:p-6"
     >
       <div className="mb-stack-md flex items-baseline justify-between gap-4">
         <h2 id="activity-title" className="font-headline-sm text-headline-sm text-on-surface">
@@ -108,7 +108,7 @@ export function ActivityHeatmap({ days }: { days: ActivityDay[] }) {
         role="region"
         aria-label="Activity calendar"
         tabIndex={0}
-        className="overflow-x-auto pb-2"
+        className="min-h-0 flex-1 overflow-x-auto pb-2"
       >
         <div className="min-w-max">
           <div className="mb-2 ml-8 grid grid-flow-col auto-cols-[0.75rem] gap-1 text-[10px] text-on-surface-variant">

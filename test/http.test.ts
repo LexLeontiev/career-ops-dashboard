@@ -51,6 +51,71 @@ describe("HTTP application", () => {
     expect(logger.error).not.toHaveBeenCalled();
   });
 
+  test("serves calculated reminders from the read-only career-ops cadence command", async () => {
+    const paths = resolveCareerOpsPaths(fixture.root);
+    await writeFile(
+      path.join(fixture.root, "data", "follow-ups.md"),
+      [
+        "# Follow-ups",
+        "",
+        "| num | appNum | date | company | role | channel | contact | notes |",
+        "|---|---|---|---|---|---|---|---|",
+        "| 1 | 52 | 2026-08-04 | Yazio | Senior Mobile Engineer | Email | Team lead | Already sent |",
+      ].join("\n"),
+      "utf8",
+    );
+    await writeFile(
+      path.join(fixture.root, "followup-cadence.mjs"),
+      `process.stdout.write(JSON.stringify({ entries: [{
+        num: 29,
+        company: "Proton",
+        notes: "Interview complete; feedback pending.",
+        urgency: "overdue",
+        nextFollowupDate: "2026-08-13"
+      }] }));\n`,
+      "utf8",
+    );
+
+    await withHttpServer(createApp({ paths, logger: { error: vi.fn() } }), async (baseUrl) => {
+      const response = await fetch(`${baseUrl}/api/reminders`);
+
+      expect(response.status).toBe(200);
+      expect(await response.json()).toEqual([
+        expect.objectContaining({
+          appNum: 29,
+          date: "2026-08-13",
+          company: "Proton",
+          notes: "Interview complete; feedback pending.",
+          urgency: "overdue",
+        }),
+      ]);
+      for (const [name, value] of Object.entries(securityHeaders)) {
+        expect(response.headers.get(name)).toBe(value);
+      }
+    });
+  });
+
+  test("returns a generic error when the cadence command output is invalid", async () => {
+    const paths = resolveCareerOpsPaths(fixture.root);
+    const logger = { error: vi.fn() };
+    await writeFile(
+      path.join(fixture.root, "followup-cadence.mjs"),
+      'process.stdout.write("not json");\n',
+      "utf8",
+    );
+
+    await withHttpServer(createApp({ paths, logger }), async (baseUrl) => {
+      const response = await fetch(`${baseUrl}/api/reminders`);
+
+      expect(response.status).toBe(500);
+      expect(await response.json()).toEqual({
+        error: "Unable to load follow-up cadence. Check CAREER_OPS_ROOT and server logs.",
+      });
+    });
+
+    expect(logger.error).toHaveBeenCalledOnce();
+  });
+
   test("rejects invalid report paths and maps missing reports to 404", async () => {
     const paths = resolveCareerOpsPaths(fixture.root);
 

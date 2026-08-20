@@ -3,6 +3,7 @@ import path from "node:path";
 export interface CareerOpsPaths {
   root: string;
   applicationsFile: string;
+  followUpCadenceFile: string;
   reportsDirectory: string;
   parserFile: string;
 }
@@ -12,6 +13,7 @@ export function resolveCareerOpsPaths(root: string, cwd = process.cwd()): Career
   return {
     root: resolvedRoot,
     applicationsFile: path.join(resolvedRoot, "data", "applications.md"),
+    followUpCadenceFile: path.join(resolvedRoot, "followup-cadence.mjs"),
     reportsDirectory: path.join(resolvedRoot, "reports"),
     parserFile: path.join(resolvedRoot, "tracker-parse.mjs"),
   };

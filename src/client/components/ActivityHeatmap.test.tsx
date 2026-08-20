@@ -54,7 +54,11 @@ test("renders calendar labels, legend, and a scrollable activity region", () => 
     />,
   );
 
-  expect(screen.getByRole("region", { name: "Activity" })).toHaveClass("w-fit", "max-w-full");
+  expect(screen.getByRole("region", { name: "Activity" })).toHaveClass(
+    "h-[17rem]",
+    "w-full",
+    "max-w-full",
+  );
   const calendar = screen.getByRole("region", { name: "Activity calendar" });
   expect(calendar).toHaveClass("overflow-x-auto");
   expect(screen.getByText("Last 6 months")).toBeInTheDocument();
