@@ -12,6 +12,7 @@ career-ops-dashboard is a local-first React and Express dashboard for viewing ap
 ## Features
 
 - Browse, filter, and sort applications from the upstream tracker.
+- Review chronologically sorted reminders calculated by the upstream follow-up cadence command.
 - Open read-only Markdown reports in an accessible drawer.
 - Use the privacy mode to obscure visible application details on demand.
 - Choose light or dark appearance locally in the browser.
@@ -90,7 +91,7 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for the data flow, read-only boundary, an
 - If startup cannot find the upstream checkout, set `CAREER_OPS_ROOT` to its local path.
 - If port `3001` is unavailable, start with another port: `PORT=3002 npm run dev`.
 - If `data/applications.md` is absent, open your AI CLI in the career-ops directory and complete first-run onboarding.
-- If the tracker parser or `reports/` directory is absent, update your local career-ops checkout before starting the dashboard.
+- If the tracker parser, `followup-cadence.mjs`, or `reports/` directory is absent, update your local career-ops checkout before starting the dashboard.
 
 ## Contributing
 
@@ -102,7 +103,7 @@ See [SECURITY.md](SECURITY.md) for supported versions and private vulnerability-
 
 ## Upstream compatibility
 
-The canonical upstream is [santifer/career-ops](https://github.com/santifer/career-ops). This dashboard uses its tracker parser through a local adapter and never vendors or modifies the upstream parser. Compatibility depends on the documented upstream tracker layout; report breakage with synthetic reproduction data only.
+The canonical upstream is [santifer/career-ops](https://github.com/santifer/career-ops). This dashboard uses its tracker parser and `followup-cadence.mjs` through local read-only adapters and never vendors or modifies upstream logic. Compatibility depends on the documented upstream tracker layout; report breakage with synthetic reproduction data only.
 
 ## License
 

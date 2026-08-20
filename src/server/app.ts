@@ -2,6 +2,7 @@ import express, { type Express } from "express";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { getCareerOpsPaths, type CareerOpsPaths } from "./config.js";
+import { loadFollowUpCadence } from "./follow-up-cadence.js";
 import { ApplicationsFileNotFoundError, parseApplicationsMD } from "./parser.js";
 
 export interface CreateAppOptions {
@@ -61,6 +62,17 @@ export function createApp(options: CreateAppOptions = {}): Express {
       logger.error(error);
       response.status(500).json({
         error: "Unable to load applications. Check CAREER_OPS_ROOT and server logs.",
+      });
+    }
+  });
+
+  app.get("/api/reminders", async (_request, response) => {
+    try {
+      response.json(await loadFollowUpCadence(paths));
+    } catch (error: unknown) {
+      logger.error(error);
+      response.status(500).json({
+        error: "Unable to load follow-up cadence. Check CAREER_OPS_ROOT and server logs.",
       });
     }
   });

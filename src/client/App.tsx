@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { ExternalLink, Eye, EyeOff, Moon, Sun, Terminal } from "lucide-react";
 import type { Application } from "../shared/application.js";
-import { fetchApplications, TrackerNotInitializedError } from "./api.js";
+import type { Reminder } from "../shared/reminder.js";
+import { fetchApplications, fetchReminders, TrackerNotInitializedError } from "./api.js";
 import { buildActivityDays, trackerAndNotesDateStrategy } from "./activity.js";
 import { ActivityHeatmap } from "./components/ActivityHeatmap.js";
+import { RemindersWidget } from "./components/RemindersWidget.js";
 import { StatsOverview } from "./components/StatsOverview.js";
 import { FilterBar } from "./components/FilterBar.js";
 import { DataTable } from "./components/DataTable.js";
@@ -51,6 +53,8 @@ function TrackerSetupEmptyState() {
 
 export default function App() {
   const [applications, setApplications] = useState<Application[]>([]);
+  const [reminders, setReminders] = useState<Reminder[]>([]);
+  const [remindersError, setRemindersError] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [trackerNotInitialized, setTrackerNotInitialized] = useState(false);
@@ -120,6 +124,15 @@ export default function App() {
       })
       .finally(() => {
         if (!controller.signal.aborted) setLoading(false);
+      });
+    void fetchReminders(controller.signal)
+      .then((items) => {
+        setReminders(items);
+        setRemindersError(false);
+      })
+      .catch((cause: unknown) => {
+        if (cause instanceof DOMException && cause.name === "AbortError") return;
+        setRemindersError(true);
       });
     return () => controller.abort();
   }, []);
@@ -289,7 +302,14 @@ export default function App() {
           {!loading && !error && !trackerNotInitialized && (
             <>
               <StatsOverview applications={applications} />
-              <ActivityHeatmap days={activityDays} />
+              <div className="mb-stack-lg grid min-w-0 grid-cols-1 items-stretch gap-gutter lg:grid-cols-2">
+                <ActivityHeatmap days={activityDays} />
+                <RemindersWidget
+                  items={reminders}
+                  hasError={remindersError}
+                  isBlurred={isBlurred}
+                />
+              </div>
               <FilterBar
                 searchQuery={searchQuery}
                 setSearchQuery={setSearchQuery}

@@ -1,4 +1,5 @@
 import { parseApplicationsPayload, type Application } from "../shared/application.js";
+import { parseRemindersPayload, type Reminder } from "../shared/reminder.js";
 
 export type FetchLike = (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>;
 
@@ -29,4 +30,13 @@ export async function fetchApplications(
   }
   if (!response.ok) throw new Error(`Failed to load applications (HTTP ${response.status})`);
   return parseApplicationsPayload(await response.json());
+}
+
+export async function fetchReminders(
+  signal: AbortSignal,
+  request: FetchLike = fetch,
+): Promise<Reminder[]> {
+  const response = await request("/api/reminders", { signal });
+  if (!response.ok) throw new Error(`Failed to load reminders (HTTP ${response.status})`);
+  return parseRemindersPayload(await response.json());
 }

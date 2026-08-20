@@ -82,6 +82,63 @@ describe("App application loading lifecycle", () => {
     );
   });
 
+  test("renders follow-up reminders beside activity from the read-only API", async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    vi.setSystemTime(new Date(2030, 0, 10, 12));
+    vi.stubGlobal(
+      "fetch",
+      vi.fn((input: RequestInfo | URL) => {
+        if (String(input) === "/api/reminders") {
+          return Promise.resolve(
+            new Response(
+              JSON.stringify([
+                {
+                  appNum: 101,
+                  date: "2030-01-11",
+                  company: "Google",
+                  notes: "Schedule a technical interview.",
+                  urgency: "overdue",
+                },
+              ]),
+              { status: 200, headers: { "content-type": "application/json" } },
+            ),
+          );
+        }
+        return Promise.resolve(applicationsResponse());
+      }),
+    );
+
+    render(<App />);
+
+    const activity = await screen.findByRole("region", { name: "Activity" });
+    const reminders = screen.getByRole("region", { name: "Reminders" });
+    expect(reminders).toHaveTextContent("Tomorrow · Jan 11");
+    expect(reminders).toHaveTextContent("Google");
+    expect(reminders).toHaveTextContent("Schedule a technical interview.");
+    expect(activity.parentElement).toBe(reminders.parentElement);
+    expect(activity.parentElement).toHaveClass("grid-cols-1", "lg:grid-cols-2");
+    expect(activity).toHaveClass("h-[17rem]");
+    expect(reminders).toHaveClass("h-[17rem]");
+  });
+
+  test("shows when reminders cannot be loaded instead of an empty state", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn((input: RequestInfo | URL) => {
+        if (String(input) === "/api/reminders") {
+          return Promise.reject(new Error("reminders unavailable"));
+        }
+        return Promise.resolve(applicationsResponse());
+      }),
+    );
+
+    render(<App />);
+
+    await screen.findByRole("region", { name: "Activity" });
+    expect(screen.getByText("Reminders unavailable.")).toBeInTheDocument();
+    expect(screen.queryByText("No reminders scheduled.")).not.toBeInTheDocument();
+  });
+
   test("announces a stable error when loading rejects", async () => {
     vi.stubGlobal("fetch", vi.fn().mockRejectedValue("network unavailable"));
 
