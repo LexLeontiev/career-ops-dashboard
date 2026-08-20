@@ -48,6 +48,21 @@ test("keeps every reminder row in the scrollable list", () => {
   expect(screen.getAllByRole("listitem")).toHaveLength(many.length);
 });
 
+test("aligns the Reminders heading with Activity without a decorative icon", () => {
+  render(<RemindersWidget items={items} today={today} isBlurred={false} />);
+
+  const region = screen.getByRole("region", { name: "Reminders" });
+  expect(region).toHaveClass("p-4", "md:p-6");
+  expect(screen.getByRole("heading", { name: "Reminders" }).parentElement).toHaveClass(
+    "mb-stack-md",
+    "flex",
+    "items-baseline",
+    "justify-between",
+    "gap-4",
+  );
+  expect(region.querySelector("svg")).not.toBeInTheDocument();
+});
+
 test("shows an ellipsis followed by the last 140 Unicode characters of long notes", () => {
   const tail = "🙂".repeat(140);
   const notes = `Earlier tracker history that should be hidden. ${tail}`;

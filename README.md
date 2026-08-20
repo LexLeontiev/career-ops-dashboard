@@ -84,7 +84,7 @@ npm run check
 
 ## Refresh the README preview
 
-The dashboard preview uses synthetic data only: 56 applications, 11 active processes, 7 interviews, 1 offer, a 34% response rate, two months of activity, and five follow-up reminders. It never reads a local career-ops tracker.
+The dashboard preview uses synthetic data only: 56 applications, 11 active processes, 7 interviews, 1 offer, a 95% response rate, two months of activity, and five follow-up reminders. It never reads a local career-ops tracker.
 
 To regenerate the PNG with current relative dates, install Playwright's Chromium once and then run:
 

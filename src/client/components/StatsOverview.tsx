@@ -11,17 +11,16 @@ export function StatsOverview({ applications }: { applications: AppData[] }) {
   let interviews = 0;
   let offers = 0;
   let responses = 0;
+  let submitted = 0;
 
   for (const app of applications) {
     const status = (app.status || "").toUpperCase();
 
-    if (
-      status === "RESPONDED" ||
-      status === "INTERVIEW" ||
-      status === "OFFER" ||
-      status === "REJECTED"
-    ) {
-      responses++;
+    if (status !== "SKIP" && status !== "EVALUATED" && status !== "") {
+      submitted++;
+      if (status !== "APPLIED") {
+        responses++;
+      }
     }
 
     if (status === "APPLIED" || status === "INTERVIEW" || status === "RESPONDED") {
@@ -35,7 +34,7 @@ export function StatsOverview({ applications }: { applications: AppData[] }) {
     }
   }
 
-  const responseRate = total > 0 ? Math.round((responses / total) * 100) : 0;
+  const responseRate = submitted > 0 ? Math.round((responses / submitted) * 100) : 0;
   const hasOffers = offers > 0;
 
   return (

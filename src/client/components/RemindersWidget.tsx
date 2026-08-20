@@ -1,5 +1,4 @@
 import React from "react";
-import { Bell } from "lucide-react";
 
 export interface ReminderItem {
   date: string;
@@ -80,12 +79,11 @@ export function RemindersWidget({
 
   return (
     <section
-      className="h-[17rem] flex flex-col rounded-xl border border-border-subtle bg-surface-card p-5"
+      className="h-[17rem] flex flex-col rounded-xl border border-border-subtle bg-surface-card p-4 md:p-6"
       aria-label="Reminders"
       role="region"
     >
-      <div className="mb-3 flex items-center gap-2">
-        <Bell aria-hidden="true" className="size-4 text-primary" />
+      <div className="mb-stack-md flex items-baseline justify-between gap-4">
         <h2 className="font-headline-sm text-headline-sm text-on-surface">Reminders</h2>
       </div>
       {hasError ? (

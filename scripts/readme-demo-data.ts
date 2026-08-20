@@ -7,21 +7,21 @@ const demoApplications: DemoApplication[] = [
   {
     company: "Google",
     role: "Senior Software Engineer",
-    score: "4.9/5",
+    score: "4.8/5",
     status: "INTERVIEW",
     notes: "System design interview scheduled with the Search Infrastructure team.",
   },
   {
     company: "Meta",
     role: "Product Engineer",
-    score: "4.8/5",
+    score: "4.2/5",
     status: "RESPONDED",
     notes: "Recruiter confirmed the next technical screen.",
   },
   {
     company: "Stripe",
     role: "Backend Engineer",
-    score: "4.8/5",
+    score: "3.8/5",
     status: "INTERVIEW",
     notes: "Preparing for the distributed systems interview.",
   },
@@ -35,56 +35,56 @@ const demoApplications: DemoApplication[] = [
   {
     company: "Vercel",
     role: "Software Engineer, Platform",
-    score: "4.7/5",
+    score: "3.7/5",
     status: "APPLIED",
     notes: "Referral application submitted through the engineering team.",
   },
   {
     company: "Notion",
     role: "Product Engineer",
-    score: "4.6/5",
+    score: "3.5/5",
     status: "INTERVIEW",
     notes: "Hiring manager conversation booked for this week.",
   },
   {
     company: "Linear",
     role: "Frontend Engineer",
-    score: "4.6/5",
+    score: "3.4/5",
     status: "RESPONDED",
     notes: "Portfolio review passed; waiting for the coding exercise.",
   },
   {
     company: "Cloudflare",
     role: "Systems Engineer",
-    score: "4.5/5",
+    score: "3.3/5",
     status: "INTERVIEW",
     notes: "Networking interview prep is in progress.",
   },
   {
     company: "Shopify",
     role: "Staff Backend Engineer",
-    score: "4.5/5",
+    score: "3.2/5",
     status: "INTERVIEW",
     notes: "Technical interview loop confirmed with the data platform group.",
   },
   {
     company: "Miro",
     role: "Senior Software Engineer",
-    score: "4.4/5",
+    score: "3.1/5",
     status: "RESPONDED",
     notes: "Recruiter requested availability for a first call.",
   },
   {
     company: "Datadog",
     role: "Software Engineer",
-    score: "4.4/5",
+    score: "3.0/5",
     status: "INTERVIEW",
     notes: "Live coding round scheduled with the observability team.",
   },
   {
     company: "Atlassian",
     role: "Full-Stack Engineer",
-    score: "4.3/5",
+    score: "2.9/5",
     status: "INTERVIEW",
     notes: "Architecture discussion scheduled with the hiring panel.",
   },
@@ -398,6 +398,11 @@ const demoApplications: DemoApplication[] = [
   },
 ];
 
+const activityCounts = [4, 3, 2, 1, 4, 3, 2, 1, 4, 3, 2, 1, 4, 3, 2, 1, 4, 3, 2, 1, 3, 2, 1];
+const activityDayOffsets = activityCounts.flatMap((count, index) =>
+  Array<number>(count).fill(Math.round((index * 61) / (activityCounts.length - 1))),
+);
+
 function localNoon(date: Date): Date {
   return new Date(date.getFullYear(), date.getMonth(), date.getDate(), 12);
 }
@@ -415,6 +420,11 @@ function formatDate(date: Date): string {
   return `${year}-${month}-${day}`;
 }
 
+function formatStatus(status: string): string {
+  const normalized = status.toLowerCase();
+  return `${normalized.charAt(0).toUpperCase()}${normalized.slice(1)}`;
+}
+
 export function createReadmeDemoData(today = new Date()): {
   applications: Application[];
   reminders: Reminder[];
@@ -422,10 +432,9 @@ export function createReadmeDemoData(today = new Date()): {
   const anchorDate = localNoon(today);
   const applications = demoApplications.map((application, index) => ({
     ...application,
+    status: formatStatus(application.status),
     num: demoApplications.length - index,
-    date: formatDate(
-      addDays(anchorDate, -Math.round((index * 61) / (demoApplications.length - 1))),
-    ),
+    date: formatDate(addDays(anchorDate, -(activityDayOffsets[index] ?? 0))),
     via: index % 3 === 0 ? "Referral" : index % 3 === 1 ? "Careers page" : "LinkedIn",
     pdf: "",
     report: "",
