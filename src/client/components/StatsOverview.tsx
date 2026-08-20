@@ -57,16 +57,10 @@ export function StatsOverview({ applications }: { applications: AppData[] }) {
         </div>
         <div className="text-secondary font-headline-lg text-headline-lg">{interviews}</div>
       </div>
-      <div
-        className={`col-span-1 md:col-span-2 lg:col-span-1 bg-surface-card p-6 rounded-xl border transition-colors ${
-          hasOffers
-            ? "border-emerald-500/40 bg-emerald-500/5 hover:border-emerald-600 dark:hover:border-emerald-400"
-            : "border-border-subtle hover:border-primary/50"
-        }`}
-      >
+      <div className="col-span-1 md:col-span-2 lg:col-span-1 bg-surface-card p-6 rounded-xl border border-border-subtle hover:border-primary/50 transition-colors">
         <div className="text-text-secondary font-label-sm text-label-sm uppercase mb-2">Offers</div>
         <div
-          className={`font-headline-lg text-headline-lg ${hasOffers ? "text-emerald-600 dark:text-emerald-400 font-bold" : "text-text-secondary"}`}
+          className={`font-headline-lg text-headline-lg ${hasOffers ? "text-violet-600 dark:text-violet-400 font-bold" : "text-text-secondary"}`}
         >
           {offers}
         </div>

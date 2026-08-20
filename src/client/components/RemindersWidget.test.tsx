@@ -48,6 +48,13 @@ test("keeps every reminder row in the scrollable list", () => {
   expect(screen.getAllByRole("listitem")).toHaveLength(many.length);
 });
 
+test("uses a distinct surface for reminder rows", () => {
+  render(<RemindersWidget items={[items[0]]} today={today} isBlurred={false} />);
+
+  expect(screen.getByRole("listitem")).toHaveClass("bg-surface-container");
+  expect(screen.getByRole("listitem")).not.toHaveClass("bg-surface-container-low");
+});
+
 test("aligns the Reminders heading with Activity without a decorative icon", () => {
   render(<RemindersWidget items={items} today={today} isBlurred={false} />);
 

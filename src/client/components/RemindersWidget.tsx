@@ -99,7 +99,7 @@ export function RemindersWidget({
           {sortedItems.map((item, index) => (
             <li
               key={`${item.date}-${item.company}-${index}`}
-              className="rounded-lg bg-surface-container-low px-3 py-2 text-sm"
+              className="rounded-lg bg-surface-container px-3 py-2 text-sm"
             >
               <div className="text-xs text-text-secondary">{formatDateLabel(item.date, today)}</div>
               <div className="font-medium text-on-surface">

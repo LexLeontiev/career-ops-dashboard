@@ -1,8 +1,11 @@
 // @vitest-environment jsdom
-import { expect, test } from "vitest";
+import { cleanup, render, screen, within } from "@testing-library/react";
+import { afterEach, expect, test } from "vitest";
 import React from "react";
 import { renderToString } from "react-dom/server";
 import { StatsOverview } from "./StatsOverview.js";
+
+afterEach(cleanup);
 
 test("renders aggregated stats correctly including Interview Stage and Offers", () => {
   const mockApps = [
@@ -38,8 +41,17 @@ test("renders aggregated stats correctly including Interview Stage and Offers", 
   expect(html).toMatch(/Active Processes.*1/);
   expect(html).toMatch(/Interview Stage.*0/);
   expect(html).toMatch(/Offers.*1/);
-  expect(html).toMatch(/text-emerald-400/);
   expect(html).toMatch(/Response Rate.*50.*%/);
+});
+
+test("highlights a positive offer count in violet without a colored card outline", () => {
+  render(<StatsOverview applications={[{ score: "4.8/5", status: "Offer" }]} />);
+
+  const offerCard = screen.getByText("Offers").parentElement;
+  expect(offerCard).not.toBeNull();
+  expect(offerCard).toHaveClass("border-border-subtle", "hover:border-primary/50");
+  expect(offerCard).not.toHaveClass("border-emerald-500/40", "bg-emerald-500/5");
+  expect(within(offerCard!).getByText("1")).toHaveClass("text-violet-600", "dark:text-violet-400");
 });
 
 test("renders unhighlighted Offers card when offer count is 0", () => {
@@ -56,7 +68,7 @@ test("renders unhighlighted Offers card when offer count is 0", () => {
   ];
   const html = renderToString(React.createElement(StatsOverview, { applications: mockApps }));
   expect(html).toMatch(/Offers.*0/);
-  expect(html).not.toMatch(/text-emerald-400/);
+  expect(html).not.toMatch(/text-violet-400/);
 });
 
 test("calculates response rate from submitted applications only", () => {
