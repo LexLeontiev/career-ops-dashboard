@@ -43,6 +43,7 @@ describe("App application loading lifecycle", () => {
 
   afterEach(() => {
     cleanup();
+    vi.useRealTimers();
     vi.unstubAllGlobals();
   });
 
@@ -54,6 +55,31 @@ describe("App application loading lifecycle", () => {
     expect(screen.getByRole("status")).toHaveTextContent("Loading applications…");
     await waitFor(() => expect(screen.queryByRole("status")).not.toBeInTheDocument());
     expect(screen.getByText("Acme Labs")).toBeInTheDocument();
+  });
+
+  test("uses note dates for activity by default", async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    vi.setSystemTime(new Date(2026, 7, 20, 12));
+    const activityApplication = {
+      ...application,
+      notes: "Recruiter replied 2026-08-20",
+    };
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(
+        new Response(JSON.stringify([activityApplication]), {
+          status: 200,
+          headers: { "content-type": "application/json" },
+        }),
+      ),
+    );
+
+    render(<App />);
+
+    await screen.findByRole("heading", { name: "Activity" });
+    expect(screen.getByRole("img", { name: "August 20, 2026: 1 interaction" })).toHaveClass(
+      "bg-primary/20",
+    );
   });
 
   test("announces a stable error when loading rejects", async () => {
