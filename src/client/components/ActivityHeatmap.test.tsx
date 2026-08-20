@@ -38,6 +38,24 @@ test("renders accessible cells for every activity intensity", () => {
   );
 });
 
+test("uses fine borders for calendar cells and intensity swatches", () => {
+  render(<ActivityHeatmap days={[{ date: "2026-08-20", count: 2 }]} />);
+
+  expect(screen.getByRole("img", { name: "August 20, 2026: 2 interactions" })).toHaveClass(
+    "border-[0.5px]",
+  );
+
+  const grid = screen.getByRole("group", { name: "Daily activity grid" });
+  for (const placeholder of grid.querySelectorAll("span")) {
+    expect(placeholder).toHaveClass("border-[0.5px]");
+  }
+
+  const legend = screen.getByLabelText("Activity intensity: less to more");
+  for (const swatch of legend.querySelectorAll("[aria-hidden='true']")) {
+    expect(swatch).toHaveClass("border-[0.5px]");
+  }
+});
+
 test("renders calendar labels, legend, and a scrollable activity region", () => {
   render(
     <ActivityHeatmap

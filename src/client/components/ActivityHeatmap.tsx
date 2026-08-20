@@ -144,7 +144,7 @@ export function ActivityHeatmap({ days }: { days: ActivityDay[] }) {
                     <span
                       key={`empty-${index}`}
                       aria-hidden="true"
-                      className="h-3 w-3 rounded-[3px] border border-border-subtle/30 bg-surface-container-high/40"
+                      className="h-3 w-3 rounded-[3px] border-[0.5px] border-border-subtle/30 bg-surface-container-high/40"
                     />
                   );
                 }
@@ -165,7 +165,7 @@ export function ActivityHeatmap({ days }: { days: ActivityDay[] }) {
                     onMouseLeave={() => setHoveredTooltip(null)}
                     onFocus={(event) => setFocusedTooltip(buildTooltip(event.currentTarget, day))}
                     onBlur={() => setFocusedTooltip(null)}
-                    className={`h-3 w-3 rounded-[3px] border border-border-subtle/50 outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-surface-card ${intensityClasses[Math.min(day.count, 4)]}`}
+                    className={`h-3 w-3 rounded-[3px] border-[0.5px] border-border-subtle/50 outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-surface-card ${intensityClasses[Math.min(day.count, 4)]}`}
                   />
                 );
               })}
@@ -183,7 +183,7 @@ export function ActivityHeatmap({ days }: { days: ActivityDay[] }) {
           <span
             key={className}
             aria-hidden="true"
-            className={`h-3 w-3 rounded-[3px] border border-border-subtle/50 ${className}`}
+            className={`h-3 w-3 rounded-[3px] border-[0.5px] border-border-subtle/50 ${className}`}
           />
         ))}
         <span>More</span>

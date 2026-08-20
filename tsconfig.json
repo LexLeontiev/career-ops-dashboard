@@ -16,5 +16,5 @@
     "isolatedModules": true,
     "jsx": "react-jsx"
   },
-  "include": ["src", "test"]
+  "include": ["scripts", "src", "test"]
 }
