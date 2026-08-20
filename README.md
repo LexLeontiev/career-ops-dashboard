@@ -7,7 +7,7 @@
 
 career-ops-dashboard is a local-first React and Express dashboard for viewing application-tracker data and Markdown reports from a local [career-ops](https://github.com/santifer/career-ops) checkout. It reads upstream data without changing it, keeps data on your machine, and binds to localhost by default.
 
-![Dashboard preview](docs/assets/dashboard-preview.png)
+![Dashboard preview with synthetic demo data](docs/assets/dashboard-preview.png)
 
 ## Features
 
@@ -81,6 +81,19 @@ Run the test suite and the complete local quality gate before opening a pull req
 npm test
 npm run check
 ```
+
+## Refresh the README preview
+
+The dashboard preview uses synthetic data only: 56 applications, 11 active processes, 7 interviews, 1 offer, a 34% response rate, two months of activity, and five follow-up reminders. It never reads a local career-ops tracker.
+
+To regenerate the PNG with current relative dates, install Playwright's Chromium once and then run:
+
+```bash
+npx playwright install chromium
+npm run screenshot:readme
+```
+
+The command starts the client with intercepted synthetic API responses, captures the dark-theme desktop view at 1440 × 1100, and overwrites `docs/assets/dashboard-preview.png`.
 
 ## Architecture
 

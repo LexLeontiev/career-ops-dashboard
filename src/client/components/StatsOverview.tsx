@@ -10,17 +10,18 @@ export function StatsOverview({ applications }: { applications: AppData[] }) {
   let active = 0;
   let interviews = 0;
   let offers = 0;
-  let responded = 0;
-  let applied = 0;
+  let responses = 0;
 
   for (const app of applications) {
     const status = (app.status || "").toUpperCase();
 
-    if (status !== "SKIP" && status !== "EVALUATED" && status !== "") {
-      applied++;
-      if (status !== "APPLIED") {
-        responded++;
-      }
+    if (
+      status === "RESPONDED" ||
+      status === "INTERVIEW" ||
+      status === "OFFER" ||
+      status === "REJECTED"
+    ) {
+      responses++;
     }
 
     if (status === "APPLIED" || status === "INTERVIEW" || status === "RESPONDED") {
@@ -34,14 +35,14 @@ export function StatsOverview({ applications }: { applications: AppData[] }) {
     }
   }
 
-  const respondedRate = applied > 0 ? Math.round((responded / applied) * 100) : 0;
+  const responseRate = total > 0 ? Math.round((responses / total) * 100) : 0;
   const hasOffers = offers > 0;
 
   return (
     <section className="grid grid-cols-2 md:grid-cols-6 lg:grid-cols-5 gap-gutter mb-stack-lg">
       <div className="col-span-1 md:col-span-3 lg:col-span-1 bg-surface-card p-6 rounded-xl border border-border-subtle hover:border-primary/50 transition-colors">
         <div className="text-text-secondary font-label-sm text-label-sm uppercase mb-2">
-          Total Analyzed
+          Total Applications
         </div>
         <div className="text-on-surface font-headline-lg text-headline-lg">{total}</div>
       </div>
@@ -73,9 +74,9 @@ export function StatsOverview({ applications }: { applications: AppData[] }) {
       </div>
       <div className="col-span-2 md:col-span-2 lg:col-span-1 bg-surface-card p-6 rounded-xl border border-border-subtle hover:border-primary/50 transition-colors">
         <div className="text-text-secondary font-label-sm text-label-sm uppercase mb-2">
-          Responded Rate
+          Response Rate
         </div>
-        <div className="text-tertiary font-headline-lg text-headline-lg">{respondedRate}%</div>
+        <div className="text-tertiary font-headline-lg text-headline-lg">{responseRate}%</div>
       </div>
     </section>
   );

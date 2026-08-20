@@ -39,7 +39,7 @@ test("renders aggregated stats correctly including Interview Stage and Offers", 
   expect(html).toMatch(/Interview Stage.*0/);
   expect(html).toMatch(/Offers.*1/);
   expect(html).toMatch(/text-emerald-400/);
-  expect(html).toMatch(/Responded Rate.*0.*%/);
+  expect(html).toMatch(/Response Rate.*33.*%/);
 });
 
 test("renders unhighlighted Offers card when offer count is 0", () => {
@@ -59,7 +59,7 @@ test("renders unhighlighted Offers card when offer count is 0", () => {
   expect(html).not.toMatch(/text-emerald-400/);
 });
 
-test("calculates Responded Rate correctly for processed/response statuses (Rejected, Interview, Discarded, Offer)", () => {
+test("calculates response rate against all applications", () => {
   const mockApps = [
     {
       num: 1,
@@ -99,5 +99,6 @@ test("calculates Responded Rate correctly for processed/response statuses (Rejec
     },
   ];
   const html = renderToString(React.createElement(StatsOverview, { applications: mockApps }));
-  expect(html).toMatch(/Responded Rate.*67.*%/);
+  expect(html).toMatch(/Total Applications.*4/);
+  expect(html).toMatch(/Response Rate.*50.*%/);
 });
