@@ -9,6 +9,7 @@ export interface ReminderItem {
 
 interface RemindersWidgetProps {
   items: ReminderItem[];
+  hasError?: boolean;
   today?: Date;
   isBlurred: boolean;
 }
@@ -67,7 +68,12 @@ function PrivacyText({
   );
 }
 
-export function RemindersWidget({ items, today = new Date(), isBlurred }: RemindersWidgetProps) {
+export function RemindersWidget({
+  items,
+  hasError = false,
+  today = new Date(),
+  isBlurred,
+}: RemindersWidgetProps) {
   const sortedItems = [...items].sort(
     (a, b) => localNoon(a.date).getTime() - localNoon(b.date).getTime(),
   );
@@ -82,7 +88,11 @@ export function RemindersWidget({ items, today = new Date(), isBlurred }: Remind
         <Bell aria-hidden="true" className="size-4 text-primary" />
         <h2 className="font-headline-sm text-headline-sm text-on-surface">Reminders</h2>
       </div>
-      {sortedItems.length === 0 ? (
+      {hasError ? (
+        <p className="flex flex-1 items-center justify-center text-sm text-text-secondary">
+          Reminders unavailable.
+        </p>
+      ) : sortedItems.length === 0 ? (
         <p className="flex flex-1 items-center justify-center text-sm text-text-secondary">
           No reminders scheduled.
         </p>

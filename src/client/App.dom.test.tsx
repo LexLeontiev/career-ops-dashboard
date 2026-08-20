@@ -121,6 +121,24 @@ describe("App application loading lifecycle", () => {
     expect(reminders).toHaveClass("h-[17rem]");
   });
 
+  test("shows when reminders cannot be loaded instead of an empty state", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn((input: RequestInfo | URL) => {
+        if (String(input) === "/api/reminders") {
+          return Promise.reject(new Error("reminders unavailable"));
+        }
+        return Promise.resolve(applicationsResponse());
+      }),
+    );
+
+    render(<App />);
+
+    await screen.findByRole("region", { name: "Activity" });
+    expect(screen.getByText("Reminders unavailable.")).toBeInTheDocument();
+    expect(screen.queryByText("No reminders scheduled.")).not.toBeInTheDocument();
+  });
+
   test("announces a stable error when loading rejects", async () => {
     vi.stubGlobal("fetch", vi.fn().mockRejectedValue("network unavailable"));
 

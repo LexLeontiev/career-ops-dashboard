@@ -54,6 +54,7 @@ function TrackerSetupEmptyState() {
 export default function App() {
   const [applications, setApplications] = useState<Application[]>([]);
   const [reminders, setReminders] = useState<Reminder[]>([]);
+  const [remindersError, setRemindersError] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [trackerNotInitialized, setTrackerNotInitialized] = useState(false);
@@ -125,10 +126,13 @@ export default function App() {
         if (!controller.signal.aborted) setLoading(false);
       });
     void fetchReminders(controller.signal)
-      .then(setReminders)
+      .then((items) => {
+        setReminders(items);
+        setRemindersError(false);
+      })
       .catch((cause: unknown) => {
         if (cause instanceof DOMException && cause.name === "AbortError") return;
-        // Reminders are optional and must not prevent the tracker from loading.
+        setRemindersError(true);
       });
     return () => controller.abort();
   }, []);
@@ -300,7 +304,11 @@ export default function App() {
               <StatsOverview applications={applications} />
               <div className="mb-stack-lg grid min-w-0 grid-cols-1 items-stretch gap-gutter lg:grid-cols-2">
                 <ActivityHeatmap days={activityDays} />
-                <RemindersWidget items={reminders} isBlurred={isBlurred} />
+                <RemindersWidget
+                  items={reminders}
+                  hasError={remindersError}
+                  isBlurred={isBlurred}
+                />
               </div>
               <FilterBar
                 searchQuery={searchQuery}
