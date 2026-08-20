@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { ExternalLink, Eye, EyeOff, Moon, Sun, Terminal } from "lucide-react";
 import type { Application } from "../shared/application.js";
 import { fetchApplications, TrackerNotInitializedError } from "./api.js";
+import { buildActivityDays, trackerAndNotesDateStrategy } from "./activity.js";
+import { ActivityHeatmap } from "./components/ActivityHeatmap.js";
 import { StatsOverview } from "./components/StatsOverview.js";
 import { FilterBar } from "./components/FilterBar.js";
 import { DataTable } from "./components/DataTable.js";
@@ -219,6 +221,7 @@ export default function App() {
       ? String(aVal).localeCompare(String(bVal))
       : String(bVal).localeCompare(String(aVal));
   });
+  const activityDays = buildActivityDays(applications, trackerAndNotesDateStrategy, new Date());
 
   return (
     <div className="font-body-md text-on-surface overflow-x-hidden selection:bg-primary-container">
@@ -286,6 +289,7 @@ export default function App() {
           {!loading && !error && !trackerNotInitialized && (
             <>
               <StatsOverview applications={applications} />
+              <ActivityHeatmap days={activityDays} />
               <FilterBar
                 searchQuery={searchQuery}
                 setSearchQuery={setSearchQuery}
