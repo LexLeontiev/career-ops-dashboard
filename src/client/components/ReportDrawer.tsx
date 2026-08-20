@@ -6,6 +6,19 @@ import rehypeHighlight from "rehype-highlight";
 
 const remarkPlugins = [remarkGfm];
 const rehypePlugins = [rehypeHighlight];
+const metadataLinePattern = /^(?:\*\*)?(?:Date|URL|Via|Archetype|Score|Legitimacy|PDF):(?:\*\*)?/;
+
+function formatReportMarkdown(markdown: string): string {
+  const lines = markdown.split(/\r?\n/);
+
+  return lines
+    .map((line, index) =>
+      metadataLinePattern.test(line) && metadataLinePattern.test(lines[index + 1] ?? "")
+        ? `${line.trimEnd()}  `
+        : line,
+    )
+    .join("\n");
+}
 
 interface ReportDrawerProps {
   reportPath: string;
@@ -162,7 +175,7 @@ export function ReportDrawer({ reportPath, isOpen, onClose, company, role }: Rep
                   },
                 }}
               >
-                {content}
+                {formatReportMarkdown(content)}
               </ReactMarkdown>
             </div>
           )}

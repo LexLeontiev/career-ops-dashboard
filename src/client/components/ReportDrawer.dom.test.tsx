@@ -81,6 +81,45 @@ test("renders external Markdown links safely without enabling raw HTML", async (
   expect(container.querySelector("script")).not.toBeInTheDocument();
 });
 
+test("renders report metadata fields on separate lines", async () => {
+  vi.stubGlobal(
+    "fetch",
+    vi
+      .fn()
+      .mockResolvedValue(
+        new Response(
+          [
+            "# Fit Report",
+            "",
+            "**Date:** 2026-08-16",
+            "**URL:** https://example.com/jobs/android-engineer",
+            "**Via:** —",
+            "**Archetype:** Senior Android Engineer",
+            "**Score:** 4.5/5",
+            "**Legitimacy:** High Confidence",
+            "**PDF:** pending",
+          ].join("\n"),
+          { status: 200 },
+        ),
+      ),
+  );
+
+  const { container } = render(
+    <ReportDrawer
+      reportPath="reports/acme.md"
+      isOpen
+      onClose={vi.fn()}
+      company="Acme Labs"
+      role="Senior Android Engineer"
+    />,
+  );
+
+  await screen.findByRole("heading", { name: "Fit Report" });
+  const metadata = container.querySelector(".prose p");
+  expect(metadata).not.toBeNull();
+  expect(metadata?.querySelectorAll("br")).toHaveLength(6);
+});
+
 test("does not open the drawer when the report path is empty", () => {
   const fetchReport = vi.fn();
   vi.stubGlobal("fetch", fetchReport);
