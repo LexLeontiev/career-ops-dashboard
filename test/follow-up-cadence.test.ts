@@ -14,15 +14,15 @@ describe("follow-up cadence adapter", () => {
         path.join(fixture.root, "followup-cadence.mjs"),
         `process.stdout.write(JSON.stringify({ entries: [
           {
-            num: 29,
-            company: "Proton",
-            notes: "Interview complete; feedback pending.",
+            num: 101,
+            company: "Google",
+            notes: "Schedule a technical interview.",
             urgency: "overdue",
-            nextFollowupDate: "2026-08-13"
+            nextFollowupDate: "2030-01-15"
           },
           {
-            num: 52,
-            company: "Yazio",
+            num: 303,
+            company: "Example Corp",
             notes: "No more reminders.",
             urgency: "cold",
             nextFollowupDate: null
@@ -33,10 +33,10 @@ describe("follow-up cadence adapter", () => {
 
       await expect(loadFollowUpCadence(paths)).resolves.toEqual([
         {
-          appNum: 29,
-          date: "2026-08-13",
-          company: "Proton",
-          notes: "Interview complete; feedback pending.",
+          appNum: 101,
+          date: "2030-01-15",
+          company: "Google",
+          notes: "Schedule a technical interview.",
           urgency: "overdue",
         },
       ]);

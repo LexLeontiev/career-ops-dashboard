@@ -6,12 +6,12 @@ import { RemindersWidget, type ReminderItem } from "./RemindersWidget.js";
 
 afterEach(cleanup);
 
-const today = new Date(2026, 7, 20, 9);
+const today = new Date(2030, 0, 10, 9);
 const items: ReminderItem[] = [
-  { date: "2026-08-25", company: "Northstar", notes: "Send portfolio" },
-  { date: "2026-08-19", company: "Acme", notes: "Follow up" },
-  { date: "2026-08-20", company: "Orbital", notes: "Interview prep" },
-  { date: "2026-08-21", company: "Wayfinder", notes: "Confirm time" },
+  { date: "2030-01-15", company: "Google", notes: "Review application" },
+  { date: "2030-01-09", company: "Microsoft", notes: "Send a follow-up" },
+  { date: "2030-01-10", company: "Example Corp", notes: "Prepare for interview" },
+  { date: "2030-01-11", company: "Demo Systems", notes: "Confirm availability" },
 ];
 
 test("sorts reminders chronologically and renders dashboard date labels", () => {
@@ -24,16 +24,16 @@ test("sorts reminders chronologically and renders dashboard date labels", () => 
       .getAllByRole("listitem")
       .map((row) => row.textContent),
   ).toEqual([
-    expect.stringContaining("Yesterday · Aug 19"),
-    expect.stringContaining("Today · Aug 20"),
-    expect.stringContaining("Tomorrow · Aug 21"),
-    expect.stringContaining("Tuesday · Aug 25"),
+    expect.stringContaining("Yesterday · Jan 9"),
+    expect.stringContaining("Today · Jan 10"),
+    expect.stringContaining("Tomorrow · Jan 11"),
+    expect.stringContaining("Tuesday · Jan 15"),
   ]);
 });
 
 test("keeps every reminder row in the scrollable list", () => {
   const many = Array.from({ length: 8 }, (_, index) => ({
-    date: `2026-09-${String(index + 1).padStart(2, "0")}`,
+    date: `2030-02-${String(index + 1).padStart(2, "0")}`,
     company: `Company ${index}`,
     notes: `Note ${index}`,
   }));
@@ -53,7 +53,7 @@ test("shows an ellipsis followed by the last 140 Unicode characters of long note
   const notes = `Earlier tracker history that should be hidden. ${tail}`;
   render(
     <RemindersWidget
-      items={[{ date: "2026-08-20", company: "Acme", notes }]}
+      items={[{ date: "2030-01-10", company: "Google", notes }]}
       today={today}
       isBlurred={false}
     />,
@@ -74,12 +74,12 @@ test("shows an accessible empty state", () => {
 test("applies privacy noise to company and notes while blurred", () => {
   render(<RemindersWidget items={[items[0]]} today={today} isBlurred />);
 
-  expect(screen.getByText("Northstar").parentElement).toHaveClass(
+  expect(screen.getByText("Google").parentElement).toHaveClass(
     "privacy-noise",
     "privacy-noise--company",
     "privacy-noise--active",
   );
-  expect(screen.getByText("Send portfolio").parentElement).toHaveClass(
+  expect(screen.getByText("Review application").parentElement).toHaveClass(
     "privacy-noise",
     "privacy-noise--timeline-notes",
     "privacy-noise--active",
@@ -89,6 +89,8 @@ test("applies privacy noise to company and notes while blurred", () => {
 test("does not activate privacy noise when privacy mode is off", () => {
   render(<RemindersWidget items={[items[0]]} today={today} isBlurred={false} />);
 
-  expect(screen.getByText("Northstar").parentElement).not.toHaveClass("privacy-noise--active");
-  expect(screen.getByText("Send portfolio").parentElement).not.toHaveClass("privacy-noise--active");
+  expect(screen.getByText("Google").parentElement).not.toHaveClass("privacy-noise--active");
+  expect(screen.getByText("Review application").parentElement).not.toHaveClass(
+    "privacy-noise--active",
+  );
 });

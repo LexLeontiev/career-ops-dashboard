@@ -60,18 +60,18 @@ describe("HTTP application", () => {
         "",
         "| num | appNum | date | company | role | channel | contact | notes |",
         "|---|---|---|---|---|---|---|---|",
-        "| 1 | 52 | 2026-08-04 | Yazio | Senior Mobile Engineer | Email | Team lead | Already sent |",
+        "| 1 | 101 | 2030-01-05 | Google | Software Engineer | Email | Recruiting Team | Follow-up sent |",
       ].join("\n"),
       "utf8",
     );
     await writeFile(
       path.join(fixture.root, "followup-cadence.mjs"),
       `process.stdout.write(JSON.stringify({ entries: [{
-        num: 29,
-        company: "Proton",
-        notes: "Interview complete; feedback pending.",
+        num: 101,
+        company: "Google",
+        notes: "Schedule a technical interview.",
         urgency: "overdue",
-        nextFollowupDate: "2026-08-13"
+        nextFollowupDate: "2030-01-15"
       }] }));\n`,
       "utf8",
     );
@@ -82,10 +82,10 @@ describe("HTTP application", () => {
       expect(response.status).toBe(200);
       expect(await response.json()).toEqual([
         expect.objectContaining({
-          appNum: 29,
-          date: "2026-08-13",
-          company: "Proton",
-          notes: "Interview complete; feedback pending.",
+          appNum: 101,
+          date: "2030-01-15",
+          company: "Google",
+          notes: "Schedule a technical interview.",
           urgency: "overdue",
         }),
       ]);

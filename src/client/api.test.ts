@@ -66,10 +66,10 @@ describe("fetchReminders", () => {
       new Response(
         JSON.stringify([
           {
-            appNum: 29,
-            date: "2026-08-21",
-            company: "Proton",
-            notes: "Interview complete; feedback pending.",
+            appNum: 101,
+            date: "2030-01-11",
+            company: "Google",
+            notes: "Schedule a technical interview.",
             urgency: "overdue",
           },
         ]),
@@ -79,10 +79,10 @@ describe("fetchReminders", () => {
 
     await expect(fetchReminders(controller.signal, request)).resolves.toEqual([
       {
-        appNum: 29,
-        date: "2026-08-21",
-        company: "Proton",
-        notes: "Interview complete; feedback pending.",
+        appNum: 101,
+        date: "2030-01-11",
+        company: "Google",
+        notes: "Schedule a technical interview.",
         urgency: "overdue",
       },
     ]);

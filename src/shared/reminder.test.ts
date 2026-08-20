@@ -2,10 +2,10 @@ import { describe, expect, test } from "vitest";
 import { parseFollowUpCadence, parseRemindersPayload } from "./reminder.js";
 
 const validReminder = {
-  appNum: 29,
-  date: "2026-08-13",
-  company: "Proton",
-  notes: "Interview completed; outcome pending.",
+  appNum: 101,
+  date: "2030-01-15",
+  company: "Google",
+  notes: "Schedule a technical interview.",
   urgency: "overdue" as const,
 };
 
@@ -14,7 +14,7 @@ describe("follow-up cadence parsing", () => {
     expect(
       parseFollowUpCadence({
         metadata: {
-          analysisDate: "2026-08-20",
+          analysisDate: "2030-01-10",
           actionable: 3,
           overdue: 1,
           urgent: 0,
@@ -23,23 +23,23 @@ describe("follow-up cadence parsing", () => {
         },
         entries: [
           {
-            num: 29,
-            company: "Proton",
-            notes: "Interview completed; outcome pending.",
+            num: 101,
+            company: "Google",
+            notes: "Schedule a technical interview.",
             urgency: "overdue",
-            nextFollowupDate: "2026-08-13",
+            nextFollowupDate: "2030-01-15",
           },
           {
-            num: 86,
-            company: "Pure",
-            notes: "Applied on 2026-08-17.",
+            num: 202,
+            company: "Microsoft",
+            notes: "Send a follow-up email.",
             urgency: "waiting",
-            nextFollowupDate: "2026-08-24",
+            nextFollowupDate: "2030-01-22",
           },
           {
-            num: 52,
-            company: "Yazio",
-            notes: "Two follow-ups already sent.",
+            num: 303,
+            company: "Example Corp",
+            notes: "No further action is needed.",
             urgency: "cold",
             nextFollowupDate: null,
           },
@@ -48,10 +48,10 @@ describe("follow-up cadence parsing", () => {
     ).toEqual([
       validReminder,
       {
-        appNum: 86,
-        date: "2026-08-24",
-        company: "Pure",
-        notes: "Applied on 2026-08-17.",
+        appNum: 202,
+        date: "2030-01-22",
+        company: "Microsoft",
+        notes: "Send a follow-up email.",
         urgency: "waiting",
       },
     ]);
@@ -61,9 +61,9 @@ describe("follow-up cadence parsing", () => {
     null,
     {},
     { entries: null },
-    { entries: [{ ...validReminder, num: 29, nextFollowupDate: "2026-02-30" }] },
-    { entries: [{ ...validReminder, num: "29", nextFollowupDate: "2026-08-13" }] },
-    { entries: [{ ...validReminder, num: 29, nextFollowupDate: "2026-08-13", urgency: "soon" }] },
+    { entries: [{ ...validReminder, num: 101, nextFollowupDate: "2030-02-30" }] },
+    { entries: [{ ...validReminder, num: "101", nextFollowupDate: "2030-01-15" }] },
+    { entries: [{ ...validReminder, num: 101, nextFollowupDate: "2030-01-15", urgency: "soon" }] },
   ])("rejects malformed cadence output %#", (payload) => {
     expect(() => parseFollowUpCadence(payload)).toThrow("Invalid follow-up cadence output");
   });

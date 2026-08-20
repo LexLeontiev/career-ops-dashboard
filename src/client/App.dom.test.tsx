@@ -84,7 +84,7 @@ describe("App application loading lifecycle", () => {
 
   test("renders follow-up reminders beside activity from the read-only API", async () => {
     vi.useFakeTimers({ shouldAdvanceTime: true });
-    vi.setSystemTime(new Date(2026, 7, 20, 12));
+    vi.setSystemTime(new Date(2030, 0, 10, 12));
     vi.stubGlobal(
       "fetch",
       vi.fn((input: RequestInfo | URL) => {
@@ -93,10 +93,10 @@ describe("App application loading lifecycle", () => {
             new Response(
               JSON.stringify([
                 {
-                  appNum: 29,
-                  date: "2026-08-21",
-                  company: "Proton",
-                  notes: "Interview complete; feedback pending.",
+                  appNum: 101,
+                  date: "2030-01-11",
+                  company: "Google",
+                  notes: "Schedule a technical interview.",
                   urgency: "overdue",
                 },
               ]),
@@ -112,9 +112,9 @@ describe("App application loading lifecycle", () => {
 
     const activity = await screen.findByRole("region", { name: "Activity" });
     const reminders = screen.getByRole("region", { name: "Reminders" });
-    expect(reminders).toHaveTextContent("Tomorrow · Aug 21");
-    expect(reminders).toHaveTextContent("Proton");
-    expect(reminders).toHaveTextContent("Interview complete; feedback pending.");
+    expect(reminders).toHaveTextContent("Tomorrow · Jan 11");
+    expect(reminders).toHaveTextContent("Google");
+    expect(reminders).toHaveTextContent("Schedule a technical interview.");
     expect(activity.parentElement).toBe(reminders.parentElement);
     expect(activity.parentElement).toHaveClass("grid-cols-1", "lg:grid-cols-2");
     expect(activity).toHaveClass("h-[17rem]");
