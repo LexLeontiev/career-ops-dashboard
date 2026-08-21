@@ -248,9 +248,15 @@
 }
 
 .privacy-noise--table-notes .privacy-noise__content {
-  display: -webkit-box;
+  display: flex;
+  align-items: center;
   min-height: 2.25rem;
   max-height: 2.25rem;
+  overflow: hidden;
+}
+
+.privacy-noise--table-notes .privacy-noise__text {
+  display: -webkit-box;
   overflow: hidden;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;

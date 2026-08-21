@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { FileText } from "lucide-react";
 import type { Application } from "../../shared/application.js";
+import { buildApplicationTimeline } from "../application-timeline.js";
 
 interface DataTableProps {
   applications: Application[];
@@ -50,7 +51,13 @@ function PrivacyText({ children, isPrivate, revealLabel, title, variant }: Priva
       aria-label={isHidden ? revealLabel : undefined}
       title={isHidden ? undefined : title}
     >
-      <span className="privacy-noise__content">{children}</span>
+      <span className="privacy-noise__content">
+        {variant === "table-notes" ? (
+          <span className="privacy-noise__text">{children}</span>
+        ) : (
+          children
+        )}
+      </span>
     </span>
   );
 }
@@ -97,8 +104,18 @@ export function DataTable({
 
   const formatDate = (dateStr: string) => {
     if (!dateStr) return "";
-    const date = new Date(dateStr);
+    const isoDateParts = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dateStr);
+    const year = Number(isoDateParts?.[1]);
+    const month = Number(isoDateParts?.[2]);
+    const day = Number(isoDateParts?.[3]);
+    const date = isoDateParts ? new Date(year, month - 1, day) : new Date(dateStr);
     if (isNaN(date.getTime())) return dateStr;
+    if (
+      isoDateParts &&
+      (date.getFullYear() !== year || date.getMonth() !== month - 1 || date.getDate() !== day)
+    ) {
+      return dateStr;
+    }
 
     const today = new Date();
     const yesterday = new Date(today);
@@ -233,6 +250,8 @@ export function DataTable({
               const statusClass = getStatusInfo(app.status);
               const isExpanded = !!expandedRows[app.num];
               const hasReport = app.report.trim().length > 0;
+              const timeline = buildApplicationTimeline(app);
+              const latestComment = timeline[0]?.comment ?? "";
 
               return (
                 <React.Fragment key={app.num}>
@@ -317,10 +336,10 @@ export function DataTable({
                         key={isBlurred ? "private" : "visible"}
                         isPrivate={!!isBlurred}
                         revealLabel="Reveal comment"
-                        title={app.notes}
+                        title={latestComment}
                         variant="table-notes"
                       >
-                        {app.notes}
+                        {latestComment}
                       </PrivacyText>
                     </td>
                   </tr>
@@ -330,34 +349,39 @@ export function DataTable({
                         <div className="px-12 py-8 relative">
                           <div className="timeline-connector"></div>
                           <div className="space-y-8">
-                            <div className="relative pl-10">
-                              <div className="absolute left-[-2px] top-1.5 w-4 h-4 rounded-full bg-primary/40 ring-4 ring-transparent"></div>
-                              <div className="flex flex-col">
-                                <div className="text-xs font-label-sm text-on-surface-variant mb-1">
-                                  <PrivacyText
-                                    key={isBlurred ? "private" : "visible"}
-                                    isPrivate={!!isBlurred}
-                                    revealLabel="Reveal timeline date"
-                                    variant="date"
-                                  >
-                                    {formatDate(app.date)}
-                                  </PrivacyText>
-                                </div>
-                                <h4 className="font-bold text-on-surface mb-1">
-                                  Status: {app.status}
-                                </h4>
-                                <div className="text-on-surface-variant text-body-sm max-w-2xl">
-                                  <PrivacyText
-                                    key={isBlurred ? "private" : "visible"}
-                                    isPrivate={!!isBlurred}
-                                    revealLabel="Reveal timeline comment"
-                                    variant="timeline-notes"
-                                  >
-                                    {app.notes}
-                                  </PrivacyText>
+                            {timeline.map((entry, index) => (
+                              <div
+                                className="relative pl-10"
+                                key={`${entry.date}-${entry.status}-${index}`}
+                              >
+                                <div className="absolute left-[-2px] top-1.5 w-4 h-4 rounded-full bg-primary/40 ring-4 ring-transparent"></div>
+                                <div className="flex flex-col">
+                                  <div className="text-xs font-label-sm text-on-surface-variant mb-1">
+                                    <PrivacyText
+                                      key={isBlurred ? "private" : "visible"}
+                                      isPrivate={!!isBlurred}
+                                      revealLabel="Reveal timeline date"
+                                      variant="date"
+                                    >
+                                      {formatDate(entry.date)}
+                                    </PrivacyText>
+                                  </div>
+                                  <h4 className="font-bold text-on-surface mb-1">
+                                    Status: {entry.status}
+                                  </h4>
+                                  <div className="text-on-surface-variant text-body-sm max-w-2xl">
+                                    <PrivacyText
+                                      key={isBlurred ? "private" : "visible"}
+                                      isPrivate={!!isBlurred}
+                                      revealLabel="Reveal timeline comment"
+                                      variant="timeline-notes"
+                                    >
+                                      {entry.comment}
+                                    </PrivacyText>
+                                  </div>
                                 </div>
                               </div>
-                            </div>
+                            ))}
                           </div>
                         </div>
                       </td>
