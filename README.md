@@ -24,13 +24,13 @@ I prefer working with data in the terminal, but I find reports and statistics ea
 
 ## Features
 
-- 🔎 Browse, filter, and sort applications from the upstream tracker.
-- 📊 Review global statistics, including applications at each stage, interview totals, and response rate.
-- ⏰ Review chronologically sorted reminders calculated by the upstream follow-up cadence command.
-- 🗓️ Review your activity in a GitHub-style heatmap.
-- 📄 Open read-only Markdown reports in an accessible drawer.
-- 🕶️ Use Privacy Mode to share statistics without revealing company names, roles, dates, scores, or notes.
-- 🧭 Review a timeline for each application. The standard career-ops comment format works as-is; optionally add structured date-and-status tags for a richer timeline.
+- **Browse, filter, and sort** applications from the upstream tracker.
+- **Review global statistics**, including applications at each stage, interview totals, and response rate.
+- **Review chronologically sorted reminders** calculated by the upstream follow-up cadence command.
+- **Review your activity** in a GitHub-style heatmap.
+- **Open read-only Markdown reports** in an accessible drawer.
+- **Use Privacy Mode** to share statistics without revealing company names, roles, dates, scores, or notes.
+- **Review a timeline for each application.** The standard career-ops comment format works as-is; optionally add structured date-and-status tags for a richer timeline.
 
 ## Optional timeline tracking
 
