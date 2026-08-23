@@ -49,3 +49,13 @@ test("spreads README demo activity across the preceding two months", () => {
     [...new Set(activityDays.map(({ count }) => count).filter((count) => count > 0))].sort(),
   ).toEqual([1, 2, 3, 4]);
 });
+
+test("includes a tagged active application for the timeline preview", () => {
+  const { applications } = createReadmeDemoData(new Date(2026, 7, 23, 12));
+  const timelineApplication = applications.find(({ company }) => company === "Google");
+
+  expect(timelineApplication?.notes).toContain("[2026-08-03·Evaluated]");
+  expect(timelineApplication?.notes).toContain("[2026-08-10·Applied]");
+  expect(timelineApplication?.notes).toContain("[2026-08-18·Interview]");
+  expect(timelineApplication?.status).toBe("Interview");
+});
