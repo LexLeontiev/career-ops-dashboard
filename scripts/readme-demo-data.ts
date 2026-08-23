@@ -432,6 +432,14 @@ export function createReadmeDemoData(today = new Date()): {
   const anchorDate = localNoon(today);
   const applications = demoApplications.map((application, index) => ({
     ...application,
+    notes:
+      application.company === "Google"
+        ? [
+            `[${formatDate(addDays(anchorDate, -20))}·Evaluated] Identified a strong product and engineering fit.`,
+            `[${formatDate(addDays(anchorDate, -13))}·Applied] Submitted an application through the careers page.`,
+            `[${formatDate(addDays(anchorDate, -5))}·Interview] Completed the hiring manager conversation.`,
+          ].join("\n")
+        : application.notes,
     status: formatStatus(application.status),
     num: demoApplications.length - index,
     date: formatDate(addDays(anchorDate, -(activityDayOffsets[index] ?? 0))),

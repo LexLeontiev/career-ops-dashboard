@@ -7,6 +7,7 @@ import { createReadmeDemoData } from "./readme-demo-data.js";
 
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const previewPath = path.join(repositoryRoot, "docs", "assets", "dashboard-preview.png");
+const timelinePreviewPath = path.join(repositoryRoot, "docs", "assets", "timeline-preview.png");
 const port = 4173;
 const previewUrl = `http://127.0.0.1:${port}`;
 const demoData = createReadmeDemoData();
@@ -70,6 +71,15 @@ try {
       .getByText("56", { exact: true })
       .waitFor();
     await page.screenshot({ path: previewPath });
+
+    const timelineRow = page.getByRole("row", { name: /google/i });
+    await timelineRow.scrollIntoViewIfNeeded();
+    await timelineRow.click();
+    const timeline = page
+      .getByRole("heading", { name: "Status: Interview" })
+      .locator("xpath=ancestor::tr[1]");
+    await timeline.waitFor();
+    await timeline.screenshot({ path: timelinePreviewPath });
   } finally {
     await browser.close();
   }
@@ -81,4 +91,4 @@ try {
   }
 }
 
-console.log(`Updated ${path.relative(repositoryRoot, previewPath)} with synthetic demo data.`);
+console.log(`Updated README preview assets with synthetic demo data.`);
