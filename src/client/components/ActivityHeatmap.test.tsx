@@ -1,11 +1,14 @@
 // @vitest-environment jsdom
 import React from "react";
-import { cleanup, render, screen, within } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
-import { afterEach, expect, test } from "vitest";
+import { afterEach, expect, test, vi } from "vitest";
 import { ActivityHeatmap } from "./ActivityHeatmap.js";
 
-afterEach(cleanup);
+afterEach(() => {
+  cleanup();
+  vi.useRealTimers();
+});
 
 test("renders accessible cells for every activity intensity", () => {
   render(
@@ -87,6 +90,40 @@ test("renders calendar labels, legend, and a scrollable activity region", () => 
   expect(within(calendar).getByText("Fri")).toBeInTheDocument();
   expect(screen.getByText("Less")).toBeInTheDocument();
   expect(screen.getByText("More")).toBeInTheDocument();
+});
+
+test("briefly reveals the activity scrollbar after horizontal scrolling", () => {
+  vi.useFakeTimers();
+  render(<ActivityHeatmap days={[{ date: "2026-08-20", count: 2 }]} />);
+
+  const calendar = screen.getByRole("region", { name: "Activity calendar" });
+  expect(calendar.parentElement?.querySelector(".overlay-scrollbar")).not.toBeInTheDocument();
+
+  fireEvent.scroll(calendar);
+  expect(calendar.parentElement?.querySelector(".overlay-scrollbar")).toBeInTheDocument();
+
+  act(() => vi.advanceTimersByTime(900));
+  expect(calendar.parentElement?.querySelector(".overlay-scrollbar")).not.toBeInTheDocument();
+});
+
+test("lets a mouse drag on the activity scrollbar move the calendar", () => {
+  render(<ActivityHeatmap days={[{ date: "2026-08-20", count: 2 }]} />);
+
+  const calendar = screen.getByRole("region", { name: "Activity calendar" });
+  Object.defineProperties(calendar, {
+    clientWidth: { configurable: true, value: 100 },
+    scrollLeft: { configurable: true, value: 0, writable: true },
+    scrollWidth: { configurable: true, value: 400 },
+  });
+
+  fireEvent.scroll(calendar);
+  const scrollbar = calendar.parentElement?.querySelector(".overlay-scrollbar");
+  expect(scrollbar).toBeInTheDocument();
+
+  fireEvent.pointerDown(scrollbar!, { clientX: 0, pointerId: 1 });
+  fireEvent.pointerMove(window, { clientX: 30, pointerId: 1 });
+
+  expect(calendar.scrollLeft).toBeGreaterThan(0);
 });
 
 test("hides a prior month label when its first day is outside the activity range", () => {

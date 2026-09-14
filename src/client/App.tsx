@@ -9,6 +9,7 @@ import { RemindersWidget } from "./components/RemindersWidget.js";
 import { StatsOverview } from "./components/StatsOverview.js";
 import { FilterBar } from "./components/FilterBar.js";
 import { DataTable } from "./components/DataTable.js";
+import { usePageOverlayScrollbar } from "./overlay-scrollbar.js";
 
 const ReportDrawer = React.lazy(async () => {
   const module = await import("./components/ReportDrawer.js");
@@ -65,6 +66,7 @@ export default function App() {
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
 
   const [selectedApp, setSelectedApp] = useState<Application | null>(null);
+  const { onThumbPointerDown, scrollbar: pageScrollbar } = usePageOverlayScrollbar();
 
   const [theme, setTheme] = useState<Theme>(() => {
     try {
@@ -340,6 +342,15 @@ export default function App() {
             role={selectedApp.role}
           />
         </React.Suspense>
+      )}
+
+      {pageScrollbar.visible && (
+        <span
+          aria-hidden="true"
+          className="page-scrollbar-overlay"
+          onPointerDown={onThumbPointerDown}
+          style={{ top: `${pageScrollbar.offset}%`, height: `${pageScrollbar.size}%` }}
+        />
       )}
     </div>
   );

@@ -44,6 +44,73 @@ test("renders aggregated stats correctly including Interview Stage and Offers", 
   expect(html).toMatch(/Response Rate.*50.*%/);
 });
 
+test("counts every submitted status in Total Applied", () => {
+  render(
+    <StatsOverview
+      applications={[
+        { score: "4.8/5", status: "Applied" },
+        { score: "4.2/5", status: "Responded" },
+        { score: "4.5/5", status: "Interview" },
+        { score: "4.1/5", status: "Offer" },
+        { score: "4.4/5", status: "Rejected" },
+        { score: "4.0/5", status: "Discarded" },
+        { score: "4.3/5", status: "Evaluated" },
+        { score: "4.6/5", status: "Skip" },
+      ]}
+    />,
+  );
+
+  const totalAppliedCard = screen.getByText("Total Applied").parentElement;
+  expect(totalAppliedCard).not.toBeNull();
+  expect(within(totalAppliedCard!).getByText("6")).toBeInTheDocument();
+});
+
+test("uses three columns before collapsing the six statistic cards into two columns", () => {
+  render(<StatsOverview applications={[]} />);
+
+  const statsGrid = screen.getByText("Total Evaluated").closest("section");
+  expect(statsGrid).toHaveClass("grid-cols-2", "sm:grid-cols-3", "lg:grid-cols-6");
+});
+
+test("reserves two label lines above every statistic value", () => {
+  render(<StatsOverview applications={[]} />);
+
+  expect(screen.getByText("Offers")).toHaveClass("min-h-[28px]");
+  expect(screen.getByText("Total Evaluated")).toHaveClass("min-h-[28px]");
+});
+
+test("orders application stages from evaluation through interview", () => {
+  render(<StatsOverview applications={[]} />);
+
+  const statsGrid = screen.getByText("Total Evaluated").closest("section");
+  const stageLabels = Array.from(statsGrid!.children)
+    .slice(0, 4)
+    .map((card) => card.firstElementChild?.textContent);
+
+  expect(stageLabels).toEqual([
+    "Total Evaluated",
+    "Total Applied",
+    "Active Processes",
+    "Interview Stage",
+  ]);
+});
+
+test("uses a dark blue value for Total Applied in both themes", () => {
+  render(<StatsOverview applications={[]} />);
+
+  const totalAppliedCard = screen.getByText("Total Applied").parentElement;
+  expect(totalAppliedCard).not.toBeNull();
+  expect(totalAppliedCard!.lastElementChild).toHaveClass("text-blue-800", "dark:text-blue-500");
+});
+
+test("uses a light blue value for active processes in both themes", () => {
+  render(<StatsOverview applications={[]} />);
+
+  const activeProcessesCard = screen.getByText("Active Processes").parentElement;
+  expect(activeProcessesCard).not.toBeNull();
+  expect(activeProcessesCard!.lastElementChild).toHaveClass("text-blue-500", "dark:text-blue-300");
+});
+
 test("highlights a positive offer count in violet without a colored card outline", () => {
   render(<StatsOverview applications={[{ score: "4.8/5", status: "Offer" }]} />);
 
@@ -138,6 +205,6 @@ test("calculates response rate from submitted applications only", () => {
     },
   ];
   const html = renderToString(React.createElement(StatsOverview, { applications: mockApps }));
-  expect(html).toMatch(/Total Applications.*7/);
+  expect(html).toMatch(/Total Evaluated.*7/);
   expect(html).toMatch(/Response Rate.*80.*%/);
 });
