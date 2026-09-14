@@ -1,6 +1,7 @@
 import React from "react";
 import { createPortal } from "react-dom";
 import type { ActivityDay } from "../activity.js";
+import { useElementOverlayScrollbar } from "../overlay-scrollbar.js";
 
 const dateLabelFormatter = new Intl.DateTimeFormat("en-US", {
   month: "long",
@@ -74,8 +75,7 @@ function buildMonthLabels(cells: Array<ActivityDay | null>): string[] {
 export function ActivityHeatmap({ days }: { days: ActivityDay[] }) {
   const cells = buildCalendarCells(days);
   const monthLabels = buildMonthLabels(cells);
-  const [scrollbar, setScrollbar] = React.useState({ visible: false, left: 0, width: 100 });
-  const hideScrollbarTimer = React.useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const { onScroll, onThumbPointerDown, scrollbar } = useElementOverlayScrollbar("horizontal");
   type TooltipState = {
     day: ActivityDay;
     left: number;
@@ -94,27 +94,6 @@ export function ActivityHeatmap({ days }: { days: ActivityDay[] }) {
     };
   };
 
-  const revealScrollbar = (event: React.UIEvent<HTMLDivElement>) => {
-    const { clientWidth, scrollLeft, scrollWidth } = event.currentTarget;
-    const maxScroll = Math.max(scrollWidth - clientWidth, 0);
-    const width = scrollWidth > 0 ? Math.max((clientWidth / scrollWidth) * 100, 10) : 100;
-    const left = maxScroll > 0 ? (scrollLeft / maxScroll) * (100 - width) : 0;
-
-    setScrollbar({ visible: true, left, width });
-    if (hideScrollbarTimer.current) clearTimeout(hideScrollbarTimer.current);
-    hideScrollbarTimer.current = setTimeout(
-      () => setScrollbar((current) => ({ ...current, visible: false })),
-      900,
-    );
-  };
-
-  React.useEffect(
-    () => () => {
-      if (hideScrollbarTimer.current) clearTimeout(hideScrollbarTimer.current);
-    },
-    [],
-  );
-
   return (
     <section
       aria-labelledby="activity-title"
@@ -132,7 +111,7 @@ export function ActivityHeatmap({ days }: { days: ActivityDay[] }) {
           role="region"
           aria-label="Activity calendar"
           tabIndex={0}
-          onScroll={revealScrollbar}
+          onScroll={onScroll}
           className="scrollbar-autohide h-full overflow-x-auto"
         >
           <div className="min-w-max">
@@ -202,7 +181,8 @@ export function ActivityHeatmap({ days }: { days: ActivityDay[] }) {
           <span
             aria-hidden="true"
             className="overlay-scrollbar"
-            style={{ left: `${scrollbar.left}%`, width: `${scrollbar.width}%` }}
+            onPointerDown={onThumbPointerDown}
+            style={{ left: `${scrollbar.offset}%`, width: `${scrollbar.size}%` }}
           />
         )}
       </div>

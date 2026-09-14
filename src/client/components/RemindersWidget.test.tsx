@@ -48,6 +48,7 @@ test("keeps every reminder row in the scrollable list", () => {
     "flex-col",
   );
   expect(screen.getByRole("list", { name: "Reminders list" })).toHaveClass("overflow-y-auto");
+  expect(screen.getByRole("list", { name: "Reminders list" })).toHaveAttribute("tabindex", "0");
   expect(screen.getAllByRole("listitem")).toHaveLength(many.length);
 });
 

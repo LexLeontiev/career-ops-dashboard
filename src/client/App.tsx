@@ -9,6 +9,7 @@ import { RemindersWidget } from "./components/RemindersWidget.js";
 import { StatsOverview } from "./components/StatsOverview.js";
 import { FilterBar } from "./components/FilterBar.js";
 import { DataTable } from "./components/DataTable.js";
+import { usePageOverlayScrollbar } from "./overlay-scrollbar.js";
 
 const ReportDrawer = React.lazy(async () => {
   const module = await import("./components/ReportDrawer.js");
@@ -65,7 +66,7 @@ export default function App() {
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
 
   const [selectedApp, setSelectedApp] = useState<Application | null>(null);
-  const [pageScrollbar, setPageScrollbar] = useState({ visible: false, offset: 0, size: 100 });
+  const { onThumbPointerDown, scrollbar: pageScrollbar } = usePageOverlayScrollbar();
 
   const [theme, setTheme] = useState<Theme>(() => {
     try {
@@ -98,32 +99,6 @@ export default function App() {
   useEffect(() => {
     document.documentElement.classList.toggle("dark", theme === "dark");
   }, [theme]);
-
-  useEffect(() => {
-    let hideScrollbarTimer: ReturnType<typeof setTimeout> | undefined;
-    const revealScrollbar = () => {
-      const documentHeight = Math.max(
-        document.documentElement.scrollHeight,
-        document.body.scrollHeight,
-      );
-      const viewportHeight = window.innerHeight;
-      const maxScroll = Math.max(documentHeight - viewportHeight, 0);
-      const size = documentHeight > 0 ? Math.max((viewportHeight / documentHeight) * 100, 10) : 100;
-      const offset = maxScroll > 0 ? (window.scrollY / maxScroll) * (100 - size) : 0;
-
-      setPageScrollbar({ visible: true, offset, size });
-      if (hideScrollbarTimer) clearTimeout(hideScrollbarTimer);
-      hideScrollbarTimer = setTimeout(() => {
-        setPageScrollbar((current) => ({ ...current, visible: false }));
-      }, 900);
-    };
-
-    window.addEventListener("scroll", revealScrollbar, { passive: true });
-    return () => {
-      window.removeEventListener("scroll", revealScrollbar);
-      if (hideScrollbarTimer) clearTimeout(hideScrollbarTimer);
-    };
-  }, []);
 
   const toggleTheme = () => {
     setTheme((currentTheme) => {
@@ -373,6 +348,7 @@ export default function App() {
         <span
           aria-hidden="true"
           className="page-scrollbar-overlay"
+          onPointerDown={onThumbPointerDown}
           style={{ top: `${pageScrollbar.offset}%`, height: `${pageScrollbar.size}%` }}
         />
       )}

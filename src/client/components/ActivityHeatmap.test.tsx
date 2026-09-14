@@ -106,6 +106,26 @@ test("briefly reveals the activity scrollbar after horizontal scrolling", () => 
   expect(calendar.parentElement?.querySelector(".overlay-scrollbar")).not.toBeInTheDocument();
 });
 
+test("lets a mouse drag on the activity scrollbar move the calendar", () => {
+  render(<ActivityHeatmap days={[{ date: "2026-08-20", count: 2 }]} />);
+
+  const calendar = screen.getByRole("region", { name: "Activity calendar" });
+  Object.defineProperties(calendar, {
+    clientWidth: { configurable: true, value: 100 },
+    scrollLeft: { configurable: true, value: 0, writable: true },
+    scrollWidth: { configurable: true, value: 400 },
+  });
+
+  fireEvent.scroll(calendar);
+  const scrollbar = calendar.parentElement?.querySelector(".overlay-scrollbar");
+  expect(scrollbar).toBeInTheDocument();
+
+  fireEvent.pointerDown(scrollbar!, { clientX: 0, pointerId: 1 });
+  fireEvent.pointerMove(window, { clientX: 30, pointerId: 1 });
+
+  expect(calendar.scrollLeft).toBeGreaterThan(0);
+});
+
 test("hides a prior month label when its first day is outside the activity range", () => {
   render(
     <ActivityHeatmap

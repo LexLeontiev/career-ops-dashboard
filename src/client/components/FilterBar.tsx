@@ -1,5 +1,6 @@
 import React from "react";
 import { ChevronDown, Search } from "lucide-react";
+import { useElementOverlayScrollbar } from "../overlay-scrollbar.js";
 
 interface FilterBarProps {
   searchQuery: string;
@@ -16,29 +17,7 @@ export function FilterBar({
   setStatusFilter,
   counts,
 }: FilterBarProps) {
-  const [scrollbar, setScrollbar] = React.useState({ visible: false, left: 0, width: 100 });
-  const hideScrollbarTimer = React.useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
-
-  const revealScrollbar = (event: React.UIEvent<HTMLDivElement>) => {
-    const { clientWidth, scrollLeft, scrollWidth } = event.currentTarget;
-    const maxScroll = Math.max(scrollWidth - clientWidth, 0);
-    const width = scrollWidth > 0 ? Math.max((clientWidth / scrollWidth) * 100, 10) : 100;
-    const left = maxScroll > 0 ? (scrollLeft / maxScroll) * (100 - width) : 0;
-
-    setScrollbar({ visible: true, left, width });
-    if (hideScrollbarTimer.current) clearTimeout(hideScrollbarTimer.current);
-    hideScrollbarTimer.current = setTimeout(
-      () => setScrollbar((current) => ({ ...current, visible: false })),
-      900,
-    );
-  };
-
-  React.useEffect(
-    () => () => {
-      if (hideScrollbarTimer.current) clearTimeout(hideScrollbarTimer.current);
-    },
-    [],
-  );
+  const { onScroll, onThumbPointerDown, scrollbar } = useElementOverlayScrollbar("horizontal");
 
   return (
     <section className="mb-stack-lg space-y-4">
@@ -98,7 +77,8 @@ export function FilterBar({
         <div
           role="group"
           aria-label="Status filters"
-          onScroll={revealScrollbar}
+          tabIndex={0}
+          onScroll={onScroll}
           className="scrollbar-autohide flex items-center gap-2 overflow-x-auto"
         >
           <button
@@ -162,7 +142,8 @@ export function FilterBar({
           <span
             aria-hidden="true"
             className="overlay-scrollbar"
-            style={{ left: `${scrollbar.left}%`, width: `${scrollbar.width}%` }}
+            onPointerDown={onThumbPointerDown}
+            style={{ left: `${scrollbar.offset}%`, width: `${scrollbar.size}%` }}
           />
         )}
       </div>

@@ -61,7 +61,7 @@
     --color-on-tertiary: #ffffff;
     --text-muted: var(--color-on-surface-variant);
     --drawer-shadow: 0 25px 50px -12px rgb(31 41 55 / 0.2);
-    --scrollbar-thumb: #aab4c3;
+    --scrollbar-thumb: #64748b;
     --timeline-connector: #cbd3df;
     --syntax-foreground: #24292e;
     --syntax-background: #ffffff;
@@ -136,7 +136,7 @@
     --color-on-primary-container: #00285d;
     --color-on-tertiary: #472a00;
     --drawer-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.5);
-    --scrollbar-thumb: #2d3748;
+    --scrollbar-thumb: #94a3b8;
     --timeline-connector: #2d3748;
     --syntax-foreground: #c9d1d9;
     --syntax-background: #0d1117;
@@ -197,14 +197,20 @@ body::-webkit-scrollbar,
 
 .page-scrollbar-overlay,
 .overlay-scrollbar {
-  pointer-events: none;
+  cursor: grab;
+  touch-action: none;
   position: fixed;
   z-index: 60;
   right: 2px;
   width: 4px;
   border-radius: 9999px;
   background: var(--scrollbar-thumb);
-  opacity: 0.85;
+  opacity: 1;
+}
+
+.page-scrollbar-overlay:active,
+.overlay-scrollbar:active {
+  cursor: grabbing;
 }
 
 .overlay-scrollbar {

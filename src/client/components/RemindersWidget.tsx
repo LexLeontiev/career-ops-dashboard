@@ -1,4 +1,5 @@
 import React from "react";
+import { useElementOverlayScrollbar } from "../overlay-scrollbar.js";
 
 export interface ReminderItem {
   date: string;
@@ -76,29 +77,7 @@ export function RemindersWidget({
   const sortedItems = [...items].sort(
     (a, b) => localNoon(a.date).getTime() - localNoon(b.date).getTime(),
   );
-  const [scrollbar, setScrollbar] = React.useState({ visible: false, offset: 0, size: 100 });
-  const hideScrollbarTimer = React.useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
-
-  const revealScrollbar = (event: React.UIEvent<HTMLUListElement>) => {
-    const { clientHeight, scrollHeight, scrollTop } = event.currentTarget;
-    const maxScroll = Math.max(scrollHeight - clientHeight, 0);
-    const size = scrollHeight > 0 ? Math.max((clientHeight / scrollHeight) * 100, 10) : 100;
-    const offset = maxScroll > 0 ? (scrollTop / maxScroll) * (100 - size) : 0;
-
-    setScrollbar({ visible: true, offset, size });
-    if (hideScrollbarTimer.current) clearTimeout(hideScrollbarTimer.current);
-    hideScrollbarTimer.current = setTimeout(
-      () => setScrollbar((current) => ({ ...current, visible: false })),
-      900,
-    );
-  };
-
-  React.useEffect(
-    () => () => {
-      if (hideScrollbarTimer.current) clearTimeout(hideScrollbarTimer.current);
-    },
-    [],
-  );
+  const { onScroll, onThumbPointerDown, scrollbar } = useElementOverlayScrollbar("vertical");
 
   return (
     <section
@@ -124,7 +103,8 @@ export function RemindersWidget({
           <ul
             className="scrollbar-autohide h-full space-y-2 overflow-y-auto"
             aria-label="Reminders list"
-            onScroll={revealScrollbar}
+            tabIndex={0}
+            onScroll={onScroll}
           >
             {sortedItems.map((item, index) => (
               <li
@@ -151,6 +131,7 @@ export function RemindersWidget({
             <span
               aria-hidden="true"
               className="overlay-scrollbar overlay-scrollbar--vertical"
+              onPointerDown={onThumbPointerDown}
               style={{ top: `${scrollbar.offset}%`, height: `${scrollbar.size}%` }}
             />
           )}
