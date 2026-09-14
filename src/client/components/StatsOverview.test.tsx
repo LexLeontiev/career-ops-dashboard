@@ -72,6 +72,13 @@ test("uses three columns before collapsing the six statistic cards into two colu
   expect(statsGrid).toHaveClass("grid-cols-2", "sm:grid-cols-3", "lg:grid-cols-6");
 });
 
+test("reserves two label lines above every statistic value", () => {
+  render(<StatsOverview applications={[]} />);
+
+  expect(screen.getByText("Offers")).toHaveClass("min-h-[28px]");
+  expect(screen.getByText("Total Evaluated")).toHaveClass("min-h-[28px]");
+});
+
 test("highlights a positive offer count in violet without a colored card outline", () => {
   render(<StatsOverview applications={[{ score: "4.8/5", status: "Offer" }]} />);
 
