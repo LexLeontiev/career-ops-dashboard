@@ -138,6 +138,6 @@ test("calculates response rate from submitted applications only", () => {
     },
   ];
   const html = renderToString(React.createElement(StatsOverview, { applications: mockApps }));
-  expect(html).toMatch(/Total Applications.*7/);
+  expect(html).toMatch(/Total Evaluated.*7/);
   expect(html).toMatch(/Response Rate.*80.*%/);
 });

@@ -41,7 +41,7 @@ export function StatsOverview({ applications }: { applications: AppData[] }) {
     <section className="grid grid-cols-2 md:grid-cols-6 lg:grid-cols-5 gap-gutter mb-stack-lg">
       <div className="col-span-1 md:col-span-3 lg:col-span-1 bg-surface-card p-6 rounded-xl border border-border-subtle hover:border-primary/50 transition-colors">
         <div className="text-text-secondary font-label-sm text-label-sm uppercase mb-2">
-          Total Applications
+          Total Evaluated
         </div>
         <div className="text-on-surface font-headline-lg text-headline-lg">{total}</div>
       </div>
