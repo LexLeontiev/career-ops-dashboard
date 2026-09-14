@@ -51,19 +51,23 @@ export function StatsOverview({ applications }: { applications: AppData[] }) {
         <div className="min-h-[28px] text-text-secondary font-label-sm text-label-sm uppercase mb-2">
           Total Applied
         </div>
-        <div className="text-primary font-headline-lg text-headline-lg">{applied}</div>
+        <div className="text-blue-800 font-headline-lg text-headline-lg dark:text-blue-500">
+          {applied}
+        </div>
+      </div>
+      <div className="col-span-1 bg-surface-card p-6 rounded-xl border border-border-subtle hover:border-primary/50 transition-colors">
+        <div className="min-h-[28px] text-text-secondary font-label-sm text-label-sm uppercase mb-2">
+          Active Processes
+        </div>
+        <div className="text-blue-500 font-headline-lg text-headline-lg dark:text-blue-300">
+          {active}
+        </div>
       </div>
       <div className="col-span-1 bg-surface-card p-6 rounded-xl border border-border-subtle hover:border-primary/50 transition-colors">
         <div className="min-h-[28px] text-text-secondary font-label-sm text-label-sm uppercase mb-2">
           Interview Stage
         </div>
         <div className="text-secondary font-headline-lg text-headline-lg">{interviews}</div>
-      </div>
-      <div className="col-span-1 bg-surface-card p-6 rounded-xl border border-border-subtle hover:border-primary/50 transition-colors">
-        <div className="min-h-[28px] text-text-secondary font-label-sm text-label-sm uppercase mb-2">
-          Active Processes
-        </div>
-        <div className="text-primary font-headline-lg text-headline-lg">{active}</div>
       </div>
       <div className="col-span-1 bg-surface-card p-6 rounded-xl border border-border-subtle hover:border-primary/50 transition-colors">
         <div className="min-h-[28px] text-text-secondary font-label-sm text-label-sm uppercase mb-2">

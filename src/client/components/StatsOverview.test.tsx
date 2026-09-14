@@ -79,6 +79,38 @@ test("reserves two label lines above every statistic value", () => {
   expect(screen.getByText("Total Evaluated")).toHaveClass("min-h-[28px]");
 });
 
+test("orders application stages from evaluation through interview", () => {
+  render(<StatsOverview applications={[]} />);
+
+  const statsGrid = screen.getByText("Total Evaluated").closest("section");
+  const stageLabels = Array.from(statsGrid!.children)
+    .slice(0, 4)
+    .map((card) => card.firstElementChild?.textContent);
+
+  expect(stageLabels).toEqual([
+    "Total Evaluated",
+    "Total Applied",
+    "Active Processes",
+    "Interview Stage",
+  ]);
+});
+
+test("uses a dark blue value for Total Applied in both themes", () => {
+  render(<StatsOverview applications={[]} />);
+
+  const totalAppliedCard = screen.getByText("Total Applied").parentElement;
+  expect(totalAppliedCard).not.toBeNull();
+  expect(totalAppliedCard!.lastElementChild).toHaveClass("text-blue-800", "dark:text-blue-500");
+});
+
+test("uses a light blue value for active processes in both themes", () => {
+  render(<StatsOverview applications={[]} />);
+
+  const activeProcessesCard = screen.getByText("Active Processes").parentElement;
+  expect(activeProcessesCard).not.toBeNull();
+  expect(activeProcessesCard!.lastElementChild).toHaveClass("text-blue-500", "dark:text-blue-300");
+});
+
 test("highlights a positive offer count in violet without a colored card outline", () => {
   render(<StatsOverview applications={[{ score: "4.8/5", status: "Offer" }]} />);
 
