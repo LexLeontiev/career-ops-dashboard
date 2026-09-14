@@ -74,6 +74,8 @@ function buildMonthLabels(cells: Array<ActivityDay | null>): string[] {
 export function ActivityHeatmap({ days }: { days: ActivityDay[] }) {
   const cells = buildCalendarCells(days);
   const monthLabels = buildMonthLabels(cells);
+  const [scrollbar, setScrollbar] = React.useState({ visible: false, left: 0, width: 100 });
+  const hideScrollbarTimer = React.useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   type TooltipState = {
     day: ActivityDay;
     left: number;
@@ -92,6 +94,27 @@ export function ActivityHeatmap({ days }: { days: ActivityDay[] }) {
     };
   };
 
+  const revealScrollbar = (event: React.UIEvent<HTMLDivElement>) => {
+    const { clientWidth, scrollLeft, scrollWidth } = event.currentTarget;
+    const maxScroll = Math.max(scrollWidth - clientWidth, 0);
+    const width = scrollWidth > 0 ? Math.max((clientWidth / scrollWidth) * 100, 10) : 100;
+    const left = maxScroll > 0 ? (scrollLeft / maxScroll) * (100 - width) : 0;
+
+    setScrollbar({ visible: true, left, width });
+    if (hideScrollbarTimer.current) clearTimeout(hideScrollbarTimer.current);
+    hideScrollbarTimer.current = setTimeout(
+      () => setScrollbar((current) => ({ ...current, visible: false })),
+      900,
+    );
+  };
+
+  React.useEffect(
+    () => () => {
+      if (hideScrollbarTimer.current) clearTimeout(hideScrollbarTimer.current);
+    },
+    [],
+  );
+
   return (
     <section
       aria-labelledby="activity-title"
@@ -104,74 +127,84 @@ export function ActivityHeatmap({ days }: { days: ActivityDay[] }) {
         <span className="font-label-sm text-label-sm text-on-surface-variant">Last 6 months</span>
       </div>
 
-      <div
-        role="region"
-        aria-label="Activity calendar"
-        tabIndex={0}
-        className="min-h-0 flex-1 overflow-x-auto pb-2"
-      >
-        <div className="min-w-max">
-          <div className="mb-2 ml-8 grid grid-flow-col auto-cols-[0.75rem] gap-1 text-[10px] text-on-surface-variant">
-            {monthLabels.map((label, index) => (
-              <span key={`${label}-${index}`} className="h-3 whitespace-nowrap">
-                {label}
-              </span>
-            ))}
-          </div>
-
-          <div className="flex gap-2">
-            <div
-              aria-hidden="true"
-              className="grid w-6 grid-rows-7 gap-1 text-[10px] leading-3 text-on-surface-variant"
-            >
-              <span>Mon</span>
-              <span />
-              <span>Wed</span>
-              <span />
-              <span>Fri</span>
-              <span />
-              <span />
+      <div className="relative min-h-0 flex-1">
+        <div
+          role="region"
+          aria-label="Activity calendar"
+          tabIndex={0}
+          onScroll={revealScrollbar}
+          className="scrollbar-autohide h-full overflow-x-auto"
+        >
+          <div className="min-w-max">
+            <div className="mb-2 ml-8 grid grid-flow-col auto-cols-[0.75rem] gap-1 text-[10px] text-on-surface-variant">
+              {monthLabels.map((label, index) => (
+                <span key={`${label}-${index}`} className="h-3 whitespace-nowrap">
+                  {label}
+                </span>
+              ))}
             </div>
 
-            <div
-              role="group"
-              aria-label="Daily activity grid"
-              className="grid grid-flow-col grid-rows-7 auto-cols-[0.75rem] gap-1"
-            >
-              {cells.map((day, index) => {
-                if (!day) {
+            <div className="flex gap-2">
+              <div
+                aria-hidden="true"
+                className="grid w-6 grid-rows-7 gap-1 text-[10px] leading-3 text-on-surface-variant"
+              >
+                <span>Mon</span>
+                <span />
+                <span>Wed</span>
+                <span />
+                <span>Fri</span>
+                <span />
+                <span />
+              </div>
+
+              <div
+                role="group"
+                aria-label="Daily activity grid"
+                className="grid grid-flow-col grid-rows-7 auto-cols-[0.75rem] gap-1"
+              >
+                {cells.map((day, index) => {
+                  if (!day) {
+                    return (
+                      <span
+                        key={`empty-${index}`}
+                        aria-hidden="true"
+                        className="h-3 w-3 rounded-[3px] border-[0.5px] border-border-subtle/30 bg-surface-container-high/40"
+                      />
+                    );
+                  }
+                  const label = activityLabel(day);
+                  const tooltipId = `activity-tooltip-${day.date}`;
+                  const tooltipVisible = tooltip?.day.date === day.date;
                   return (
-                    <span
-                      key={`empty-${index}`}
-                      aria-hidden="true"
-                      className="h-3 w-3 rounded-[3px] border-[0.5px] border-border-subtle/30 bg-surface-container-high/40"
+                    <time
+                      key={day.date}
+                      role="img"
+                      dateTime={day.date}
+                      aria-label={label}
+                      aria-describedby={tooltipVisible ? tooltipId : undefined}
+                      tabIndex={0}
+                      onMouseEnter={(event) =>
+                        setHoveredTooltip(buildTooltip(event.currentTarget, day))
+                      }
+                      onMouseLeave={() => setHoveredTooltip(null)}
+                      onFocus={(event) => setFocusedTooltip(buildTooltip(event.currentTarget, day))}
+                      onBlur={() => setFocusedTooltip(null)}
+                      className={`h-3 w-3 rounded-[3px] border-[0.5px] border-border-subtle/50 outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-surface-card ${intensityClasses[Math.min(day.count, 4)]}`}
                     />
                   );
-                }
-                const label = activityLabel(day);
-                const tooltipId = `activity-tooltip-${day.date}`;
-                const tooltipVisible = tooltip?.day.date === day.date;
-                return (
-                  <time
-                    key={day.date}
-                    role="img"
-                    dateTime={day.date}
-                    aria-label={label}
-                    aria-describedby={tooltipVisible ? tooltipId : undefined}
-                    tabIndex={0}
-                    onMouseEnter={(event) =>
-                      setHoveredTooltip(buildTooltip(event.currentTarget, day))
-                    }
-                    onMouseLeave={() => setHoveredTooltip(null)}
-                    onFocus={(event) => setFocusedTooltip(buildTooltip(event.currentTarget, day))}
-                    onBlur={() => setFocusedTooltip(null)}
-                    className={`h-3 w-3 rounded-[3px] border-[0.5px] border-border-subtle/50 outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-surface-card ${intensityClasses[Math.min(day.count, 4)]}`}
-                  />
-                );
-              })}
+                })}
+              </div>
             </div>
           </div>
         </div>
+        {scrollbar.visible && (
+          <span
+            aria-hidden="true"
+            className="overlay-scrollbar"
+            style={{ left: `${scrollbar.left}%`, width: `${scrollbar.width}%` }}
+          />
+        )}
       </div>
 
       <div

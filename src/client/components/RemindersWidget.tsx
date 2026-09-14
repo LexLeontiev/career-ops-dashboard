@@ -76,6 +76,29 @@ export function RemindersWidget({
   const sortedItems = [...items].sort(
     (a, b) => localNoon(a.date).getTime() - localNoon(b.date).getTime(),
   );
+  const [scrollbar, setScrollbar] = React.useState({ visible: false, offset: 0, size: 100 });
+  const hideScrollbarTimer = React.useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+
+  const revealScrollbar = (event: React.UIEvent<HTMLUListElement>) => {
+    const { clientHeight, scrollHeight, scrollTop } = event.currentTarget;
+    const maxScroll = Math.max(scrollHeight - clientHeight, 0);
+    const size = scrollHeight > 0 ? Math.max((clientHeight / scrollHeight) * 100, 10) : 100;
+    const offset = maxScroll > 0 ? (scrollTop / maxScroll) * (100 - size) : 0;
+
+    setScrollbar({ visible: true, offset, size });
+    if (hideScrollbarTimer.current) clearTimeout(hideScrollbarTimer.current);
+    hideScrollbarTimer.current = setTimeout(
+      () => setScrollbar((current) => ({ ...current, visible: false })),
+      900,
+    );
+  };
+
+  React.useEffect(
+    () => () => {
+      if (hideScrollbarTimer.current) clearTimeout(hideScrollbarTimer.current);
+    },
+    [],
+  );
 
   return (
     <section
@@ -84,7 +107,9 @@ export function RemindersWidget({
       role="region"
     >
       <div className="mb-stack-md flex items-baseline justify-between gap-4">
-        <h2 className="font-headline-sm text-headline-sm text-on-surface">Reminders</h2>
+        <h2 className="font-headline-sm text-headline-sm text-on-surface">
+          Reminders ({sortedItems.length})
+        </h2>
       </div>
       {hasError ? (
         <p className="flex flex-1 items-center justify-center text-sm text-text-secondary">
@@ -95,26 +120,41 @@ export function RemindersWidget({
           No reminders scheduled.
         </p>
       ) : (
-        <ul className="min-h-0 flex-1 space-y-2 overflow-y-auto" aria-label="Reminders list">
-          {sortedItems.map((item, index) => (
-            <li
-              key={`${item.date}-${item.company}-${index}`}
-              className="rounded-lg bg-surface-container px-3 py-2 text-sm"
-            >
-              <div className="text-xs text-text-secondary">{formatDateLabel(item.date, today)}</div>
-              <div className="font-medium text-on-surface">
-                <PrivacyText variant="company" isBlurred={isBlurred}>
-                  {item.company}
-                </PrivacyText>
-              </div>
-              <div className="text-xs text-text-secondary">
-                <PrivacyText variant="timeline-notes" isBlurred={isBlurred}>
-                  {formatNotes(item.notes)}
-                </PrivacyText>
-              </div>
-            </li>
-          ))}
-        </ul>
+        <div className="relative min-h-0 flex-1">
+          <ul
+            className="scrollbar-autohide h-full space-y-2 overflow-y-auto"
+            aria-label="Reminders list"
+            onScroll={revealScrollbar}
+          >
+            {sortedItems.map((item, index) => (
+              <li
+                key={`${item.date}-${item.company}-${index}`}
+                className="rounded-lg bg-surface-container px-3 py-2 text-sm"
+              >
+                <div className="text-xs text-text-secondary">
+                  {formatDateLabel(item.date, today)}
+                </div>
+                <div className="font-medium text-on-surface">
+                  <PrivacyText variant="company" isBlurred={isBlurred}>
+                    {item.company}
+                  </PrivacyText>
+                </div>
+                <div className="text-xs text-text-secondary">
+                  <PrivacyText variant="timeline-notes" isBlurred={isBlurred}>
+                    {formatNotes(item.notes)}
+                  </PrivacyText>
+                </div>
+              </li>
+            ))}
+          </ul>
+          {scrollbar.visible && (
+            <span
+              aria-hidden="true"
+              className="overlay-scrollbar overlay-scrollbar--vertical"
+              style={{ top: `${scrollbar.offset}%`, height: `${scrollbar.size}%` }}
+            />
+          )}
+        </div>
       )}
     </section>
   );

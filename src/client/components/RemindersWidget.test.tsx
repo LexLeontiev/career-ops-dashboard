@@ -1,10 +1,13 @@
 // @vitest-environment jsdom
 import React from "react";
-import { cleanup, render, screen, within } from "@testing-library/react";
-import { afterEach, expect, test } from "vitest";
+import { act, cleanup, fireEvent, render, screen, within } from "@testing-library/react";
+import { afterEach, expect, test, vi } from "vitest";
 import { RemindersWidget, type ReminderItem } from "./RemindersWidget.js";
 
-afterEach(cleanup);
+afterEach(() => {
+  cleanup();
+  vi.useRealTimers();
+});
 
 const today = new Date(2030, 0, 10, 9);
 const items: ReminderItem[] = [
@@ -60,7 +63,7 @@ test("aligns the Reminders heading with Activity without a decorative icon", () 
 
   const region = screen.getByRole("region", { name: "Reminders" });
   expect(region).toHaveClass("p-4", "md:p-6");
-  expect(screen.getByRole("heading", { name: "Reminders" }).parentElement).toHaveClass(
+  expect(screen.getByRole("heading", { name: "Reminders (4)" }).parentElement).toHaveClass(
     "mb-stack-md",
     "flex",
     "items-baseline",
@@ -68,6 +71,20 @@ test("aligns the Reminders heading with Activity without a decorative icon", () 
     "gap-4",
   );
   expect(region.querySelector("svg")).not.toBeInTheDocument();
+});
+
+test("briefly reveals the reminders scrollbar after scrolling", () => {
+  vi.useFakeTimers();
+  render(<RemindersWidget items={items} today={today} isBlurred={false} />);
+
+  const list = screen.getByRole("list", { name: "Reminders list" });
+  expect(list.parentElement?.querySelector(".overlay-scrollbar--vertical")).not.toBeInTheDocument();
+
+  fireEvent.scroll(list);
+  expect(list.parentElement?.querySelector(".overlay-scrollbar--vertical")).toBeInTheDocument();
+
+  act(() => vi.advanceTimersByTime(900));
+  expect(list.parentElement?.querySelector(".overlay-scrollbar--vertical")).not.toBeInTheDocument();
 });
 
 test("shows an ellipsis followed by the last 140 Unicode characters of long notes", () => {
@@ -88,7 +105,7 @@ test("shows an ellipsis followed by the last 140 Unicode characters of long note
 test("shows an accessible empty state", () => {
   render(<RemindersWidget items={[]} today={today} isBlurred={false} />);
 
-  expect(screen.getByRole("heading", { name: "Reminders" })).toBeInTheDocument();
+  expect(screen.getByRole("heading", { name: "Reminders (0)" })).toBeInTheDocument();
   expect(screen.getByText("No reminders scheduled.")).toBeInTheDocument();
   expect(screen.queryAllByRole("listitem")).toHaveLength(0);
 });
