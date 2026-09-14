@@ -19,6 +19,7 @@ export function StatsOverview({ applications }: { applications: AppData[] }) {
 
     if (status !== "SKIP" && status !== "EVALUATED" && status !== "") {
       submitted++;
+      applied++;
       if (status !== "APPLIED") {
         responses++;
       }
@@ -26,9 +27,6 @@ export function StatsOverview({ applications }: { applications: AppData[] }) {
 
     if (status === "APPLIED" || status === "INTERVIEW" || status === "RESPONDED") {
       active++;
-    }
-    if (status === "APPLIED") {
-      applied++;
     }
     if (status === "INTERVIEW") {
       interviews++;
@@ -42,7 +40,7 @@ export function StatsOverview({ applications }: { applications: AppData[] }) {
   const hasOffers = offers > 0;
 
   return (
-    <section className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-gutter mb-stack-lg">
+    <section className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-gutter mb-stack-lg">
       <div className="col-span-1 bg-surface-card p-6 rounded-xl border border-border-subtle hover:border-primary/50 transition-colors">
         <div className="text-text-secondary font-label-sm text-label-sm uppercase mb-2">
           Total Evaluated

@@ -44,27 +44,32 @@ test("renders aggregated stats correctly including Interview Stage and Offers", 
   expect(html).toMatch(/Response Rate.*50.*%/);
 });
 
-test("shows Total Applied for applications currently in the Applied status", () => {
+test("counts every submitted status in Total Applied", () => {
   render(
     <StatsOverview
       applications={[
         { score: "4.8/5", status: "Applied" },
-        { score: "4.2/5", status: "APPLIED" },
+        { score: "4.2/5", status: "Responded" },
         { score: "4.5/5", status: "Interview" },
+        { score: "4.1/5", status: "Offer" },
+        { score: "4.4/5", status: "Rejected" },
+        { score: "4.0/5", status: "Discarded" },
+        { score: "4.3/5", status: "Evaluated" },
+        { score: "4.6/5", status: "Skip" },
       ]}
     />,
   );
 
   const totalAppliedCard = screen.getByText("Total Applied").parentElement;
   expect(totalAppliedCard).not.toBeNull();
-  expect(within(totalAppliedCard!).getByText("2")).toBeInTheDocument();
+  expect(within(totalAppliedCard!).getByText("6")).toBeInTheDocument();
 });
 
 test("uses three columns before collapsing the six statistic cards into two columns", () => {
   render(<StatsOverview applications={[]} />);
 
   const statsGrid = screen.getByText("Total Evaluated").closest("section");
-  expect(statsGrid).toHaveClass("grid-cols-2", "sm:grid-cols-3", "xl:grid-cols-6");
+  expect(statsGrid).toHaveClass("grid-cols-2", "sm:grid-cols-3", "lg:grid-cols-6");
 });
 
 test("highlights a positive offer count in violet without a colored card outline", () => {
