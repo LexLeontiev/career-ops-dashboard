@@ -8,6 +8,7 @@ interface AppData {
 export function StatsOverview({ applications }: { applications: AppData[] }) {
   const total = applications.length;
   let active = 0;
+  let applied = 0;
   let interviews = 0;
   let offers = 0;
   let responses = 0;
@@ -26,6 +27,9 @@ export function StatsOverview({ applications }: { applications: AppData[] }) {
     if (status === "APPLIED" || status === "INTERVIEW" || status === "RESPONDED") {
       active++;
     }
+    if (status === "APPLIED") {
+      applied++;
+    }
     if (status === "INTERVIEW") {
       interviews++;
     }
@@ -38,26 +42,32 @@ export function StatsOverview({ applications }: { applications: AppData[] }) {
   const hasOffers = offers > 0;
 
   return (
-    <section className="grid grid-cols-2 md:grid-cols-6 lg:grid-cols-5 gap-gutter mb-stack-lg">
-      <div className="col-span-1 md:col-span-3 lg:col-span-1 bg-surface-card p-6 rounded-xl border border-border-subtle hover:border-primary/50 transition-colors">
+    <section className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-gutter mb-stack-lg">
+      <div className="col-span-1 bg-surface-card p-6 rounded-xl border border-border-subtle hover:border-primary/50 transition-colors">
         <div className="text-text-secondary font-label-sm text-label-sm uppercase mb-2">
           Total Evaluated
         </div>
         <div className="text-on-surface font-headline-lg text-headline-lg">{total}</div>
       </div>
-      <div className="col-span-1 md:col-span-3 lg:col-span-1 bg-surface-card p-6 rounded-xl border border-border-subtle hover:border-primary/50 transition-colors">
+      <div className="col-span-1 bg-surface-card p-6 rounded-xl border border-border-subtle hover:border-primary/50 transition-colors">
         <div className="text-text-secondary font-label-sm text-label-sm uppercase mb-2">
-          Active Processes
+          Total Applied
         </div>
-        <div className="text-primary font-headline-lg text-headline-lg">{active}</div>
+        <div className="text-primary font-headline-lg text-headline-lg">{applied}</div>
       </div>
-      <div className="col-span-1 md:col-span-2 lg:col-span-1 bg-surface-card p-6 rounded-xl border border-border-subtle hover:border-primary/50 transition-colors">
+      <div className="col-span-1 bg-surface-card p-6 rounded-xl border border-border-subtle hover:border-primary/50 transition-colors">
         <div className="text-text-secondary font-label-sm text-label-sm uppercase mb-2">
           Interview Stage
         </div>
         <div className="text-secondary font-headline-lg text-headline-lg">{interviews}</div>
       </div>
-      <div className="col-span-1 md:col-span-2 lg:col-span-1 bg-surface-card p-6 rounded-xl border border-border-subtle hover:border-primary/50 transition-colors">
+      <div className="col-span-1 bg-surface-card p-6 rounded-xl border border-border-subtle hover:border-primary/50 transition-colors">
+        <div className="text-text-secondary font-label-sm text-label-sm uppercase mb-2">
+          Active Processes
+        </div>
+        <div className="text-primary font-headline-lg text-headline-lg">{active}</div>
+      </div>
+      <div className="col-span-1 bg-surface-card p-6 rounded-xl border border-border-subtle hover:border-primary/50 transition-colors">
         <div className="text-text-secondary font-label-sm text-label-sm uppercase mb-2">Offers</div>
         <div
           className={`font-headline-lg text-headline-lg ${hasOffers ? "text-violet-600 dark:text-violet-400 font-bold" : "text-text-secondary"}`}
@@ -65,7 +75,7 @@ export function StatsOverview({ applications }: { applications: AppData[] }) {
           {offers}
         </div>
       </div>
-      <div className="col-span-2 md:col-span-2 lg:col-span-1 bg-surface-card p-6 rounded-xl border border-border-subtle hover:border-primary/50 transition-colors">
+      <div className="col-span-1 bg-surface-card p-6 rounded-xl border border-border-subtle hover:border-primary/50 transition-colors">
         <div className="text-text-secondary font-label-sm text-label-sm uppercase mb-2">
           Response Rate
         </div>

@@ -44,6 +44,29 @@ test("renders aggregated stats correctly including Interview Stage and Offers", 
   expect(html).toMatch(/Response Rate.*50.*%/);
 });
 
+test("shows Total Applied for applications currently in the Applied status", () => {
+  render(
+    <StatsOverview
+      applications={[
+        { score: "4.8/5", status: "Applied" },
+        { score: "4.2/5", status: "APPLIED" },
+        { score: "4.5/5", status: "Interview" },
+      ]}
+    />,
+  );
+
+  const totalAppliedCard = screen.getByText("Total Applied").parentElement;
+  expect(totalAppliedCard).not.toBeNull();
+  expect(within(totalAppliedCard!).getByText("2")).toBeInTheDocument();
+});
+
+test("uses three columns before collapsing the six statistic cards into two columns", () => {
+  render(<StatsOverview applications={[]} />);
+
+  const statsGrid = screen.getByText("Total Evaluated").closest("section");
+  expect(statsGrid).toHaveClass("grid-cols-2", "sm:grid-cols-3", "xl:grid-cols-6");
+});
+
 test("highlights a positive offer count in violet without a colored card outline", () => {
   render(<StatsOverview applications={[{ score: "4.8/5", status: "Offer" }]} />);
 
