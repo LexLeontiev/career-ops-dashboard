@@ -60,7 +60,7 @@ test("counts every submitted status in Total Applied", () => {
     />,
   );
 
-  const totalAppliedCard = screen.getByText("Total Applied").parentElement;
+  const totalAppliedCard = screen.getByText("Total Applied").closest<HTMLDivElement>(".stats-card");
   expect(totalAppliedCard).not.toBeNull();
   expect(within(totalAppliedCard!).getByText("6")).toBeInTheDocument();
 });
@@ -95,30 +95,45 @@ test("orders application stages from evaluation through interview", () => {
   ]);
 });
 
-test("uses a dark blue value for Total Applied in both themes", () => {
+test("uses the approved light blue value for Total Applied in both themes", () => {
   render(<StatsOverview applications={[]} />);
 
-  const totalAppliedCard = screen.getByText("Total Applied").parentElement;
+  const totalAppliedCard = screen.getByText("Total Applied").closest<HTMLDivElement>(".stats-card");
   expect(totalAppliedCard).not.toBeNull();
-  expect(totalAppliedCard!.lastElementChild).toHaveClass("text-blue-800", "dark:text-blue-500");
+  expect(within(totalAppliedCard!).getByText("0")).toHaveClass(
+    "text-blue-500",
+    "dark:text-blue-300",
+  );
 });
 
-test("uses a light blue value for active processes in both themes", () => {
+test("uses the existing primary accent for active processes", () => {
   render(<StatsOverview applications={[]} />);
 
-  const activeProcessesCard = screen.getByText("Active Processes").parentElement;
+  const activeProcessesCard = screen
+    .getByText("Active Processes")
+    .closest<HTMLDivElement>(".stats-card");
   expect(activeProcessesCard).not.toBeNull();
-  expect(activeProcessesCard!.lastElementChild).toHaveClass("text-blue-500", "dark:text-blue-300");
+  expect(within(activeProcessesCard!).getByText("0")).toHaveClass("text-primary");
 });
 
-test("highlights a positive offer count in violet without a colored card outline", () => {
-  render(<StatsOverview applications={[{ score: "4.8/5", status: "Offer" }]} />);
-
-  const offerCard = screen.getByText("Offers").parentElement;
+test("activates the achievement styling only while actual offers are present", () => {
+  const { rerender } = render(<StatsOverview applications={[]} />);
+  const offerCard = screen.getByText("Offers").closest<HTMLDivElement>(".stats-card");
   expect(offerCard).not.toBeNull();
   expect(offerCard).toHaveClass("border-border-subtle", "hover:border-primary/50");
-  expect(offerCard).not.toHaveClass("border-emerald-500/40", "bg-emerald-500/5");
-  expect(within(offerCard!).getByText("1")).toHaveClass("text-violet-600", "dark:text-violet-400");
+  expect(within(offerCard!).getByText("0")).toHaveClass("text-text-secondary");
+
+  rerender(<StatsOverview applications={[{ score: "4.8/5", status: "Offer" }]} />);
+  expect(offerCard).toHaveClass("stats-card--achievement", "border-on-surface");
+  expect(offerCard).not.toHaveClass("border-border-subtle", "hover:border-primary/50");
+  expect(within(offerCard!).getByText("1")).toHaveClass(
+    "text-emerald-600",
+    "dark:text-emerald-400",
+  );
+
+  rerender(<StatsOverview applications={[{ score: "4.8/5", status: "Interview" }]} />);
+  expect(offerCard).not.toHaveClass("stats-card--achievement", "border-on-surface");
+  expect(within(offerCard!).getByText("0")).toHaveClass("text-text-secondary");
 });
 
 test("renders unhighlighted Offers card when offer count is 0", () => {
@@ -135,7 +150,7 @@ test("renders unhighlighted Offers card when offer count is 0", () => {
   ];
   const html = renderToString(React.createElement(StatsOverview, { applications: mockApps }));
   expect(html).toMatch(/Offers.*0/);
-  expect(html).not.toMatch(/text-violet-400/);
+  expect(html).not.toMatch(/stats-card--achievement/);
 });
 
 test("calculates response rate from submitted applications only", () => {
