@@ -1,5 +1,6 @@
-import { chmod, copyFile, mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { chmod, copyFile, mkdir, mkdtemp, readFile, rename, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
+import { realpathSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { afterEach, describe, expect, test } from "vitest";
@@ -34,6 +35,11 @@ async function createSyntheticDashboard(): Promise<{
   await mkdir(path.join(dashboardRoot, "bin"), { recursive: true });
   await mkdir(unrelatedCwd, { recursive: true });
   await copyFile(startScript, path.join(dashboardRoot, "bin", "start.sh"));
+  await mkdir(path.join(dashboardRoot, "src/server"), { recursive: true });
+  await copyFile(
+    path.join(projectRoot, "src/server/career-ops-paths.mjs"),
+    path.join(dashboardRoot, "src/server/career-ops-paths.mjs"),
+  );
   await createCareerOpsFixture(upstreamRoot);
   return { dashboardRoot, upstreamRoot, unrelatedCwd };
 }
@@ -50,7 +56,7 @@ async function createFakeRuntime(
   const [nodeMajor, nodeMinor] = nodeVersion.split(".");
   await writeFile(
     nodePath,
-    `#!/usr/bin/env bash\nif [[ "\${1:-}" == "-p" ]]; then printf "${nodeMajor} ${nodeMinor}\\n"; else printf "v${nodeVersion}\\n"; fi\n`,
+    `#!/usr/bin/env bash\nif [[ "\${1:-}" == "-p" ]]; then printf "${nodeMajor} ${nodeMinor}\\n"; elif [[ "\${1:-}" == "-v" ]]; then printf "v${nodeVersion}\\n"; else exec "${process.execPath}" "$@"; fi\n`,
     "utf8",
   );
   await writeFile(npmPath, `#!/usr/bin/env bash\n${npmBody}\n`, "utf8");
@@ -71,6 +77,32 @@ afterEach(async () => {
 });
 
 describe("bin/start.sh", () => {
+  test("checks external data through a relative marker without requiring reports in the checkout", async () => {
+    const fixture = await createSyntheticDashboard();
+    const data = path.join(fixture.upstreamRoot, "personal data");
+    await mkdir(data);
+    await rename(path.join(fixture.upstreamRoot, "data"), path.join(data, "data"));
+    await rename(path.join(fixture.upstreamRoot, "reports"), path.join(data, "reports"));
+    await writeFile(path.join(fixture.upstreamRoot, ".career-ops-data"), "./personal data\n");
+    const result = spawnSync(
+      "bash",
+      [path.join(fixture.dashboardRoot, "bin/start.sh"), "--check"],
+      {
+        cwd: fixture.unrelatedCwd,
+        env: {
+          ...process.env,
+          CAREER_OPS_CODE_ROOT: fixture.upstreamRoot,
+          CAREER_OPS_ROOT: "",
+          CAREER_OPS_DATA_DIR: "",
+          CAREER_OPS_TRACKER: "",
+        },
+        encoding: "utf8",
+      },
+    );
+    expect(result.status).toBe(0);
+    expect(result.stdout).not.toContain("Tracker not initialized yet");
+    expect(result.stdout).toContain("Environment check passed");
+  });
   test("passes check-only mode for a complete configured career-ops tree", async () => {
     const fixtureRoot = await makeTemporaryDirectory("career-ops-fixture-");
     await createCareerOpsFixture(fixtureRoot);
@@ -126,7 +158,7 @@ describe("bin/start.sh", () => {
 
       const result = spawnSync("bash", ["bin/start.sh", "--check"], {
         cwd: projectRoot,
-        env: { ...process.env, CAREER_OPS_ROOT: fixtureRoot },
+        env: { ...process.env, CAREER_OPS_CODE_ROOT: fixtureRoot, CAREER_OPS_ROOT: "" },
         encoding: "utf8",
       });
 
@@ -216,7 +248,7 @@ describe("bin/start.sh", () => {
     expect(result.stdout).toContain("Environment check passed");
   });
 
-  test("uses npm ci and forwards CAREER_OPS_ROOT unchanged when starting", async () => {
+  test("uses npm ci and forwards a resolved data root when starting", async () => {
     const fixture = await createSyntheticDashboard();
     const npmLog = path.join(fixture.dashboardRoot, "npm.log");
     const fakeBin = await createFakeRuntime(
@@ -239,6 +271,6 @@ describe("bin/start.sh", () => {
     expect(result.status).toBe(0);
     const npmCalls = await readFile(npmLog, "utf8");
     expect(npmCalls).toContain("ci --no-audit --no-fund|");
-    expect(npmCalls).toContain("run dev|../career-ops");
+    expect(npmCalls).toContain(`run dev|${realpathSync(fixture.upstreamRoot)}`);
   });
 });

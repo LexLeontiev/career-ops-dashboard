@@ -1,8 +1,8 @@
-import { mkdir, rm, writeFile } from "node:fs/promises";
+import { mkdir, rename, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { createApp, resolveReportPath } from "../src/server/app.js";
-import { resolveCareerOpsPaths } from "../src/server/config.js";
+import { getCareerOpsPaths, resolveCareerOpsPaths } from "../src/server/config.js";
 import { parsePort } from "../src/server/start.js";
 import { createCareerOpsFixture, type CareerOpsFixture } from "./helpers/career-ops-fixture.js";
 import { withHttpServer } from "./helpers/http-server.js";
@@ -23,6 +23,27 @@ describe("HTTP application", () => {
 
   afterEach(async () => {
     await fixture.cleanup();
+  });
+
+  test("loads an initialized external tracker and reports through the data marker", async () => {
+    const dataRoot = path.join(fixture.root, "personal data");
+    await mkdir(dataRoot);
+    await rename(path.join(fixture.root, "data"), path.join(dataRoot, "data"));
+    await rename(path.join(fixture.root, "reports"), path.join(dataRoot, "reports"));
+    await writeFile(path.join(fixture.root, ".career-ops-data"), "./personal data\n");
+    const paths = getCareerOpsPaths({ CAREER_OPS_ROOT: fixture.root });
+    await withHttpServer(createApp({ paths }), async (baseUrl) => {
+      const response = await fetch(`${baseUrl}/api/applications`);
+      expect(response.status).toBe(200);
+      expect(await response.json()).toEqual([expect.objectContaining({ company: "Acme Labs" })]);
+      const report = await fetch(`${baseUrl}/api/reports/001-acme-platform-engineer.md`);
+      expect(report.status).toBe(200);
+      expect(await report.text()).toContain("Synthetic report");
+      await rm(path.join(dataRoot, "data/applications.md"));
+      const missing = await fetch(`${baseUrl}/api/applications`);
+      expect(missing.status).toBe(404);
+      expect(await missing.json()).toMatchObject({ code: "TRACKER_NOT_INITIALIZED" });
+    });
   });
 
   test("serves applications and reports from the injected career-ops paths", async () => {

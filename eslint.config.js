@@ -22,7 +22,12 @@ export default tseslint.config(
     languageOptions: { globals: globals.browser },
   },
   {
-    files: ["src/server/**/*.ts", "test/**/*.{ts,tsx}", "scripts/**/*.mjs", "*.config.{js,ts}"],
+    files: [
+      "src/server/**/*.{ts,mjs}",
+      "test/**/*.{ts,tsx}",
+      "scripts/**/*.mjs",
+      "*.config.{js,ts}",
+    ],
     languageOptions: { globals: globals.node },
   },
   {
