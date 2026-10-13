@@ -10,6 +10,18 @@ interface FilterBarProps {
   counts: Record<string, number>;
 }
 
+const filters = [
+  { value: "active", label: "Active", alwaysVisible: true },
+  { value: "evaluated", label: "Evaluated", alwaysVisible: true },
+  { value: "all", label: "All Statuses", alwaysVisible: true },
+  { value: "applied", label: "Applied", alwaysVisible: false },
+  { value: "interview", label: "Interview", alwaysVisible: false },
+  { value: "offer", label: "Offer", alwaysVisible: false },
+  { value: "skip", label: "Skip", alwaysVisible: false },
+  { value: "rejected", label: "Rejected", alwaysVisible: false },
+  { value: "discarded", label: "Discarded", alwaysVisible: false },
+];
+
 export function FilterBar({
   searchQuery,
   setSearchQuery,
@@ -18,6 +30,9 @@ export function FilterBar({
   counts,
 }: FilterBarProps) {
   const { onScroll, onThumbPointerDown, scrollbar } = useElementOverlayScrollbar("horizontal");
+  const visibleFilters = filters.filter(
+    (filter) => filter.alwaysVisible || (counts[filter.value] ?? 0) > 0,
+  );
 
   return (
     <section className="mb-stack-lg space-y-4">
@@ -55,15 +70,11 @@ export function FilterBar({
           }}
           className="w-full appearance-none bg-background-main border border-border-subtle rounded-lg py-3 pl-4 pr-10 text-body-md text-on-surface focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all cursor-pointer"
         >
-          <option value="active">{`Active (${counts.active ?? 0})`}</option>
-          <option value="evaluated">{`Evaluated (${counts.evaluated ?? 0})`}</option>
-          <option value="all">{`All Statuses (${counts.all ?? 0})`}</option>
-          <option value="applied">{`Applied (${counts.applied ?? 0})`}</option>
-          <option value="interview">{`Interview (${counts.interview ?? 0})`}</option>
-          <option value="offer">{`Offer (${counts.offer ?? 0})`}</option>
-          <option value="skip">{`Skip (${counts.skip ?? 0})`}</option>
-          <option value="rejected">{`Rejected (${counts.rejected ?? 0})`}</option>
-          <option value="discarded">{`Discarded (${counts.discarded ?? 0})`}</option>
+          {visibleFilters.map((filter) => (
+            <option key={filter.value} value={filter.value}>
+              {`${filter.label} (${counts[filter.value] ?? 0})`}
+            </option>
+          ))}
         </select>
         <ChevronDown
           aria-hidden="true"
@@ -82,69 +93,20 @@ export function FilterBar({
           onScroll={onScroll}
           className="scrollbar-autohide flex items-center gap-2 overflow-x-auto"
         >
-          <button
-            onClick={() => setStatusFilter("active")}
-            className={`flex-shrink-0 px-5 py-2 rounded-full font-label-md text-label-md transition-colors flex items-center ${statusFilter === "active" ? "bg-primary text-on-primary-container" : "border border-border-subtle text-on-surface-variant hover:bg-surface-hover"}`}
-          >
-            Active <span className="opacity-50 text-xs ml-1.5 font-normal">{counts.active}</span>
-          </button>
-          <button
-            onClick={() => setStatusFilter("evaluated")}
-            className={`flex-shrink-0 px-5 py-2 rounded-full font-label-md text-label-md transition-colors flex items-center ${statusFilter === "evaluated" ? "bg-primary text-on-primary-container" : "border border-border-subtle text-on-surface-variant hover:bg-surface-hover"}`}
-          >
-            Evaluated{" "}
-            <span className="opacity-50 text-xs ml-1.5 font-normal">{counts.evaluated}</span>
-          </button>
-          <button
-            onClick={() => setStatusFilter("all")}
-            className={`flex-shrink-0 px-5 py-2 rounded-full font-label-md text-label-md transition-colors flex items-center ${statusFilter === "all" ? "bg-primary text-on-primary-container" : "border border-border-subtle text-on-surface-variant hover:bg-surface-hover"}`}
-          >
-            All Statuses <span className="opacity-50 text-xs ml-1.5 font-normal">{counts.all}</span>
-          </button>
-
-          <div className="w-px h-8 bg-border-subtle mx-2 flex-shrink-0" />
-
-          <button
-            onClick={() => setStatusFilter("applied")}
-            className={`flex-shrink-0 px-5 py-2 rounded-full font-label-md text-label-md transition-colors flex items-center ${statusFilter === "applied" ? "bg-primary text-on-primary-container" : "border border-border-subtle text-on-surface-variant hover:bg-surface-hover"}`}
-          >
-            Applied <span className="opacity-50 text-xs ml-1.5 font-normal">{counts.applied}</span>
-          </button>
-          <button
-            onClick={() => setStatusFilter("interview")}
-            className={`flex-shrink-0 px-5 py-2 rounded-full font-label-md text-label-md transition-colors flex items-center ${statusFilter === "interview" ? "bg-primary text-on-primary-container" : "border border-border-subtle text-on-surface-variant hover:bg-surface-hover"}`}
-          >
-            Interview{" "}
-            <span className="opacity-50 text-xs ml-1.5 font-normal">{counts.interview}</span>
-          </button>
-
-          <button
-            onClick={() => setStatusFilter("offer")}
-            className={`flex-shrink-0 px-5 py-2 rounded-full font-label-md text-label-md transition-colors flex items-center ${statusFilter === "offer" ? "bg-primary text-on-primary-container" : "border border-border-subtle text-on-surface-variant hover:bg-surface-hover"}`}
-          >
-            Offer <span className="opacity-50 text-xs ml-1.5 font-normal">{counts.offer ?? 0}</span>
-          </button>
-
-          <button
-            onClick={() => setStatusFilter("skip")}
-            className={`flex-shrink-0 px-5 py-2 rounded-full font-label-md text-label-md transition-colors flex items-center ${statusFilter === "skip" ? "bg-primary text-on-primary-container" : "border border-border-subtle text-on-surface-variant hover:bg-surface-hover"}`}
-          >
-            Skip <span className="opacity-50 text-xs ml-1.5 font-normal">{counts.skip}</span>
-          </button>
-          <button
-            onClick={() => setStatusFilter("rejected")}
-            className={`flex-shrink-0 px-5 py-2 rounded-full font-label-md text-label-md transition-colors flex items-center ${statusFilter === "rejected" ? "bg-primary text-on-primary-container" : "border border-border-subtle text-on-surface-variant hover:bg-surface-hover"}`}
-          >
-            Rejected{" "}
-            <span className="opacity-50 text-xs ml-1.5 font-normal">{counts.rejected}</span>
-          </button>
-          <button
-            onClick={() => setStatusFilter("discarded")}
-            className={`flex-shrink-0 px-5 py-2 rounded-full font-label-md text-label-md transition-colors flex items-center ${statusFilter === "discarded" ? "bg-primary text-on-primary-container" : "border border-border-subtle text-on-surface-variant hover:bg-surface-hover"}`}
-          >
-            Discarded{" "}
-            <span className="opacity-50 text-xs ml-1.5 font-normal">{counts.discarded}</span>
-          </button>
+          {visibleFilters.map((filter, index) => (
+            <React.Fragment key={filter.value}>
+              {index === 3 && <div className="w-px h-8 bg-border-subtle mx-2 flex-shrink-0" />}
+              <button
+                onClick={() => setStatusFilter(filter.value)}
+                className={`flex-shrink-0 px-5 py-2 rounded-full font-label-md text-label-md transition-colors flex items-center ${statusFilter === filter.value ? "bg-primary text-on-primary-container" : "border border-border-subtle text-on-surface-variant hover:bg-surface-hover"}`}
+              >
+                {filter.label}{" "}
+                <span className="opacity-50 text-xs ml-1.5 font-normal">
+                  {counts[filter.value] ?? 0}
+                </span>
+              </button>
+            </React.Fragment>
+          ))}
         </div>
         {scrollbar.visible && (
           <span

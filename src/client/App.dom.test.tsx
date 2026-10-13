@@ -232,10 +232,62 @@ describe("App application loading lifecycle", () => {
     const search = screen.getByPlaceholderText("Search company, role, or notes...");
     await user.type(search, "No Match");
     expect(screen.queryByText("Acme Labs")).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /^Interview/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole("option", { name: /^Interview/ })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Active 0" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Evaluated 0" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "All Statuses 0" })).toBeInTheDocument();
 
     await user.clear(search);
     expect(screen.getByText("Acme Labs")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Interview 1" })).toBeInTheDocument();
+    expect(screen.getByRole("option", { name: "Interview (1)" })).toBeInTheDocument();
   });
+
+  test.each(["desktop", "mobile"])(
+    "switches to All Statuses when the selected status disappears on %s",
+    async (layout) => {
+      const applications = [
+        { ...application, num: 1, company: "Offer Company", status: "Offer" },
+        { ...application, num: 2, company: "Rejected Company", status: "Rejected" },
+      ];
+      vi.stubGlobal(
+        "fetch",
+        vi.fn((input: RequestInfo | URL) =>
+          Promise.resolve(
+            new Response(
+              JSON.stringify(String(input) === "/api/applications" ? applications : []),
+              { status: 200, headers: { "content-type": "application/json" } },
+            ),
+          ),
+        ),
+      );
+      const user = userEvent.setup();
+      render(<App />);
+      await screen.findByText("Offer Company");
+
+      const select = screen.getByRole("combobox", { name: "Filter by Status" });
+      if (layout === "mobile") {
+        await user.selectOptions(select, "offer");
+      } else {
+        await user.click(screen.getByRole("button", { name: "Offer 1" }));
+      }
+
+      const search = screen.getByRole("textbox", { name: "Search applications" });
+      await user.type(search, "Rejected Company");
+      expect(screen.queryByRole("button", { name: /^Offer/ })).not.toBeInTheDocument();
+      expect(screen.queryByRole("option", { name: /^Offer/ })).not.toBeInTheDocument();
+      expect(select).toHaveValue("all");
+      expect(screen.getByRole("button", { name: "All Statuses 1" })).toHaveClass("bg-primary");
+      expect(screen.getByText("Rejected Company")).toBeInTheDocument();
+
+      await user.clear(search);
+      expect(select).toHaveValue("all");
+      expect(screen.getByText("Offer Company")).toBeInTheDocument();
+      expect(screen.getByText("Rejected Company")).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: "Offer 1" })).toBeInTheDocument();
+    },
+  );
 
   test.each(["desktop", "mobile"])(
     "filters offers and hired applications on %s and includes them in Active",

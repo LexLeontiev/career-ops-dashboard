@@ -183,6 +183,13 @@ export default function App() {
     if (status === "DISCARDED") counts.discarded++;
   });
 
+  if (
+    !["active", "evaluated", "all"].includes(statusFilter) &&
+    counts[statusFilter as keyof typeof counts] === 0
+  ) {
+    setStatusFilter("all");
+  }
+
   const filteredApps = applications.filter((app) => {
     // Search query match
     const term = searchQuery.toLowerCase();

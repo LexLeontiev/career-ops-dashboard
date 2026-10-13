@@ -10,6 +10,99 @@ afterEach(() => {
   vi.useRealTimers();
 });
 
+test.each<{
+  name: string;
+  counts: Record<string, number>;
+  buttons: string[];
+  options: string[];
+}>([
+  {
+    name: "all counts are zero",
+    counts: {
+      active: 0,
+      evaluated: 0,
+      all: 0,
+      applied: 0,
+      interview: 0,
+      offer: 0,
+      skip: 0,
+      rejected: 0,
+      discarded: 0,
+    },
+    buttons: ["Active 0", "Evaluated 0", "All Statuses 0"],
+    options: ["Active (0)", "Evaluated (0)", "All Statuses (0)"],
+  },
+  {
+    name: "status counts are absent",
+    counts: {},
+    buttons: ["Active 0", "Evaluated 0", "All Statuses 0"],
+    options: ["Active (0)", "Evaluated (0)", "All Statuses (0)"],
+  },
+  {
+    name: "only some statuses have matches",
+    counts: {
+      active: 3,
+      evaluated: 0,
+      all: 6,
+      applied: 1,
+      interview: 0,
+      offer: 2,
+      skip: 0,
+      rejected: 3,
+      discarded: 0,
+    },
+    buttons: ["Active 3", "Evaluated 0", "All Statuses 6", "Applied 1", "Offer 2", "Rejected 3"],
+    options: [
+      "Active (3)",
+      "Evaluated (0)",
+      "All Statuses (6)",
+      "Applied (1)",
+      "Offer (2)",
+      "Rejected (3)",
+    ],
+  },
+])("shows only nonempty status filters when $name", ({ counts, buttons, options }) => {
+  render(
+    <FilterBar
+      searchQuery=""
+      setSearchQuery={() => {}}
+      statusFilter="active"
+      setStatusFilter={() => {}}
+      counts={counts}
+    />,
+  );
+
+  const statusButtons = within(screen.getByRole("group", { name: "Status filters" })).getAllByRole(
+    "button",
+  );
+  expect(statusButtons.map((button) => button.textContent?.replace(/\s+/g, " ").trim())).toEqual(
+    buttons,
+  );
+  const statusOptions = within(
+    screen.getByRole("combobox", { name: "Filter by Status" }),
+  ).getAllByRole("option");
+  expect(statusOptions.map((option) => option.textContent)).toEqual(options);
+});
+
+test("restores status filters when their counts become positive again", () => {
+  const props = {
+    searchQuery: "",
+    setSearchQuery: () => {},
+    statusFilter: "active",
+    setStatusFilter: () => {},
+  };
+  const { rerender } = render(<FilterBar {...props} counts={{ interview: 1, offer: 2 }} />);
+  expect(screen.getByRole("button", { name: "Offer 2" })).toBeInTheDocument();
+
+  rerender(<FilterBar {...props} counts={{ interview: 0, offer: 0 }} />);
+  expect(screen.queryByRole("button", { name: /^Offer/ })).not.toBeInTheDocument();
+  expect(screen.queryByRole("option", { name: /^Offer/ })).not.toBeInTheDocument();
+
+  rerender(<FilterBar {...props} counts={{ interview: 1, offer: 2 }} />);
+  expect(screen.getByRole("button", { name: "Offer 2" })).toBeInTheDocument();
+  expect(screen.getByRole("option", { name: "Offer (2)" })).toBeInTheDocument();
+});
+
 test("shows Offer immediately after Interview in desktop and mobile filters", () => {
   render(
     <FilterBar
