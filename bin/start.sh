@@ -9,7 +9,6 @@ set -euo pipefail
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 PROJECT_ROOT="$(cd -- "$SCRIPT_DIR/.." && pwd -P)"
 cd "$PROJECT_ROOT"
-CAREER_OPS_ROOT="${CAREER_OPS_ROOT:-$PROJECT_ROOT/../career-ops}"
 
 bold()  { printf "\033[1m%s\033[0m\n" "$1"; }
 green() { printf "\033[32m%s\033[0m\n" "$1"; }
@@ -45,30 +44,45 @@ fi
 green "  ✓ Node $(node -v), npm $(npm -v)"
 
 # 2. Check for career-ops repository
-if [ ! -d "$CAREER_OPS_ROOT" ]; then
+RESOLVED_PATHS="$(node --input-type=module <<'NODE'
+import { getCareerOpsPaths } from './src/server/career-ops-paths.mjs';
+const paths = getCareerOpsPaths();
+console.log([paths.root, paths.dataRoot, paths.applicationsFile, paths.reportsDirectory, paths.parserFile].join('\n'));
+NODE
+)"
+{
+  IFS= read -r RESOLVED_CODE_ROOT
+  IFS= read -r RESOLVED_DATA_ROOT
+  IFS= read -r RESOLVED_TRACKER
+  IFS= read -r RESOLVED_REPORTS
+  IFS= read -r RESOLVED_PARSER
+} <<< "$RESOLVED_PATHS"
+
+if [ ! -d "$RESOLVED_CODE_ROOT" ]; then
   echo ""
-  red "  error: career-ops repository not found at '$CAREER_OPS_ROOT'."
+  red "  error: career-ops repository not found at '$RESOLVED_CODE_ROOT'."
   dim "  This dashboard is designed to run side-by-side with the career-ops CLI."
   dim "  Please clone it first:"
-  dim "    git clone https://github.com/santifer/career-ops.git $CAREER_OPS_ROOT"
+  dim "    git clone https://github.com/santifer/career-ops.git $RESOLVED_CODE_ROOT"
   echo ""
-  dim "  Or if it's located elsewhere, set the CAREER_OPS_ROOT environment variable:"
-  dim "    CAREER_OPS_ROOT=/path/to/career-ops bash bin/start.sh"
+  dim "  Or if it's located elsewhere, set the CAREER_OPS_CODE_ROOT environment variable:"
+  dim "    CAREER_OPS_CODE_ROOT=/path/to/career-ops bash bin/start.sh"
   exit 1
 fi
 
-if [ ! -f "$CAREER_OPS_ROOT/data/applications.md" ]; then
+if [ ! -f "$RESOLVED_TRACKER" ]; then
   dim "  ⚠ Tracker not initialized yet; dashboard will show setup guidance."
 fi
-if [ ! -d "$CAREER_OPS_ROOT/reports" ]; then
-  red "  error: career-ops is missing reports at '$CAREER_OPS_ROOT'."
+if [ ! -d "$RESOLVED_REPORTS" ]; then
+  red "  error: career-ops is missing reports at '$RESOLVED_REPORTS'."
   exit 1
 fi
-if [ ! -f "$CAREER_OPS_ROOT/tracker-parse.mjs" ]; then
-  red "  error: career-ops is missing tracker-parse.mjs at '$CAREER_OPS_ROOT'."
+if [ ! -f "$RESOLVED_PARSER" ]; then
+  red "  error: career-ops is missing tracker-parse.mjs at '$RESOLVED_PARSER'."
   exit 1
 fi
-green "  ✓ Found career-ops at $CAREER_OPS_ROOT"
+green "  ✓ Found career-ops at $RESOLVED_CODE_ROOT"
+green "  ✓ Reading career-ops data from $RESOLVED_DATA_ROOT"
 
 if [[ "${1:-}" == "--check" ]]; then
   green "  ✓ Environment check passed"
@@ -86,4 +100,5 @@ fi
 # 4. Start the server
 echo ""
 bold "  Starting career-ops-dashboard..."
-exec env CAREER_OPS_ROOT="$CAREER_OPS_ROOT" npm run dev
+exec env CAREER_OPS_CODE_ROOT="$RESOLVED_CODE_ROOT" CAREER_OPS_ROOT="$RESOLVED_DATA_ROOT" \
+  CAREER_OPS_DATA_DIR="$RESOLVED_DATA_ROOT" CAREER_OPS_TRACKER="$RESOLVED_TRACKER" npm run dev

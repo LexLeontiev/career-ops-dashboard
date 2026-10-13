@@ -4,6 +4,7 @@ coverage/
 package-lock.json
 .agent/
 .agents/
+.stitch/
 scratch/
 docs/superpowers/
 docs/assets/*.png

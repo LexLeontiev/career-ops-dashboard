@@ -12,6 +12,7 @@ coverage/
 .agent/
 .agents/
 .superpowers/
+.stitch/
 docs/superpowers/
 scratch/
 

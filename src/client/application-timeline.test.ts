@@ -41,15 +41,34 @@ test.each(["[2026-13-40·Evaluated] Keep this literal", "[2026-08-21·   ] Keep 
   },
 );
 
-test("keeps mixed legacy text and tags in the legacy format", () => {
-  const notes = "Existing note\n[2026-08-21·Evaluated] Strong match";
+test("dates the legacy preamble to the tracker row and parses subsequent events", () => {
+  const notes = "Existing note\nwith another line\n[2026-08-21·Evaluated] Strong match";
 
   expect(buildApplicationTimeline({ ...legacyApplication, notes })).toEqual([
     {
-      date: "2026-08-01",
-      status: "INTERVIEW",
-      comment: notes,
+      date: "2026-08-21",
+      status: "Evaluated",
+      comment: "Strong match",
     },
+    {
+      date: "2026-08-01",
+      status: "Note",
+      comment: "Existing note\nwith another line",
+    },
+  ]);
+});
+
+test("keeps tagged events ahead of the legacy note when their dates match", () => {
+  expect(
+    buildApplicationTimeline({
+      ...legacyApplication,
+      status: "HIRED",
+      notes: "Old context\n[2026-08-01·Applied] Applied\n[2026-08-01·Interview] Interview",
+    }),
+  ).toEqual([
+    { date: "2026-08-01", status: "Interview", comment: "Interview" },
+    { date: "2026-08-01", status: "Applied", comment: "Applied" },
+    { date: "2026-08-01", status: "Note", comment: "Old context" },
   ]);
 });
 

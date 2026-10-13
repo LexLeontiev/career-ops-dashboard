@@ -37,7 +37,7 @@ export function StatsOverview({ applications }: StatsOverviewProps) {
     if (status === "INTERVIEW") {
       interviews++;
     }
-    if (status === "OFFER") {
+    if (status === "OFFER" || status === "HIRED") {
       offers++;
     }
   }

@@ -153,6 +153,27 @@ test("renders unhighlighted Offers card when offer count is 0", () => {
   expect(html).not.toMatch(/stats-card--achievement/);
 });
 
+test("counts hired applications alongside offers and highlights the achievement", () => {
+  const { rerender } = render(
+    <StatsOverview applications={[{ score: "4.8/5", status: "HIRED" }]} />,
+  );
+  const offerCard = screen.getByText("Offers").closest<HTMLDivElement>(".stats-card");
+  expect(within(offerCard!).getByText("1")).toBeInTheDocument();
+  expect(offerCard).toHaveClass("stats-card--achievement", "border-on-surface");
+
+  rerender(
+    <StatsOverview
+      applications={[
+        { score: "4.8/5", status: "HIRED" },
+        { score: "4.5/5", status: "Hired" },
+        { score: "4.2/5", status: "Offer" },
+        { score: "4.0/5", status: "Interview" },
+      ]}
+    />,
+  );
+  expect(within(offerCard!).getByText("3")).toBeInTheDocument();
+});
+
 test("calculates response rate from submitted applications only", () => {
   const mockApps = [
     {

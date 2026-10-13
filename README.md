@@ -50,7 +50,7 @@ The dashboard reads these tags to show a chronological timeline with each applic
 
 ## Privacy and security
 
-The dashboard reads data only from your local career-ops checkout. It does not write to upstream files, send data to third parties, sync data to the cloud, require authentication, or collect telemetry. Operational errors may appear only in the local server console; the dashboard has no remote logging service. Keep resumes, trackers, reports, and credentials out of issues, pull requests, and screenshots.
+The dashboard reads data only from your local career-ops checkout or its configured external data directory. It does not write to upstream files, send data to third parties, sync data to the cloud, require authentication, or collect telemetry. Operational errors may appear only in the local server console; the dashboard has no remote logging service. Keep resumes, trackers, reports, and credentials out of issues, pull requests, and screenshots.
 
 The server binds to `127.0.0.1` by default. Changing `HOST` may expose private job-search data to your local network.
 
@@ -79,17 +79,33 @@ The dashboard remains read-only and never creates or modifies the tracker itself
 
 ## Configuration
 
-| Variable          | Default         | Purpose                                                                                                        |
-| ----------------- | --------------- | -------------------------------------------------------------------------------------------------------------- |
-| `CAREER_OPS_ROOT` | `../career-ops` | Path to the local career-ops checkout.                                                                         |
-| `HOST`            | `127.0.0.1`     | Address on which the API server listens. Changing it may expose private job-search data to your local network. |
-| `PORT`            | `3001`          | API server port.                                                                                               |
+| Variable               | Default         | Purpose                                                                                                                                                                                |
+| ---------------------- | --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `CAREER_OPS_CODE_ROOT` | `../career-ops` | Path to the local career-ops code checkout.                                                                                                                                            |
+| `CAREER_OPS_ROOT`      | Unset           | Upstream data-root override. For backward compatibility, a checkout containing `tracker-parse.mjs` or `package.json` is treated as the code root when `CAREER_OPS_CODE_ROOT` is unset. |
+| `CAREER_OPS_DATA_DIR`  | Unset           | External data directory; used when no data-root override is supplied in `CAREER_OPS_ROOT`.                                                                                             |
+| `CAREER_OPS_TRACKER`   | Unset           | Override the applications tracker file. Relative paths resolve from the dashboard working directory.                                                                                   |
+| `HOST`                 | `127.0.0.1`     | Address on which the API server listens. Changing it may expose private job-search data to your local network.                                                                         |
+| `PORT`                 | `3001`          | API server port.                                                                                                                                                                       |
 
 For a non-default upstream location:
 
 ```bash
-CAREER_OPS_ROOT=/path/to/career-ops bash bin/start.sh
+CAREER_OPS_CODE_ROOT=/path/to/career-ops bash bin/start.sh
 ```
+
+The dashboard supports career-ops' [external data directory](https://github.com/career-ops-hq/career-ops#external-data-directory-optional). It resolves personal data from `CAREER_OPS_ROOT`, then `CAREER_OPS_DATA_DIR`, then the `.career-ops-data` marker in the code checkout, and finally the checkout itself. Relative data-root and marker paths resolve against the code checkout, as in career-ops. Scripts continue to load from the code checkout; reports and reminder inputs follow the data root.
+
+If you already use `.career-ops-data`, no extra dashboard configuration is needed. For explicit separate locations:
+
+```bash
+CAREER_OPS_CODE_ROOT=/path/to/career-ops \
+CAREER_OPS_DATA_DIR=/path/to/personal-data bash bin/start.sh
+```
+
+Set `CAREER_OPS_CODE_ROOT` explicitly when using upstream's `CAREER_OPS_ROOT` as a data override, especially when the data directory is missing or also contains a copy of the code. The legacy `CAREER_OPS_ROOT=/path/to/career-ops` checkout setting remains supported and still honors `CAREER_OPS_DATA_DIR` and `.career-ops-data`.
+
+The tracker is read from `data/applications.md`, with `applications.md` in the data root supported as a fallback. Setup guidance appears only when the resolved tracker is absent; an existing empty tracker opens the dashboard normally. `bash bin/start.sh --check` checks the resolved locations without starting the dashboard.
 
 ## Development
 
@@ -126,9 +142,9 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for the data flow, read-only boundary, an
 
 ## Troubleshooting
 
-- If startup cannot find the upstream checkout, set `CAREER_OPS_ROOT` to its local path.
+- If startup cannot find the upstream checkout, set `CAREER_OPS_CODE_ROOT` to its local path.
 - If port `3001` is unavailable, start with another port: `PORT=3002 npm run dev`.
-- If `data/applications.md` is absent, open your AI CLI in the career-ops directory and complete first-run onboarding.
+- If the dashboard offers activation despite an existing tracker, run `bash bin/start.sh --check` and check the printed data root, `.career-ops-data`, and data-root environment overrides. If the resolved tracker is absent, open your AI CLI in the career-ops directory and complete first-run onboarding.
 - If the tracker parser, `followup-cadence.mjs`, or `reports/` directory is absent, update your local career-ops checkout before starting the dashboard.
 
 ## Contributing

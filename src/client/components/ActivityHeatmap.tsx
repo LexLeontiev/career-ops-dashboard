@@ -21,6 +21,7 @@ const intensityClasses = [
   "bg-primary/70",
   "bg-primary",
 ] as const;
+const offerClasses = "bg-emerald-600 dark:bg-emerald-400";
 
 function parseDate(date: string): Date {
   const [year, month, day] = date.split("-").map(Number);
@@ -29,12 +30,12 @@ function parseDate(date: string): Date {
 
 function activityLabel(day: ActivityDay): string {
   const interaction = day.count === 1 ? "interaction" : "interactions";
-  return `${dateLabelFormatter.format(parseDate(day.date))}: ${day.count} ${interaction}`;
+  return `${dateLabelFormatter.format(parseDate(day.date))}: ${day.count} ${interaction}${day.hasOffer ? ", offer milestone" : ""}`;
 }
 
 function tooltipLabel(day: ActivityDay): string {
   const action = day.count === 1 ? "action" : "actions";
-  return `${tooltipDateFormatter.format(parseDate(day.date))} · ${day.count} ${action}`;
+  return `${tooltipDateFormatter.format(parseDate(day.date))} · ${day.count} ${action}${day.hasOffer ? " · Offer milestone" : ""}`;
 }
 
 function buildCalendarCells(days: ActivityDay[]): Array<ActivityDay | null> {
@@ -169,7 +170,7 @@ export function ActivityHeatmap({ days }: { days: ActivityDay[] }) {
                       onMouseLeave={() => setHoveredTooltip(null)}
                       onFocus={(event) => setFocusedTooltip(buildTooltip(event.currentTarget, day))}
                       onBlur={() => setFocusedTooltip(null)}
-                      className={`h-3 w-3 rounded-[3px] border-[0.5px] border-border-subtle/50 outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-surface-card ${intensityClasses[Math.min(day.count, 4)]}`}
+                      className={`h-3 w-3 rounded-[3px] border-[0.5px] border-border-subtle/50 outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-surface-card ${day.hasOffer ? offerClasses : intensityClasses[Math.min(day.count, 4)]}`}
                     />
                   );
                 })}
@@ -191,6 +192,13 @@ export function ActivityHeatmap({ days }: { days: ActivityDay[] }) {
         aria-label="Activity intensity: less to more"
         className="mt-stack-sm flex items-center justify-end gap-1.5 font-label-sm text-label-sm text-on-surface-variant"
       >
+        <span className="mr-auto flex items-center gap-1.5">
+          <span
+            aria-hidden="true"
+            className={`h-3 w-3 rounded-[3px] border-[0.5px] border-border-subtle/50 ${offerClasses}`}
+          />
+          Offer
+        </span>
         <span>Less</span>
         {intensityClasses.map((className) => (
           <span

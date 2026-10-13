@@ -206,3 +206,30 @@ test("keeps the tooltip while a cell remains hovered or focused", async () => {
   expect(calendar).toHaveFocus();
   expect(screen.getByRole("tooltip")).toBeInTheDocument();
 });
+
+test("distinguishes offer milestones from activity intensity and explains them on hover and focus", async () => {
+  const user = userEvent.setup();
+  render(
+    <ActivityHeatmap
+      days={[
+        { date: "2026-08-19", count: 5, hasOffer: true },
+        { date: "2026-08-20", count: 5 },
+      ]}
+    />,
+  );
+  const offerDay = screen.getByRole("img", { name: /August 19, 2026.*offer/i });
+  expect(offerDay).toHaveClass("bg-emerald-600", "dark:bg-emerald-400");
+  expect(offerDay).not.toHaveClass("bg-primary");
+  expect(screen.getByRole("img", { name: "August 20, 2026: 5 interactions" })).toHaveClass(
+    "bg-primary",
+  );
+  expect(screen.getByText("Offer")).toBeInTheDocument();
+
+  await user.hover(offerDay);
+  expect(screen.getByRole("tooltip")).toHaveTextContent(/Aug 19.*5 actions.*Offer/i);
+  await user.unhover(offerDay);
+  await user.tab();
+  await user.tab();
+  expect(offerDay).toHaveFocus();
+  expect(screen.getByRole("tooltip")).toHaveTextContent(/Offer/i);
+});

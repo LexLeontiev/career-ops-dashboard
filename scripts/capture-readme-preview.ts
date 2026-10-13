@@ -4,10 +4,14 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { chromium } from "@playwright/test";
 import { createReadmeDemoData } from "./readme-demo-data.js";
+import { createReadmePreviewSettings } from "./readme-preview-settings.js";
 
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const previewPath = path.join(repositoryRoot, "docs", "assets", "dashboard-preview.png");
-const timelinePreviewPath = path.join(repositoryRoot, "docs", "assets", "timeline-preview.png");
+const { theme, dashboardFilename, timelineFilename } = createReadmePreviewSettings(
+  process.env.README_PREVIEW_THEME,
+);
+const previewPath = path.join(repositoryRoot, "docs", "assets", dashboardFilename);
+const timelinePreviewPath = path.join(repositoryRoot, "docs", "assets", timelineFilename);
 const port = 4173;
 const previewUrl = `http://127.0.0.1:${port}`;
 const demoData = createReadmeDemoData();
@@ -54,10 +58,10 @@ try {
       timezoneId: "Europe/Madrid",
       locale: "en-US",
     });
-    await page.addInitScript(() => {
-      localStorage.setItem("career_ops_theme", "dark");
+    await page.addInitScript((captureTheme) => {
+      localStorage.setItem("career_ops_theme", captureTheme);
       localStorage.setItem("career_ops_blur_mode", "false");
-    });
+    }, theme);
     await page.route("**/api/applications", (route) =>
       route.fulfill({ json: demoData.applications }),
     );
@@ -66,8 +70,8 @@ try {
     await page.goto(previewUrl, { waitUntil: "networkidle" });
     await page.getByRole("heading", { name: "Activity" }).waitFor();
     await page
-      .getByText("Total Applications", { exact: true })
-      .locator("xpath=..")
+      .locator(".stats-card")
+      .filter({ has: page.getByText("Total Evaluated", { exact: true }) })
       .getByText("56", { exact: true })
       .waitFor();
     await page.screenshot({ path: previewPath });
@@ -91,4 +95,4 @@ try {
   }
 }
 
-console.log(`Updated README preview assets with synthetic demo data.`);
+console.log(`Updated ${theme}-theme README preview assets with synthetic demo data.`);
