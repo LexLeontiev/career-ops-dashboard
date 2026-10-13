@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import { afterEach, expect, test, vi } from "vitest";
 import React from "react";
 import { renderToString } from "react-dom/server";
@@ -8,6 +8,33 @@ import { FilterBar } from "./FilterBar.js";
 afterEach(() => {
   cleanup();
   vi.useRealTimers();
+});
+
+test("shows Offer immediately after Interview in desktop and mobile filters", () => {
+  render(
+    <FilterBar
+      searchQuery=""
+      setSearchQuery={() => {}}
+      statusFilter="active"
+      setStatusFilter={() => {}}
+      counts={{ active: 5, interview: 1, offer: 2 }}
+    />,
+  );
+
+  const buttons = within(screen.getByRole("group", { name: "Status filters" })).getAllByRole(
+    "button",
+  );
+  const interviewIndex = buttons.findIndex((button) => button.textContent?.startsWith("Interview"));
+  expect(buttons[interviewIndex + 1]).toHaveTextContent("Offer 2");
+
+  const options = within(screen.getByRole("combobox", { name: "Filter by Status" })).getAllByRole(
+    "option",
+  );
+  const interviewOptionIndex = options.findIndex((option) =>
+    option.textContent?.startsWith("Interview"),
+  );
+  expect(options[interviewOptionIndex + 1]).toHaveTextContent("Offer (2)");
+  expect(options[interviewOptionIndex + 1]).toHaveValue("offer");
 });
 
 test("renders status select dropdown for mobile screens with correct counts and new option order", () => {

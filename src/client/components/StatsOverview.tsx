@@ -34,7 +34,7 @@ export function StatsOverview({ applications }: StatsOverviewProps) {
       }
     }
 
-    if (status === "APPLIED" || status === "INTERVIEW" || status === "RESPONDED") {
+    if (["APPLIED", "INTERVIEW", "RESPONDED", "OFFER", "HIRED"].includes(status)) {
       active++;
     }
     if (status === "INTERVIEW") {

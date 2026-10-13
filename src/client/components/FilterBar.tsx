@@ -60,6 +60,7 @@ export function FilterBar({
           <option value="all">{`All Statuses (${counts.all ?? 0})`}</option>
           <option value="applied">{`Applied (${counts.applied ?? 0})`}</option>
           <option value="interview">{`Interview (${counts.interview ?? 0})`}</option>
+          <option value="offer">{`Offer (${counts.offer ?? 0})`}</option>
           <option value="skip">{`Skip (${counts.skip ?? 0})`}</option>
           <option value="rejected">{`Rejected (${counts.rejected ?? 0})`}</option>
           <option value="discarded">{`Discarded (${counts.discarded ?? 0})`}</option>
@@ -115,6 +116,13 @@ export function FilterBar({
           >
             Interview{" "}
             <span className="opacity-50 text-xs ml-1.5 font-normal">{counts.interview}</span>
+          </button>
+
+          <button
+            onClick={() => setStatusFilter("offer")}
+            className={`flex-shrink-0 px-5 py-2 rounded-full font-label-md text-label-md transition-colors flex items-center ${statusFilter === "offer" ? "bg-primary text-on-primary-container" : "border border-border-subtle text-on-surface-variant hover:bg-surface-hover"}`}
+          >
+            Offer <span className="opacity-50 text-xs ml-1.5 font-normal">{counts.offer ?? 0}</span>
           </button>
 
           <button

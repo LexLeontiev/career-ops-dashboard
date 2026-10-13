@@ -38,7 +38,7 @@ test("renders aggregated stats correctly including Interview Stage and Offers", 
     },
   ];
   const html = renderToString(React.createElement(StatsOverview, { applications: mockApps }));
-  expect(html).toMatch(/Active Processes.*1/);
+  expect(html).toMatch(/Active Processes.*2/);
   expect(html).toMatch(/Interview Stage.*0/);
   expect(html).toMatch(/Offers.*1/);
   expect(html).toMatch(/Response Rate.*50.*%/);
@@ -114,6 +114,27 @@ test("uses the existing primary accent for active processes", () => {
     .closest<HTMLDivElement>(".stats-card");
   expect(activeProcessesCard).not.toBeNull();
   expect(within(activeProcessesCard!).getByText("0")).toHaveClass("text-primary");
+});
+
+test("includes offers and hired applications in Active Processes", () => {
+  render(
+    <StatsOverview
+      applications={[
+        { score: "4.8/5", status: "Offer" },
+        { score: "4.5/5", status: "HIRED" },
+        { score: "4.2/5", status: "Applied" },
+        { score: "4.1/5", status: "Interview" },
+        { score: "4.0/5", status: "Responded" },
+        { score: "3.9/5", status: "Rejected" },
+        { score: "3.8/5", status: "Discarded" },
+        { score: "3.7/5", status: "Skip" },
+        { score: "3.6/5", status: "Evaluated" },
+      ]}
+    />,
+  );
+
+  const activeCard = screen.getByText("Active Processes").closest<HTMLDivElement>(".stats-card");
+  expect(within(activeCard!).getByText("5")).toBeInTheDocument();
 });
 
 test("activates the achievement styling only while actual offers are present", () => {

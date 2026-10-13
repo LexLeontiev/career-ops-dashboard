@@ -153,6 +153,7 @@ export default function App() {
     active: 0,
     applied: 0,
     interview: 0,
+    offer: 0,
     evaluated: 0,
     skip: 0,
     rejected: 0,
@@ -171,10 +172,11 @@ export default function App() {
     counts.all++;
     const status = (app.status || "").toUpperCase();
 
-    if (status === "APPLIED" || status === "INTERVIEW" || status === "RESPONDED") counts.active++;
+    if (["APPLIED", "INTERVIEW", "RESPONDED", "OFFER", "HIRED"].includes(status)) counts.active++;
 
     if (status === "APPLIED") counts.applied++;
     if (status === "INTERVIEW") counts.interview++;
+    if (status === "OFFER" || status === "HIRED") counts.offer++;
     if (status === "EVALUATED") counts.evaluated++;
     if (status === "SKIP") counts.skip++;
     if (status === "REJECTED") counts.rejected++;
@@ -193,9 +195,11 @@ export default function App() {
     const status = (app.status || "").toUpperCase();
     let matchesStatus = true;
     if (statusFilter === "active") {
-      matchesStatus = status === "APPLIED" || status === "INTERVIEW" || status === "RESPONDED";
+      matchesStatus = ["APPLIED", "INTERVIEW", "RESPONDED", "OFFER", "HIRED"].includes(status);
     } else if (statusFilter === "interview") {
       matchesStatus = status === "INTERVIEW";
+    } else if (statusFilter === "offer") {
+      matchesStatus = status === "OFFER" || status === "HIRED";
     } else if (statusFilter === "evaluated") {
       matchesStatus = status === "EVALUATED";
     } else if (statusFilter === "skip") {
