@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import React from "react";
-import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import type { Application } from "../shared/application.js";
 import App from "./App.js";
@@ -232,8 +232,205 @@ describe("App application loading lifecycle", () => {
     const search = screen.getByPlaceholderText("Search company, role, or notes...");
     await user.type(search, "No Match");
     expect(screen.queryByText("Acme Labs")).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /^Interview/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole("option", { name: /^Interview/ })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Active 0" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Evaluated 0" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "All Statuses 0" })).toBeInTheDocument();
 
     await user.clear(search);
     expect(screen.getByText("Acme Labs")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Interview 1" })).toBeInTheDocument();
+    expect(screen.getByRole("option", { name: "Interview (1)" })).toBeInTheDocument();
   });
+
+  test.each(["desktop", "mobile"])(
+    "switches to All Statuses when the selected status disappears on %s",
+    async (layout) => {
+      const applications = [
+        { ...application, num: 1, company: "Offer Company", status: "Offer" },
+        { ...application, num: 2, company: "Rejected Company", status: "Rejected" },
+      ];
+      vi.stubGlobal(
+        "fetch",
+        vi.fn((input: RequestInfo | URL) =>
+          Promise.resolve(
+            new Response(
+              JSON.stringify(String(input) === "/api/applications" ? applications : []),
+              { status: 200, headers: { "content-type": "application/json" } },
+            ),
+          ),
+        ),
+      );
+      const user = userEvent.setup();
+      render(<App />);
+      await screen.findByText("Offer Company");
+
+      const select = screen.getByRole("combobox", { name: "Filter by Status" });
+      if (layout === "mobile") {
+        await user.selectOptions(select, "offer");
+      } else {
+        await user.click(screen.getByRole("button", { name: "Offer 1" }));
+      }
+
+      const search = screen.getByRole("textbox", { name: "Search applications" });
+      await user.type(search, "Rejected Company");
+      expect(screen.queryByRole("button", { name: /^Offer/ })).not.toBeInTheDocument();
+      expect(screen.queryByRole("option", { name: /^Offer/ })).not.toBeInTheDocument();
+      expect(select).toHaveValue("all");
+      expect(screen.getByRole("button", { name: "All Statuses 1" })).toHaveClass("bg-primary");
+      expect(screen.getByText("Rejected Company")).toBeInTheDocument();
+
+      await user.clear(search);
+      expect(select).toHaveValue("all");
+      expect(screen.getByText("Offer Company")).toBeInTheDocument();
+      expect(screen.getByText("Rejected Company")).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: "Offer 1" })).toBeInTheDocument();
+    },
+  );
+
+  test("sorts Last Interaction by the newest timeline update in both directions", async () => {
+    const applications = [
+      {
+        ...application,
+        num: 1,
+        company: "Latest Update Company",
+        date: "2025-08-01",
+        notes: "[2025-08-21·Interview] Latest update\n[2025-08-02·Applied] Earlier update",
+      },
+      {
+        ...application,
+        num: 2,
+        company: "Earlier Update Company",
+        date: "2025-08-10",
+        notes: "[2025-08-15·Interview] Earlier update",
+      },
+      {
+        ...application,
+        num: 3,
+        company: "Legacy Company",
+        date: "2025-08-18",
+        notes: "Undated legacy update",
+      },
+    ];
+    vi.stubGlobal(
+      "fetch",
+      vi.fn((input: RequestInfo | URL) =>
+        Promise.resolve(
+          new Response(JSON.stringify(String(input) === "/api/applications" ? applications : []), {
+            status: 200,
+            headers: { "content-type": "application/json" },
+          }),
+        ),
+      ),
+    );
+    const user = userEvent.setup();
+    render(<App />);
+    await screen.findByText("Latest Update Company");
+
+    const companiesInOrder = () =>
+      within(screen.getByRole("table"))
+        .getAllByRole("row")
+        .slice(1)
+        .map((row) => within(row).getAllByRole("cell")[1].textContent);
+    const sortButton = screen.getByRole("button", { name: "Sort by Last Interaction" });
+    await user.click(sortButton);
+    expect(companiesInOrder()).toEqual([
+      "Latest Update Company",
+      "Legacy Company",
+      "Earlier Update Company",
+    ]);
+    expect(screen.getByRole("columnheader", { name: /Last Interaction/ })).toHaveAttribute(
+      "aria-sort",
+      "descending",
+    );
+
+    await user.click(sortButton);
+    expect(companiesInOrder()).toEqual([
+      "Earlier Update Company",
+      "Legacy Company",
+      "Latest Update Company",
+    ]);
+    expect(screen.getByRole("columnheader", { name: /Last Interaction/ })).toHaveAttribute(
+      "aria-sort",
+      "ascending",
+    );
+  });
+
+  test.each(["desktop", "mobile"])(
+    "filters offers and hired applications on %s and includes them in Active",
+    async (layout) => {
+      const applications = [
+        "Offer",
+        "HIRED",
+        "Applied",
+        "Interview",
+        "Responded",
+        "Rejected",
+        "Discarded",
+        "Skip",
+        "Evaluated",
+      ].map((status, index) => ({
+        ...application,
+        num: index + 1,
+        company: `${status} Company`,
+        status,
+      }));
+      vi.stubGlobal(
+        "fetch",
+        vi.fn((input: RequestInfo | URL) =>
+          Promise.resolve(
+            new Response(
+              JSON.stringify(String(input) === "/api/applications" ? applications : []),
+              { status: 200, headers: { "content-type": "application/json" } },
+            ),
+          ),
+        ),
+      );
+      const user = userEvent.setup();
+      render(<App />);
+
+      await screen.findByText("Offer Company");
+      expect(screen.getByText("HIRED Company")).toBeInTheDocument();
+      expect(screen.queryByText("Rejected Company")).not.toBeInTheDocument();
+      expect(screen.getByRole("button", { name: "Active 5" })).toBeInTheDocument();
+      const activeCard = screen
+        .getByText("Active Processes")
+        .closest<HTMLDivElement>(".stats-card");
+      expect(within(activeCard!).getByText("5")).toBeInTheDocument();
+
+      const selectFilter = async (value: string, label: string) => {
+        if (layout === "mobile") {
+          await user.selectOptions(
+            screen.getByRole("combobox", { name: "Filter by Status" }),
+            value,
+          );
+        } else {
+          await user.click(screen.getByRole("button", { name: label }));
+        }
+      };
+      await selectFilter("offer", "Offer 2");
+      expect(screen.getByText("Offer Company")).toBeInTheDocument();
+      expect(screen.getByText("HIRED Company")).toBeInTheDocument();
+      expect(screen.queryByText("Interview Company")).not.toBeInTheDocument();
+      expect(screen.queryByText("Applied Company")).not.toBeInTheDocument();
+      expect(screen.queryByText("Responded Company")).not.toBeInTheDocument();
+
+      const search = screen.getByRole("textbox", { name: "Search applications" });
+      await user.type(search, "Offer Company");
+      expect(screen.getByText("Offer Company")).toBeInTheDocument();
+      expect(screen.queryByText("HIRED Company")).not.toBeInTheDocument();
+      expect(screen.getByRole("button", { name: "Offer 1" })).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: "Active 1" })).toBeInTheDocument();
+      await user.clear(search);
+
+      await selectFilter("active", "Active 5");
+      for (const status of ["Offer", "HIRED", "Applied", "Interview", "Responded"]) {
+        expect(screen.getByText(`${status} Company`)).toBeInTheDocument();
+      }
+      for (const status of ["Rejected", "Discarded", "Skip", "Evaluated"]) {
+        expect(screen.queryByText(`${status} Company`)).not.toBeInTheDocument();
+      }
+    },
+  );
 });

@@ -4,6 +4,7 @@ import type { Application } from "../shared/application.js";
 import type { Reminder } from "../shared/reminder.js";
 import { fetchApplications, fetchReminders, TrackerNotInitializedError } from "./api.js";
 import { buildActivityDays, trackerAndNotesDateStrategy } from "./activity.js";
+import { buildApplicationTimeline } from "./application-timeline.js";
 import { ActivityHeatmap } from "./components/ActivityHeatmap.js";
 import { RemindersWidget } from "./components/RemindersWidget.js";
 import { StatsOverview } from "./components/StatsOverview.js";
@@ -153,6 +154,7 @@ export default function App() {
     active: 0,
     applied: 0,
     interview: 0,
+    offer: 0,
     evaluated: 0,
     skip: 0,
     rejected: 0,
@@ -171,15 +173,23 @@ export default function App() {
     counts.all++;
     const status = (app.status || "").toUpperCase();
 
-    if (status === "APPLIED" || status === "INTERVIEW" || status === "RESPONDED") counts.active++;
+    if (["APPLIED", "INTERVIEW", "RESPONDED", "OFFER", "HIRED"].includes(status)) counts.active++;
 
     if (status === "APPLIED") counts.applied++;
     if (status === "INTERVIEW") counts.interview++;
+    if (status === "OFFER" || status === "HIRED") counts.offer++;
     if (status === "EVALUATED") counts.evaluated++;
     if (status === "SKIP") counts.skip++;
     if (status === "REJECTED") counts.rejected++;
     if (status === "DISCARDED") counts.discarded++;
   });
+
+  if (
+    !["active", "evaluated", "all"].includes(statusFilter) &&
+    counts[statusFilter as keyof typeof counts] === 0
+  ) {
+    setStatusFilter("all");
+  }
 
   const filteredApps = applications.filter((app) => {
     // Search query match
@@ -193,9 +203,11 @@ export default function App() {
     const status = (app.status || "").toUpperCase();
     let matchesStatus = true;
     if (statusFilter === "active") {
-      matchesStatus = status === "APPLIED" || status === "INTERVIEW" || status === "RESPONDED";
+      matchesStatus = ["APPLIED", "INTERVIEW", "RESPONDED", "OFFER", "HIRED"].includes(status);
     } else if (statusFilter === "interview") {
       matchesStatus = status === "INTERVIEW";
+    } else if (statusFilter === "offer") {
+      matchesStatus = status === "OFFER" || status === "HIRED";
     } else if (statusFilter === "evaluated") {
       matchesStatus = status === "EVALUATED";
     } else if (statusFilter === "skip") {
@@ -213,8 +225,10 @@ export default function App() {
 
   const sortedApps = [...filteredApps].sort((a, b) => {
     if (!sortField) return 0;
-    const aVal = a[sortField];
-    const bVal = b[sortField];
+    const aVal =
+      sortField === "date" ? (buildApplicationTimeline(a)[0]?.date ?? a.date) : a[sortField];
+    const bVal =
+      sortField === "date" ? (buildApplicationTimeline(b)[0]?.date ?? b.date) : b[sortField];
 
     if (sortField === "score") {
       const aScore = parseFloat(String(aVal));

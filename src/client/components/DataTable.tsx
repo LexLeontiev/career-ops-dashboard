@@ -309,7 +309,7 @@ export function DataTable({
                         revealLabel="Reveal last interaction date"
                         variant="date"
                       >
-                        {formatDate(app.date)}
+                        {formatDate(timeline[0]?.date ?? app.date)}
                       </PrivacyText>
                     </td>
 

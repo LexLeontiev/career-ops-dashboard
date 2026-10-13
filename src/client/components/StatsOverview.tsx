@@ -5,6 +5,7 @@ import "./StatsOverview.css";
 interface AppData {
   score: string;
   status: string;
+  notes?: string;
 }
 
 interface StatsOverviewProps {
@@ -26,12 +27,14 @@ export function StatsOverview({ applications }: StatsOverviewProps) {
     if (status !== "SKIP" && status !== "EVALUATED" && status !== "") {
       submitted++;
       applied++;
-      if (status !== "APPLIED") {
+      const rejectedWithoutResponse =
+        status === "REJECTED" && /\breason\s*:\s*no_response_over_month\b/i.test(app.notes ?? "");
+      if (status !== "APPLIED" && !rejectedWithoutResponse) {
         responses++;
       }
     }
 
-    if (status === "APPLIED" || status === "INTERVIEW" || status === "RESPONDED") {
+    if (["APPLIED", "INTERVIEW", "RESPONDED", "OFFER", "HIRED"].includes(status)) {
       active++;
     }
     if (status === "INTERVIEW") {

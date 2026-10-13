@@ -88,6 +88,29 @@ test("keeps an invalid ISO date literal", () => {
   expect(screen.getByRole("row", { name: /acme labs/i })).toHaveTextContent("2026-02-30");
 });
 
+test.each([
+  {
+    notes: "[2025-08-21·Interview] Latest update\n[2025-08-20·Applied] Older update",
+    expectedDate: "21.08",
+  },
+  { notes: "Legacy comment", expectedDate: "01.08" },
+  { notes: "[2025-13-40·Interview] Invalid update date", expectedDate: "01.08" },
+])("uses the last update date for notes $notes", ({ notes, expectedDate }) => {
+  render(
+    <DataTable
+      applications={[{ ...application, notes }]}
+      onSelect={vi.fn()}
+      sortField="date"
+      sortOrder="desc"
+      onSort={vi.fn()}
+    />,
+  );
+
+  const row = screen.getByRole("row", { name: /acme labs/i });
+  const dateCell = within(row).getAllByRole("cell")[4];
+  expect(dateCell).toHaveTextContent(expectedDate);
+});
+
 test("centers a single-line comment vertically in its two-line slot", () => {
   const style = document.createElement("style");
   const indexCss = readFileSync("src/client/index.css", "utf8");
@@ -153,6 +176,7 @@ test("shows the latest tagged comment and expands progress in reverse chronologi
   expect(applicationRow).toHaveTextContent("Strong match");
   expect(applicationRow).not.toHaveTextContent("Submitted resume");
   expect(applicationRow).not.toHaveTextContent("[2025-08-21·Evaluated]");
+  expect(within(applicationRow).getByText("21.08")).toBeInTheDocument();
 
   await user.click(applicationRow);
 
@@ -160,7 +184,6 @@ test("shows the latest tagged comment and expands progress in reverse chronologi
   expect(timelineStatuses).toHaveLength(2);
   expect(timelineStatuses[0]).toHaveTextContent("Status: Evaluated");
   expect(timelineStatuses[1]).toHaveTextContent("Status: Applied");
-  expect(screen.getByText("21.08")).toBeInTheDocument();
 });
 
 test("expands mixed legacy notes and dated milestones without attributing the current status to the old note", async () => {
