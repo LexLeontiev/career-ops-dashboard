@@ -1,4 +1,5 @@
 import type { Application } from "../shared/application.js";
+import { buildApplicationTimeline } from "./application-timeline.js";
 
 export type ActivityDateStrategy = (application: Application) => string[];
 
@@ -12,6 +13,7 @@ export const trackerAndNotesDateStrategy: ActivityDateStrategy = (application) =
 export interface ActivityDay {
   date: string;
   count: number;
+  hasOffer?: boolean;
 }
 
 function formatLocalDate(date: Date): string {
@@ -35,6 +37,7 @@ export function buildActivityDays(
   todayDate: Date,
 ): ActivityDay[] {
   const companiesByDate = new Map<string, Set<string>>();
+  const offerDates = new Set<string>();
   const todayAtNoon = new Date(
     todayDate.getFullYear(),
     todayDate.getMonth(),
@@ -46,6 +49,16 @@ export function buildActivityDays(
   const today = formatLocalDate(todayAtNoon);
 
   for (const application of applications) {
+    const timeline = buildApplicationTimeline(application).reverse();
+    // Prefer the original offer date over later offer updates or acceptance.
+    // Legacy records use the tracker's date through the existing timeline fallback.
+    const milestone =
+      timeline.find((entry) => entry.status.trim().toUpperCase() === "OFFER") ??
+      timeline.find((entry) => entry.status.trim().toUpperCase() === "HIRED");
+    if (milestone && milestone.date >= start && milestone.date <= today) {
+      offerDates.add(milestone.date);
+    }
+
     for (const date of new Set(strategy(application))) {
       if (date < start || date > today) continue;
       const companies = companiesByDate.get(date) ?? new Set<string>();
@@ -61,7 +74,11 @@ export function buildActivityDays(
     cursor.setDate(cursor.getDate() + 1)
   ) {
     const date = formatLocalDate(cursor);
-    days.push({ date, count: companiesByDate.get(date)?.size ?? 0 });
+    days.push({
+      date,
+      count: companiesByDate.get(date)?.size ?? 0,
+      ...(offerDates.has(date) ? { hasOffer: true } : {}),
+    });
   }
   return days;
 }

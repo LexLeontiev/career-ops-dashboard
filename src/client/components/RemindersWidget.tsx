@@ -1,4 +1,5 @@
 import React from "react";
+import { useElementOverlayScrollbar } from "../overlay-scrollbar.js";
 
 export interface ReminderItem {
   date: string;
@@ -76,6 +77,7 @@ export function RemindersWidget({
   const sortedItems = [...items].sort(
     (a, b) => localNoon(a.date).getTime() - localNoon(b.date).getTime(),
   );
+  const { onScroll, onThumbPointerDown, scrollbar } = useElementOverlayScrollbar("vertical");
 
   return (
     <section
@@ -84,7 +86,9 @@ export function RemindersWidget({
       role="region"
     >
       <div className="mb-stack-md flex items-baseline justify-between gap-4">
-        <h2 className="font-headline-sm text-headline-sm text-on-surface">Reminders</h2>
+        <h2 className="font-headline-sm text-headline-sm text-on-surface">
+          Reminders ({sortedItems.length})
+        </h2>
       </div>
       {hasError ? (
         <p className="flex flex-1 items-center justify-center text-sm text-text-secondary">
@@ -95,26 +99,43 @@ export function RemindersWidget({
           No reminders scheduled.
         </p>
       ) : (
-        <ul className="min-h-0 flex-1 space-y-2 overflow-y-auto" aria-label="Reminders list">
-          {sortedItems.map((item, index) => (
-            <li
-              key={`${item.date}-${item.company}-${index}`}
-              className="rounded-lg bg-surface-container px-3 py-2 text-sm"
-            >
-              <div className="text-xs text-text-secondary">{formatDateLabel(item.date, today)}</div>
-              <div className="font-medium text-on-surface">
-                <PrivacyText variant="company" isBlurred={isBlurred}>
-                  {item.company}
-                </PrivacyText>
-              </div>
-              <div className="text-xs text-text-secondary">
-                <PrivacyText variant="timeline-notes" isBlurred={isBlurred}>
-                  {formatNotes(item.notes)}
-                </PrivacyText>
-              </div>
-            </li>
-          ))}
-        </ul>
+        <div className="relative min-h-0 flex-1">
+          <ul
+            className="scrollbar-autohide h-full space-y-2 overflow-y-auto"
+            aria-label="Reminders list"
+            tabIndex={0}
+            onScroll={onScroll}
+          >
+            {sortedItems.map((item, index) => (
+              <li
+                key={`${item.date}-${item.company}-${index}`}
+                className="rounded-lg bg-surface-container px-3 py-2 text-sm"
+              >
+                <div className="text-xs text-text-secondary">
+                  {formatDateLabel(item.date, today)}
+                </div>
+                <div className="font-medium text-on-surface">
+                  <PrivacyText variant="company" isBlurred={isBlurred}>
+                    {item.company}
+                  </PrivacyText>
+                </div>
+                <div className="text-xs text-text-secondary">
+                  <PrivacyText variant="timeline-notes" isBlurred={isBlurred}>
+                    {formatNotes(item.notes)}
+                  </PrivacyText>
+                </div>
+              </li>
+            ))}
+          </ul>
+          {scrollbar.visible && (
+            <span
+              aria-hidden="true"
+              className="overlay-scrollbar overlay-scrollbar--vertical"
+              onPointerDown={onThumbPointerDown}
+              style={{ top: `${scrollbar.offset}%`, height: `${scrollbar.size}%` }}
+            />
+          )}
+        </div>
       )}
     </section>
   );

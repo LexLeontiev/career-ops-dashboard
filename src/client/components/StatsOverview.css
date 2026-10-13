@@ -1,0 +1,29 @@
+.stats-card {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.stats-card__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.stats-card__value {
+  line-height: 1;
+  margin-bottom: 8px;
+}
+
+.stats-card__caption {
+  min-height: 28px;
+  line-height: 14px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stats-card {
+    transition: none;
+  }
+}

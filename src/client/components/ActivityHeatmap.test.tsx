@@ -1,11 +1,14 @@
 // @vitest-environment jsdom
 import React from "react";
-import { cleanup, render, screen, within } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
-import { afterEach, expect, test } from "vitest";
+import { afterEach, expect, test, vi } from "vitest";
 import { ActivityHeatmap } from "./ActivityHeatmap.js";
 
-afterEach(cleanup);
+afterEach(() => {
+  cleanup();
+  vi.useRealTimers();
+});
 
 test("renders accessible cells for every activity intensity", () => {
   render(
@@ -89,6 +92,40 @@ test("renders calendar labels, legend, and a scrollable activity region", () => 
   expect(screen.getByText("More")).toBeInTheDocument();
 });
 
+test("briefly reveals the activity scrollbar after horizontal scrolling", () => {
+  vi.useFakeTimers();
+  render(<ActivityHeatmap days={[{ date: "2026-08-20", count: 2 }]} />);
+
+  const calendar = screen.getByRole("region", { name: "Activity calendar" });
+  expect(calendar.parentElement?.querySelector(".overlay-scrollbar")).not.toBeInTheDocument();
+
+  fireEvent.scroll(calendar);
+  expect(calendar.parentElement?.querySelector(".overlay-scrollbar")).toBeInTheDocument();
+
+  act(() => vi.advanceTimersByTime(900));
+  expect(calendar.parentElement?.querySelector(".overlay-scrollbar")).not.toBeInTheDocument();
+});
+
+test("lets a mouse drag on the activity scrollbar move the calendar", () => {
+  render(<ActivityHeatmap days={[{ date: "2026-08-20", count: 2 }]} />);
+
+  const calendar = screen.getByRole("region", { name: "Activity calendar" });
+  Object.defineProperties(calendar, {
+    clientWidth: { configurable: true, value: 100 },
+    scrollLeft: { configurable: true, value: 0, writable: true },
+    scrollWidth: { configurable: true, value: 400 },
+  });
+
+  fireEvent.scroll(calendar);
+  const scrollbar = calendar.parentElement?.querySelector(".overlay-scrollbar");
+  expect(scrollbar).toBeInTheDocument();
+
+  fireEvent.pointerDown(scrollbar!, { clientX: 0, pointerId: 1 });
+  fireEvent.pointerMove(window, { clientX: 30, pointerId: 1 });
+
+  expect(calendar.scrollLeft).toBeGreaterThan(0);
+});
+
 test("hides a prior month label when its first day is outside the activity range", () => {
   render(
     <ActivityHeatmap
@@ -168,4 +205,31 @@ test("keeps the tooltip while a cell remains hovered or focused", async () => {
   await user.tab({ shift: true });
   expect(calendar).toHaveFocus();
   expect(screen.getByRole("tooltip")).toBeInTheDocument();
+});
+
+test("distinguishes offer milestones from activity intensity and explains them on hover and focus", async () => {
+  const user = userEvent.setup();
+  render(
+    <ActivityHeatmap
+      days={[
+        { date: "2026-08-19", count: 5, hasOffer: true },
+        { date: "2026-08-20", count: 5 },
+      ]}
+    />,
+  );
+  const offerDay = screen.getByRole("img", { name: /August 19, 2026.*offer/i });
+  expect(offerDay).toHaveClass("bg-emerald-600", "dark:bg-emerald-400");
+  expect(offerDay).not.toHaveClass("bg-primary");
+  expect(screen.getByRole("img", { name: "August 20, 2026: 5 interactions" })).toHaveClass(
+    "bg-primary",
+  );
+  expect(screen.getByText("Offer")).toBeInTheDocument();
+
+  await user.hover(offerDay);
+  expect(screen.getByRole("tooltip")).toHaveTextContent(/Aug 19.*5 actions.*Offer/i);
+  await user.unhover(offerDay);
+  await user.tab();
+  await user.tab();
+  expect(offerDay).toHaveFocus();
+  expect(screen.getByRole("tooltip")).toHaveTextContent(/Offer/i);
 });

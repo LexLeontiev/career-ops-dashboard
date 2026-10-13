@@ -1,13 +1,20 @@
 import React from "react";
+import { StatsCard } from "./StatsCard.js";
+import "./StatsOverview.css";
 
 interface AppData {
   score: string;
   status: string;
 }
 
-export function StatsOverview({ applications }: { applications: AppData[] }) {
+interface StatsOverviewProps {
+  readonly applications: AppData[];
+}
+
+export function StatsOverview({ applications }: StatsOverviewProps) {
   const total = applications.length;
   let active = 0;
+  let applied = 0;
   let interviews = 0;
   let offers = 0;
   let responses = 0;
@@ -18,6 +25,7 @@ export function StatsOverview({ applications }: { applications: AppData[] }) {
 
     if (status !== "SKIP" && status !== "EVALUATED" && status !== "") {
       submitted++;
+      applied++;
       if (status !== "APPLIED") {
         responses++;
       }
@@ -29,7 +37,7 @@ export function StatsOverview({ applications }: { applications: AppData[] }) {
     if (status === "INTERVIEW") {
       interviews++;
     }
-    if (status === "OFFER") {
+    if (status === "OFFER" || status === "HIRED") {
       offers++;
     }
   }
@@ -38,39 +46,40 @@ export function StatsOverview({ applications }: { applications: AppData[] }) {
   const hasOffers = offers > 0;
 
   return (
-    <section className="grid grid-cols-2 md:grid-cols-6 lg:grid-cols-5 gap-gutter mb-stack-lg">
-      <div className="col-span-1 md:col-span-3 lg:col-span-1 bg-surface-card p-6 rounded-xl border border-border-subtle hover:border-primary/50 transition-colors">
-        <div className="text-text-secondary font-label-sm text-label-sm uppercase mb-2">
-          Total Applications
-        </div>
-        <div className="text-on-surface font-headline-lg text-headline-lg">{total}</div>
-      </div>
-      <div className="col-span-1 md:col-span-3 lg:col-span-1 bg-surface-card p-6 rounded-xl border border-border-subtle hover:border-primary/50 transition-colors">
-        <div className="text-text-secondary font-label-sm text-label-sm uppercase mb-2">
-          Active Processes
-        </div>
-        <div className="text-primary font-headline-lg text-headline-lg">{active}</div>
-      </div>
-      <div className="col-span-1 md:col-span-2 lg:col-span-1 bg-surface-card p-6 rounded-xl border border-border-subtle hover:border-primary/50 transition-colors">
-        <div className="text-text-secondary font-label-sm text-label-sm uppercase mb-2">
-          Interview Stage
-        </div>
-        <div className="text-secondary font-headline-lg text-headline-lg">{interviews}</div>
-      </div>
-      <div className="col-span-1 md:col-span-2 lg:col-span-1 bg-surface-card p-6 rounded-xl border border-border-subtle hover:border-primary/50 transition-colors">
-        <div className="text-text-secondary font-label-sm text-label-sm uppercase mb-2">Offers</div>
-        <div
-          className={`font-headline-lg text-headline-lg ${hasOffers ? "text-violet-600 dark:text-violet-400 font-bold" : "text-text-secondary"}`}
-        >
-          {offers}
-        </div>
-      </div>
-      <div className="col-span-2 md:col-span-2 lg:col-span-1 bg-surface-card p-6 rounded-xl border border-border-subtle hover:border-primary/50 transition-colors">
-        <div className="text-text-secondary font-label-sm text-label-sm uppercase mb-2">
-          Response Rate
-        </div>
-        <div className="text-tertiary font-headline-lg text-headline-lg">{responseRate}%</div>
-      </div>
+    <section className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-gutter mb-stack-lg">
+      <StatsCard label="Total Evaluated" value={total} caption="All tracked applications" />
+      <StatsCard
+        label="Total Applied"
+        value={applied}
+        caption="All submitted applications"
+        valueClassName="text-blue-500 dark:text-blue-300"
+      />
+      <StatsCard
+        label="Active Processes"
+        value={active}
+        caption="Active application processes"
+        valueClassName="text-primary"
+      />
+      <StatsCard
+        label="Interview Stage"
+        value={interviews}
+        caption="Interviews in progress"
+        valueClassName="text-tertiary"
+      />
+      <StatsCard
+        label="Offers"
+        value={offers}
+        caption="Received offer letters"
+        valueClassName={
+          hasOffers ? "text-emerald-600 dark:text-emerald-400" : "text-text-secondary"
+        }
+        achievement={hasOffers}
+      />
+      <StatsCard
+        label="Response Rate"
+        value={`${responseRate}%`}
+        caption="Responses to applications"
+      />
     </section>
   );
 }

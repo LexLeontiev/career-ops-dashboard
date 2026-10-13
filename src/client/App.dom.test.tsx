@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import React from "react";
-import { cleanup, render, screen, waitFor } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import type { Application } from "../shared/application.js";
 import App from "./App.js";
@@ -55,6 +55,20 @@ describe("App application loading lifecycle", () => {
     expect(screen.getByRole("status")).toHaveTextContent("Loading applications…");
     await waitFor(() => expect(screen.queryByRole("status")).not.toBeInTheDocument());
     expect(screen.getByText("Acme Labs")).toBeInTheDocument();
+  });
+
+  test("briefly reveals the page scrollbar after scrolling", async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(applicationsResponse()));
+
+    render(<App />);
+    await screen.findByText("Acme Labs");
+
+    fireEvent.scroll(window);
+    expect(document.querySelector(".page-scrollbar-overlay")).toBeInTheDocument();
+
+    act(() => vi.advanceTimersByTime(900));
+    expect(document.querySelector(".page-scrollbar-overlay")).not.toBeInTheDocument();
   });
 
   test("uses note dates for activity by default", async () => {

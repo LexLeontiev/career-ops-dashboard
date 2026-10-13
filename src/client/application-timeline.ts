@@ -30,10 +30,7 @@ export function buildApplicationTimeline(
   const hasInvalidTag = matches.some(
     (match) => !isValidIsoDate(match[1]) || match[2].trim().length === 0,
   );
-  const hasLegacyPreamble =
-    matches.length > 0 && application.notes.slice(0, matches[0].index).trim().length > 0;
-
-  if (matches.length === 0 || hasInvalidTag || hasLegacyPreamble) {
+  if (matches.length === 0 || hasInvalidTag) {
     return [
       {
         date: application.date,
@@ -57,6 +54,17 @@ export function buildApplicationTimeline(
       sourceIndex,
     };
   });
+
+  const legacyPreamble = application.notes.slice(0, matches[0].index).trim();
+  if (legacyPreamble) {
+    entries.push({
+      date: application.date,
+      // The current status does not describe when the undated note was written.
+      status: "Note",
+      comment: legacyPreamble,
+      sourceIndex: -1,
+    });
+  }
 
   return entries
     .sort(

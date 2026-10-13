@@ -163,6 +163,39 @@ test("shows the latest tagged comment and expands progress in reverse chronologi
   expect(screen.getByText("21.08")).toBeInTheDocument();
 });
 
+test("expands mixed legacy notes and dated milestones without attributing the current status to the old note", async () => {
+  const user = userEvent.setup();
+  render(
+    <DataTable
+      applications={[
+        {
+          ...application,
+          date: "2026-07-17",
+          status: "Hired",
+          notes:
+            "Old application context\n[2026-09-29·Offer] Received an offer\n[2026-09-30·Hired] Accepted the offer",
+        },
+      ]}
+      onSelect={vi.fn()}
+      sortField="score"
+      sortOrder="desc"
+      onSort={vi.fn()}
+    />,
+  );
+
+  const row = screen.getByRole("row", { name: /acme labs/i });
+  expect(row).toHaveTextContent("Accepted the offer");
+  expect(row).not.toHaveTextContent("Old application context");
+  await user.click(row);
+  expect(screen.getAllByRole("heading", { level: 4 }).map((el) => el.textContent)).toEqual([
+    "Status: Hired",
+    "Status: Offer",
+    "Status: Note",
+  ]);
+  expect(screen.getByText("Old application context")).toBeInTheDocument();
+  expect(screen.getByText("Received an offer")).toBeInTheDocument();
+});
+
 test.each([
   ["invalid date", "[2026-13-40·Evaluated] Keep this literal"],
   ["blank status", "[2026-08-21·   ] Keep this literal"],
