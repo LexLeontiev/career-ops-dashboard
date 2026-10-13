@@ -4,6 +4,7 @@ import type { Application } from "../shared/application.js";
 import type { Reminder } from "../shared/reminder.js";
 import { fetchApplications, fetchReminders, TrackerNotInitializedError } from "./api.js";
 import { buildActivityDays, trackerAndNotesDateStrategy } from "./activity.js";
+import { buildApplicationTimeline } from "./application-timeline.js";
 import { ActivityHeatmap } from "./components/ActivityHeatmap.js";
 import { RemindersWidget } from "./components/RemindersWidget.js";
 import { StatsOverview } from "./components/StatsOverview.js";
@@ -224,8 +225,10 @@ export default function App() {
 
   const sortedApps = [...filteredApps].sort((a, b) => {
     if (!sortField) return 0;
-    const aVal = a[sortField];
-    const bVal = b[sortField];
+    const aVal =
+      sortField === "date" ? (buildApplicationTimeline(a)[0]?.date ?? a.date) : a[sortField];
+    const bVal =
+      sortField === "date" ? (buildApplicationTimeline(b)[0]?.date ?? b.date) : b[sortField];
 
     if (sortField === "score") {
       const aScore = parseFloat(String(aVal));

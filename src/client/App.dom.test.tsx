@@ -289,6 +289,74 @@ describe("App application loading lifecycle", () => {
     },
   );
 
+  test("sorts Last Interaction by the newest timeline update in both directions", async () => {
+    const applications = [
+      {
+        ...application,
+        num: 1,
+        company: "Latest Update Company",
+        date: "2025-08-01",
+        notes: "[2025-08-21·Interview] Latest update\n[2025-08-02·Applied] Earlier update",
+      },
+      {
+        ...application,
+        num: 2,
+        company: "Earlier Update Company",
+        date: "2025-08-10",
+        notes: "[2025-08-15·Interview] Earlier update",
+      },
+      {
+        ...application,
+        num: 3,
+        company: "Legacy Company",
+        date: "2025-08-18",
+        notes: "Undated legacy update",
+      },
+    ];
+    vi.stubGlobal(
+      "fetch",
+      vi.fn((input: RequestInfo | URL) =>
+        Promise.resolve(
+          new Response(JSON.stringify(String(input) === "/api/applications" ? applications : []), {
+            status: 200,
+            headers: { "content-type": "application/json" },
+          }),
+        ),
+      ),
+    );
+    const user = userEvent.setup();
+    render(<App />);
+    await screen.findByText("Latest Update Company");
+
+    const companiesInOrder = () =>
+      within(screen.getByRole("table"))
+        .getAllByRole("row")
+        .slice(1)
+        .map((row) => within(row).getAllByRole("cell")[1].textContent);
+    const sortButton = screen.getByRole("button", { name: "Sort by Last Interaction" });
+    await user.click(sortButton);
+    expect(companiesInOrder()).toEqual([
+      "Latest Update Company",
+      "Legacy Company",
+      "Earlier Update Company",
+    ]);
+    expect(screen.getByRole("columnheader", { name: /Last Interaction/ })).toHaveAttribute(
+      "aria-sort",
+      "descending",
+    );
+
+    await user.click(sortButton);
+    expect(companiesInOrder()).toEqual([
+      "Earlier Update Company",
+      "Legacy Company",
+      "Latest Update Company",
+    ]);
+    expect(screen.getByRole("columnheader", { name: /Last Interaction/ })).toHaveAttribute(
+      "aria-sort",
+      "ascending",
+    );
+  });
+
   test.each(["desktop", "mobile"])(
     "filters offers and hired applications on %s and includes them in Active",
     async (layout) => {
